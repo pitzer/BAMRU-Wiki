@@ -4,7 +4,7 @@ require File.expand_path('./lib/env_settings', File.dirname(__FILE__))
 
 # ===== App Config =====
 set :app_name,    APP_NAME         # <- this comes from lib/env_settings
-set :application, "BAMRU-Private"
+set :application, "BAMRU-Wiki"
 set :repository,  "https://github.com/andyl/#{application}.git"
 set :vhost_names, %w(wiki wikitest)
 set :web_port,    8888
