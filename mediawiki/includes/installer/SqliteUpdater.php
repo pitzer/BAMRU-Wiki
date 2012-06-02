@@ -43,7 +43,6 @@ class SqliteUpdater extends DatabaseUpdater {
 
 			// 1.17
 			array( 'addTable', 'iwlinks',                           'patch-iwlinks.sql' ),
-			array( 'addTable', 'user_former_groups',                'patch-user_former_groups.sql'),
 			array( 'addIndex', 'iwlinks',   'iwl_prefix_title_from', 'patch-rename-iwl_prefix.sql' ),
 			array( 'addField', 'updatelog', 'ul_value',             'patch-ul_value.sql' ),
 			array( 'addField', 'interwiki',     'iw_api',           'patch-iw_api_and_wikiid.sql' ),
@@ -59,16 +58,25 @@ class SqliteUpdater extends DatabaseUpdater {
 			// 1.18
 			array( 'addIndex', 'user',          'user_email',       'patch-user_email_index.sql' ),
 			array( 'addTable', 'uploadstash',                       'patch-uploadstash.sql' ),
+			array( 'addTable', 'user_former_groups',                'patch-user_former_groups.sql'),
 
 			// 1.19
-			array( 'addTable', 'config',                            'patch-config.sql' ),
 			array( 'addIndex', 'logging',       'type_action',      'patch-logging-type-action-index.sql'),
+			array( 'doMigrateUserOptions' ),
+			array( 'dropField', 'user',         'user_options', 'patch-drop-user_options.sql' ),
+			array( 'addField', 'revision',      'rev_sha1',         'patch-rev_sha1.sql' ),
+			array( 'addField', 'archive',       'ar_sha1',          'patch-ar_sha1.sql' ),
+			array( 'addIndex', 'page', 'page_redirect_namespace_len', 'patch-page_redirect_namespace_len.sql' ),
+			array( 'modifyField', 'user_groups', 'ug_group', 'patch-ug_group-length-increase.sql' ),
+			array( 'addField',	'uploadstash',	'us_chunk_inx',		'patch-uploadstash_chunk.sql' ),
+			array( 'addfield', 'job',           'job_timestamp',    'patch-jobs-add-timestamp.sql' ),
+			array( 'modifyField', 'user_former_groups', 'ufg_group', 'patch-ug_group-length-increase.sql' ),
 		);
 	}
 
 	protected function sqliteInitialIndexes() {
 		// initial-indexes.sql fails if the indexes are already present, so we perform a quick check if our database is newer.
-		if ( $this->updateRowExists( 'initial_indexes' ) || $this->db->indexExists( 'user', 'user_name' ) ) {
+		if ( $this->updateRowExists( 'initial_indexes' ) || $this->db->indexExists( 'user', 'user_name', __METHOD__ ) ) {
 			$this->output( "...have initial indexes\n" );
 			return;
 		}

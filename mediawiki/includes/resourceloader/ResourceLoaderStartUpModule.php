@@ -38,21 +38,8 @@ class ResourceLoaderStartUpModule extends ResourceLoaderModule {
 			$wgVariantArticlePath, $wgActionPaths, $wgUseAjax, $wgVersion,
 			$wgEnableAPI, $wgEnableWriteAPI, $wgDBname, $wgEnableMWSuggest,
 			$wgSitename, $wgFileExtensions, $wgExtensionAssetsPath,
-			$wgCookiePrefix, $wgResourceLoaderMaxQueryLength, $wgLegacyJavaScriptGlobals;
+			$wgCookiePrefix, $wgResourceLoaderMaxQueryLength;
 
-		// Pre-process information
-		$separatorTransTable = $wgContLang->separatorTransformTable();
-		$separatorTransTable = $separatorTransTable ? $separatorTransTable : array();
-		$compactSeparatorTransTable = array(
-			implode( "\t", array_keys( $separatorTransTable ) ),
-			implode( "\t", $separatorTransTable ),
-		);
-		$digitTransTable = $wgContLang->digitTransformTable();
-		$digitTransTable = $digitTransTable ? $digitTransTable : array();
-		$compactDigitTransTable = array(
-			implode( "\t", array_keys( $digitTransTable ) ),
-			implode( "\t", $digitTransTable ),
-		);
 		$mainPage = Title::newMainPage();
 
 		/**
@@ -69,10 +56,6 @@ class ResourceLoaderStartUpModule extends ResourceLoaderModule {
 			}
 		}
 
-
-		$serverBits = wfParseUrl( $wgServer );
-		$protocol = $serverBits ? $serverBits['scheme'] : 'http';
-
 		// Build list of variables
 		$vars = array(
 			'wgLoadScript' => $wgLoadScript,
@@ -85,7 +68,9 @@ class ResourceLoaderStartUpModule extends ResourceLoaderModule {
 			'wgScriptExtension' => $wgScriptExtension,
 			'wgScript' => $wgScript,
 			'wgVariantArticlePath' => $wgVariantArticlePath,
-			'wgActionPaths' => $wgActionPaths,
+			// Force object to avoid "empty" associative array from
+			// becoming [] instead of {} in JS (bug 34604)
+			'wgActionPaths' => (object)$wgActionPaths,
 			'wgServer' => $wgServer,
 			'wgUserLanguage' => $context->getLanguage(),
 			'wgContentLanguage' => $wgContLang->getCode(),
@@ -95,8 +80,6 @@ class ResourceLoaderStartUpModule extends ResourceLoaderModule {
 			'wgDefaultDateFormat' => $wgContLang->getDefaultDateFormat(),
 			'wgMonthNames' => $wgContLang->getMonthNamesArray(),
 			'wgMonthNamesShort' => $wgContLang->getMonthAbbreviationsArray(),
-			'wgSeparatorTransformTable' => $compactSeparatorTransTable,
-			'wgDigitTransformTable' => $compactDigitTransTable,
 			'wgMainPageTitle' => $mainPage ? $mainPage->getPrefixedText() : null,
 			'wgFormattedNamespaces' => $wgContLang->getFormattedNamespaces(),
 			'wgNamespaceIds' => $namespaceIds,
@@ -108,11 +91,9 @@ class ResourceLoaderStartUpModule extends ResourceLoaderModule {
 			'wgFileCanRotate' => BitmapHandler::canRotate(),
 			'wgAvailableSkins' => Skin::getSkinNames(),
 			'wgExtensionAssetsPath' => $wgExtensionAssetsPath,
-			'wgProto' => $protocol,
 			// MediaWiki sets cookies to have this prefix by default
 			'wgCookiePrefix' => $wgCookiePrefix,
 			'wgResourceLoaderMaxQueryLength' => $wgResourceLoaderMaxQueryLength,
-			'wgLegacyJavaScriptGlobals' => $wgLegacyJavaScriptGlobals,
 			'wgCaseSensitiveNamespaces' => $caseSensitiveNamespaces,
 		);
 		if ( $wgUseAjax && $wgEnableMWSuggest ) {
@@ -173,7 +154,7 @@ class ResourceLoaderStartUpModule extends ResourceLoaderModule {
 				}
 				// Modules with a group but no foreign source pass four arguments (name, timestamp, dependencies, group)
 				// to mw.loader.register()
-				else if ( $module->getSource() === 'local' ) {
+				elseif ( $module->getSource() === 'local' ) {
 					$registrations[] = array(
 						$name, $mtime,  $module->getDependencies(), $module->getGroup() );
 				}
@@ -244,6 +225,13 @@ class ResourceLoaderStartUpModule extends ResourceLoaderModule {
 		}
 
 		return $out;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function supportsURLLoading() {
+		return false;
 	}
 
 	/**

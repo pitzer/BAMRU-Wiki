@@ -136,7 +136,7 @@ class Interwiki {
 	/**
 	 * Load the interwiki, trying first memcached then the DB
 	 *
-	 * @param $prefix The interwiki prefix
+	 * @param $prefix string The interwiki prefix
 	 * @return Boolean: the prefix is valid
 	 */
 	protected static function load( $prefix ) {
@@ -150,6 +150,9 @@ class Interwiki {
 		if ( !$iwData ) {
 			$key = wfMemcKey( 'interwiki', $prefix );
 			$iwData = $wgMemc->get( $key );
+			if ( $iwData === '!NONEXISTENT' ) {
+				return false; // negative cache hit
+			}
 		}
 
 		if( $iwData && is_array( $iwData ) ) { // is_array is hack for old keys
@@ -173,6 +176,8 @@ class Interwiki {
 			);
 			$wgMemc->add( $key, $mc, $wgInterwikiExpiry );
 			return $iw;
+		} else {
+			$wgMemc->add( $key, '!NONEXISTENT', $wgInterwikiExpiry ); // negative cache hit
 		}
 
 		return false;
@@ -181,8 +186,8 @@ class Interwiki {
 	/**
 	 * Fill in member variables from an array (e.g. memcached result, Database::fetchRow, etc)
 	 *
-	 * @param $mc Associative array: row from the interwiki table
-	 * @return Boolean: whether everything was there
+	 * @param $mc array Associative array: row from the interwiki table
+	 * @return Boolean|Interwiki whether everything was there
 	 */
 	protected static function loadFromArray( $mc ) {
 		if( isset( $mc['iw_url'] ) ) {
@@ -201,7 +206,7 @@ class Interwiki {
 	/**
 	 * Fetch all interwiki prefixes from interwiki cache
 	 *
-	 * @param $local If not null, limits output to local/non-local interwikis
+	 * @param $local null|string If not null, limits output to local/non-local interwikis
 	 * @return Array List of prefixes
 	 * @since 1.19
 	 */
@@ -265,7 +270,7 @@ class Interwiki {
 	/**
 	 * Fetch all interwiki prefixes from DB
 	 *
-	 * @param $local If not null, limits output to local/non-local interwikis
+	 * @param $local string|null If not null, limits output to local/non-local interwikis
 	 * @return Array List of prefixes
 	 * @since 1.19
 	 */
@@ -296,7 +301,7 @@ class Interwiki {
 	/**
 	 * Returns all interwiki prefixes
 	 *
-	 * @param $local If set, limits output to local/non-local interwikis
+	 * @param $local string|null If set, limits output to local/non-local interwikis
 	 * @return Array List of prefixes
 	 * @since 1.19
 	 */
@@ -315,11 +320,14 @@ class Interwiki {
 	 *
 	 * @param $title String: what text to put for the article name
 	 * @return String: the URL
+	 * @note Prior to 1.19 The getURL with an argument was broken.
+	 *       If you if you use this arg in an extension that supports MW earlier
+	 *       than 1.19 please wfUrlencode and substitute $1 on your own.
 	 */
 	public function getURL( $title = null ) {
 		$url = $this->mURL;
-		if( $title != null ) {
-			$url = str_replace( "$1", $title, $url );
+		if( $title !== null ) {
+			$url = str_replace( "$1", wfUrlencode( $title ), $url );
 		}
 		return $url;
 	}

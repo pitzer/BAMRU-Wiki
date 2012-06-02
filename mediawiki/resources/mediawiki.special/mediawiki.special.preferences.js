@@ -22,13 +22,13 @@ $legends.each( function( i, legend ) {
 		$legend.parent().show();
 	}
 	var ident = $legend.parent().attr( 'id' );
-	
+
 	var $li = $( '<li/>', {
 		'class' : ( i === 0 ) ? 'selected' : null
 	});
 	var $a = $( '<a/>', {
 		text : $legend.text(),
-		id   : ident.replace('prefsection', 'preftab'),
+		id : ident.replace( 'mw-prefsection', 'preftab' ),
 		href : '#' + ident
 	}).click( function( e ) {
 		e.preventDefault();
@@ -37,7 +37,7 @@ $legends.each( function( i, legend ) {
 		var scrollTop = $(window).scrollTop();
 		window.location.hash = $(this).attr('href');
 		$(window).scrollTop(scrollTop);
-		
+
 		$preftoc.find( 'li' ).removeClass( 'selected' );
 		$(this).parent().addClass( 'selected' );
 		$( '#preferences > fieldset' ).hide();
@@ -52,46 +52,11 @@ $legends.each( function( i, legend ) {
 // On document ready:
 $( function() {
 	var hash = window.location.hash;
-	if( hash.match( /^#prefsection-[\w-]+/ ) ) {
-		var $tab = $( hash.replace('prefsection', 'preftab') );
+	if( hash.match( /^#mw-prefsection-[\w-]+/ ) ) {
+		var $tab = $( hash.replace( 'mw-prefsection', 'preftab' ) );
 		$tab.click();
 	}
 } );
-
-/**
- * Given an email validity status (true, false, null) update the label CSS class
- */
-var updateMailValidityLabel = function( mail ) {
-	var	isValid = mw.util.validateEmail( mail ),
-		$label = $( '#mw-emailaddress-validity' );
-
-	// We allow empty address
-	if( isValid === null ) {
-		$label.text( '' ).removeClass( 'valid invalid' );
-
-	// Valid
-	} else if ( isValid ) {
-		$label.text( mw.msg( 'email-address-validity-valid' ) ).addClass( 'valid' ).removeClass( 'invalid' );
-
-	// Not valid
-	} else {
-		$label.text( mw.msg( 'email-address-validity-invalid' ) ).addClass( 'invalid' ).removeClass( 'valid' );
-	}
-};
-
-// Lame tip to let user know if its email is valid. See bug 22449
-// Only bind once for 'blur' so that the user can fill it in without errors
-// After that look at every keypress for direct feedback if it was invalid onblur
-$( '#mw-input-wpemailaddress' ).one( 'blur', function() {
-	if ( $( '#mw-emailaddress-validity' ).length === 0 ) {
-		$(this).after( '<label for="mw-input-wpemailaddress" id="mw-emailaddress-validity"></label>' );
-	}
-	updateMailValidityLabel( $(this).val() );
-	$(this).keyup( function() {
-		updateMailValidityLabel( $(this).val() );
-	} );
-} );
-
 
 
 /**
@@ -145,7 +110,7 @@ var updateTimezoneSelection = function() {
 		$tzTextbox.val( minutesToHours( minuteDiff ) );
 		$tzSelect.val( 'other' );
 		$tzTextbox.get( 0 ).disabled = false;
-	} else if ( type == 'other'  ) {
+	} else if ( type == 'other' ) {
 		// Grab data from the textbox, parse it.
 		minuteDiff = hoursToMinutes( $tzTextbox.val() );
 	} else {

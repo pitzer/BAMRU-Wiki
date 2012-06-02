@@ -24,11 +24,6 @@
  * @file
  */
 
-if ( !defined( 'MEDIAWIKI' ) ) {
-	// Eclipse helper - will be ignored in production
-	require_once( 'ApiQueryBase.php' );
-}
-
 /**
  * Query module to get information about a list of users
  *
@@ -74,7 +69,7 @@ class ApiQueryUsers extends ApiQueryBase {
 		global $wgUser;
 		// Since the permissions check for userrights is non-trivial,
 		// don't bother with it here
-		return $wgUser->editToken( $user->getName() );
+		return $wgUser->getEditToken( $user->getName() );
 	}
 
 	public function execute() {
@@ -152,6 +147,10 @@ class ApiQueryUsers extends ApiQueryBase {
 					}
 				}
 
+				if ( isset( $this->prop['implicitgroups'] ) && !isset( $data[$name]['implicitgroups'] ) ) {
+					$data[$name]['implicitgroups'] =  self::getAutoGroups( $user );
+				}
+
 				if ( isset( $this->prop['rights'] ) ) {
 					if ( !isset( $data[$name]['rights'] ) ) {
 						$data[$name]['rights'] = User::getGroupPermissions( $user->getAutomaticGroups() );
@@ -226,6 +225,9 @@ class ApiQueryUsers extends ApiQueryBase {
 				if ( isset( $this->prop['groups'] ) && isset( $data[$u]['groups'] ) ) {
 					$result->setIndexedTagName( $data[$u]['groups'], 'g' );
 				}
+				if ( isset( $this->prop['implicitgroups'] ) && isset( $data[$u]['implicitgroups'] ) ) {
+					$result->setIndexedTagName( $data[$u]['implicitgroups'], 'g' );
+				}
 				if ( isset( $this->prop['rights'] ) && isset( $data[$u]['rights'] ) ) {
 					$result->setIndexedTagName( $data[$u]['rights'], 'r' );
 				}
@@ -256,12 +258,7 @@ class ApiQueryUsers extends ApiQueryBase {
 			$groups[] = 'user';
 		}
 
-		$builtGroups = array();
-		foreach( array_merge( $groups, Autopromote::getAutopromoteGroups( $user ) ) as $i => $group ) {
-			$builtGroups[$i] = array( 'implicit' => '' );
-			ApiResult::setContent( $builtGroups[$i], $group );
-		}
-		return $builtGroups;
+		return array_merge( $groups, Autopromote::getAutopromoteGroups( $user ) );
 	}
 
 	public function getCacheMode( $params ) {
@@ -280,6 +277,7 @@ class ApiQueryUsers extends ApiQueryBase {
 				ApiBase::PARAM_TYPE => array(
 					'blockinfo',
 					'groups',
+					'implicitgroups',
 					'rights',
 					'editcount',
 					'registration',
@@ -301,13 +299,14 @@ class ApiQueryUsers extends ApiQueryBase {
 		return array(
 			'prop' => array(
 				'What pieces of information to include',
-				'  blockinfo    - Tags if the user is blocked, by whom, and for what reason',
-				'  groups       - Lists all the groups the user(s) belongs to',
-				'  rights       - Lists all the rights the user(s) has',
-				'  editcount    - Adds the user\'s edit count',
-				'  registration - Adds the user\'s registration timestamp',
-				'  emailable    - Tags if the user can and wants to receive e-mail through [[Special:Emailuser]]',
-				'  gender       - Tags the gender of the user. Returns "male", "female", or "unknown"',
+				'  blockinfo      - Tags if the user is blocked, by whom, and for what reason',
+				'  groups         - Lists all the groups the user(s) belongs to',
+				'  implicitgroups - Lists all the groups a user is automatically a member of',
+				'  rights         - Lists all the rights the user(s) has',
+				'  editcount      - Adds the user\'s edit count',
+				'  registration   - Adds the user\'s registration timestamp',
+				'  emailable      - Tags if the user can and wants to receive e-mail through [[Special:Emailuser]]',
+				'  gender         - Tags the gender of the user. Returns "male", "female", or "unknown"',
 			),
 			'users' => 'A list of users to obtain the same information for',
 			'token' => 'Which tokens to obtain for each user',
@@ -318,15 +317,15 @@ class ApiQueryUsers extends ApiQueryBase {
 		return 'Get information about a list of users';
 	}
 
-	protected function getExamples() {
+	public function getExamples() {
 		return 'api.php?action=query&list=users&ususers=brion|TimStarling&usprop=groups|editcount|gender';
 	}
 
 	public function getHelpUrls() {
-		return 'http://www.mediawiki.org/wiki/API:Users';
+		return 'https://www.mediawiki.org/wiki/API:Users';
 	}
 
 	public function getVersion() {
-		return __CLASS__ . ': $Id: ApiQueryUsers.php 92477 2011-07-18 21:26:33Z reedy $';
+		return __CLASS__ . ': $Id$';
 	}
 }

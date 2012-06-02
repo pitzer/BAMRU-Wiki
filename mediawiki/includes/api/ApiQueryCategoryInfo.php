@@ -24,11 +24,6 @@
  * @file
  */
 
-if ( !defined( 'MEDIAWIKI' ) ) {
-	// Eclipse helper - will be ignored in production
-	require_once( "ApiQueryBase.php" );
-}
-
 /**
  * This query adds the <categories> subelement to all pages with the list of categories the page is in
  *
@@ -115,15 +110,15 @@ class ApiQueryCategoryInfo extends ApiQueryBase {
 		return 'Returns information about the given categories';
 	}
 
-	protected function getExamples() {
+	public function getExamples() {
 		return 'api.php?action=query&prop=categoryinfo&titles=Category:Foo|Category:Bar';
 	}
 
 	public function getHelpUrls() {
-		return 'http://www.mediawiki.org/wiki/API:Properties#categoryinfo_.2F_ci';
+		return 'https://www.mediawiki.org/wiki/API:Properties#categoryinfo_.2F_ci';
 	}
 
 	public function getVersion() {
-		return __CLASS__ . ': $Id: ApiQueryCategoryInfo.php 92400 2011-07-17 16:51:11Z reedy $';
+		return __CLASS__ . ': $Id$';
 	}
 }

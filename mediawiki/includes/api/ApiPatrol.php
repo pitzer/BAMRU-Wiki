@@ -24,10 +24,6 @@
  * @file
  */
 
-if ( !defined( 'MEDIAWIKI' ) ) {
-	require_once ( 'ApiBase.php' );
-}
-
 /**
  * Allows user to patrol pages
  * @ingroup API
@@ -42,15 +38,13 @@ class ApiPatrol extends ApiBase {
 	 * Patrols the article or provides the reason the patrol failed.
 	 */
 	public function execute() {
-		global $wgUser;
-
 		$params = $this->extractRequestParams();
 
 		$rc = RecentChange::newFromID( $params['rcid'] );
 		if ( !$rc instanceof RecentChange ) {
 			$this->dieUsageMsg( array( 'nosuchrcid', $params['rcid'] ) );
 		}
-		$retval = $rc->doMarkPatrolled( $wgUser );
+		$retval = $rc->doMarkPatrolled( $this->getUser() );
 
 		if ( $retval ) {
 			$this->dieUsageMsg( reset( $retval ) );
@@ -104,17 +98,17 @@ class ApiPatrol extends ApiBase {
 		return 'patrol';
 	}
 
-	protected function getExamples() {
+	public function getExamples() {
 		return array(
 			'api.php?action=patrol&token=123abc&rcid=230672766'
 		);
 	}
 
 	public function getHelpUrls() {
-		return 'http://www.mediawiki.org/wiki/API:Patrol';
+		return 'https://www.mediawiki.org/wiki/API:Patrol';
 	}
 
 	public function getVersion() {
-		return __CLASS__ . ': $Id: ApiPatrol.php 92400 2011-07-17 16:51:11Z reedy $';
+		return __CLASS__ . ': $Id$';
 	}
 }

@@ -43,16 +43,23 @@ class LinkSearchPage extends QueryPage {
 	}
 
 	function execute( $par ) {
-		global $wgOut, $wgRequest, $wgUrlProtocols, $wgMiserMode, $wgLang;
+		global $wgUrlProtocols, $wgMiserMode;
+
 		$this->setHeaders();
-		$wgOut->allowClickjacking();
+		$this->outputHeader();
 
-		$target = $wgRequest->getVal( 'target', $par );
-		$namespace = $wgRequest->getIntorNull( 'namespace', null );
+		$out = $this->getOutput();
+		$out->allowClickjacking();
 
-		$protocols_list[] = '';
+		$request = $this->getRequest();
+		$target = $request->getVal( 'target', $par );
+		$namespace = $request->getIntorNull( 'namespace', null );
+
+		$protocols_list = array();
 		foreach( $wgUrlProtocols as $prot ) {
-			$protocols_list[] = $prot;
+			if ( $prot !== '//' ) {
+				$protocols_list[] = $prot;
+			}
 		}
 
 		$target2 = $target;
@@ -71,17 +78,15 @@ class LinkSearchPage extends QueryPage {
 			// default
 			$protocol = 'http://';
 		}
-		if ( !in_array( $protocol, $protocols_list ) ) {
+		if ( $protocol != '' && !in_array( $protocol, $protocols_list ) ) {
 			// unsupported protocol, show original search request
 			$target2 = $target;
 			$protocol = '';
 		}
 
-		$self = $this->getTitle();
-
-		$wgOut->addWikiMsg( 'linksearch-text', '<nowiki>' . $wgLang->commaList( $wgUrlProtocols ) . '</nowiki>' );
+		$out->addWikiMsg( 'linksearch-text', '<nowiki>' . $this->getLanguage()->commaList( $protocols_list ) . '</nowiki>' );
 		$s = Xml::openElement( 'form', array( 'id' => 'mw-linksearch-form', 'method' => 'get', 'action' => $GLOBALS['wgScript'] ) ) .
-			Html::hidden( 'title', $self->getPrefixedDbKey() ) .
+			Html::hidden( 'title', $this->getTitle()->getPrefixedDbKey() ) .
 			'<fieldset>' .
 			Xml::element( 'legend', array(), wfMsg( 'linksearch' ) ) .
 			Xml::inputLabel( wfMsg( 'linksearch-pat' ), 'target', 'target', 50, $target ) . ' ';
@@ -92,7 +97,7 @@ class LinkSearchPage extends QueryPage {
 		$s .=	Xml::submitButton( wfMsg( 'linksearch-ok' ) ) .
 			'</fieldset>' .
 			Xml::closeElement( 'form' );
-		$wgOut->addHTML( $s );
+		$out->addHTML( $s );
 
 		if( $target != '' ) {
 			$this->setParams( array(
@@ -101,7 +106,7 @@ class LinkSearchPage extends QueryPage {
 				'protocol' => $protocol ) );
 			parent::execute( $par );
 			if( $this->mMungedQuery === false )
-				$wgOut->addWikiMsg( 'linksearch-error' );
+				$out->addWikiMsg( 'linksearch-error' );
 		}
 	}
 
@@ -172,8 +177,8 @@ class LinkSearchPage extends QueryPage {
 	function formatResult( $skin, $result ) {
 		$title = Title::makeTitle( $result->namespace, $result->title );
 		$url = $result->url;
-		$pageLink = $skin->linkKnown( $title );
-		$urlLink = $skin->makeExternalLink( $url, $url );
+		$pageLink = Linker::linkKnown( $title );
+		$urlLink = Linker::makeExternalLink( $url, $url );
 
 		return wfMsgHtml( 'linksearch-line', $urlLink, $pageLink );
 	}
@@ -182,14 +187,13 @@ class LinkSearchPage extends QueryPage {
 	 * Override to check query validity.
 	 */
 	function doQuery( $offset = false, $limit = false ) {
-		global $wgOut;
 		list( $this->mMungedQuery,  ) = LinkSearchPage::mungeQuery( $this->mQuery, $this->mProt );
 		if( $this->mMungedQuery === false ) {
-			$wgOut->addWikiMsg( 'linksearch-error' );
+			$this->getOutput()->addWikiMsg( 'linksearch-error' );
 		} else {
 			// For debugging
 			// Generates invalid xhtml with patterns that contain --
-			//$wgOut->addHTML( "\n<!-- " . htmlspecialchars( $this->mMungedQuery ) . " -->\n" );
+			//$this->getOutput()->addHTML( "\n<!-- " . htmlspecialchars( $this->mMungedQuery ) . " -->\n" );
 			parent::doQuery( $offset, $limit );
 		}
 	}

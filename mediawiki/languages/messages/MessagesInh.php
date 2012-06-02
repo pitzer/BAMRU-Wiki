@@ -45,8 +45,8 @@ $messages = array(
 'tog-enotifrevealaddr'        => 'ЗӀы хоамаш тӀа са фоштмоттиг хьахьокха',
 'tog-shownumberswatching'     => 'Ший теркама дагарченгахь оагӀув чулаьца бола дакъалаьцархой таьрах хьахьокха',
 'tog-fancysig'                => 'Ший кулга яздара вики-хоамбаккхам (ший лоӀаме Ӏинка йоацаш)',
-'tog-externaleditor'          => 'Арена гӀалатнийсдарца болх бе (ший болх ховш болачара мара мегаш дац, хьамлоархара ший-тайпара оттам эша; [http://www.mediawiki.org/wiki/Manual:External_editors хьажа эша])',
-'tog-externaldiff'            => 'Арена бӀасакхосса болхоагӀувца болх бе (ший болх ховш болачара мара мегаш дац, хьамлоархара ший-тайпара оттам эша; [http://www.mediawiki.org/wiki/Manual:External_editors хьажа эша])',
+'tog-externaleditor'          => 'Арена гӀалатнийсдарца болх бе (ший болх ховш болачара мара мегаш дац, хьамлоархара ший-тайпара оттам эша; [//www.mediawiki.org/wiki/Manual:External_editors хьажа эша])',
+'tog-externaldiff'            => 'Арена бӀасакхосса болхоагӀувца болх бе (ший болх ховш болачара мара мегаш дац, хьамлоархара ший-тайпара оттам эша; [//www.mediawiki.org/wiki/Manual:External_editors хьажа эша])',
 'tog-showjumplinks'           => '"Дехьадала" яха новкъостала Ӏинк хьахьокха',
 'tog-uselivepreview'          => 'Сиха бӀарахьажар (JavaScript) (Экспериментально)',
 'tog-forceeditsummary'        => 'Хоам бе, хувцамий лоацам белгал даь деци',
@@ -84,8 +84,8 @@ $messages = array(
 'march'         => 'Мутхьол',
 'april'         => 'Тушоли',
 'may_long'      => 'Бекарг',
-'june'          => 'КӀимарс',
-'july'          => 'Аьтинг',
+'june'          => 'Аьтинг',
+'july'          => 'КӀимарс',
 'august'        => 'Мангал',
 'september'     => 'Моажол',
 'october'       => 'Тов',
@@ -96,8 +96,8 @@ $messages = array(
 'march-gen'     => 'Мутхьол бетт',
 'april-gen'     => 'Тушоли бетт',
 'may-gen'       => 'Бекарг бетт',
-'june-gen'      => 'КӀимарс бетт',
-'july-gen'      => 'Аьтинг бетт',
+'june-gen'      => 'Аьтинг бетт',
+'july-gen'      => 'КӀимарс бетт',
 'august-gen'    => 'Мангал бетт',
 'september-gen' => 'Моажол бетт',
 'october-gen'   => 'Тов бетт',
@@ -108,8 +108,8 @@ $messages = array(
 'mar'           => 'Мутхь.',
 'apr'           => 'Tуш.',
 'may'           => 'Бек.',
-'jun'           => 'КӀим.',
-'jul'           => 'Аьт.',
+'jun'           => 'Аьт.',
+'jul'           => 'КӀим.',
 'aug'           => 'Манг.',
 'sep'           => 'Моаж.',
 'oct'           => 'Тов.',
@@ -463,17 +463,11 @@ $messages = array(
 'revdelete-radio-set'        => 'XӀаа',
 'revdelete-radio-unset'      => 'A',
 'revdelete-log'              => 'Бахьан',
-'revdelete-logentry'         => '[[$1]] доржама оагӀувни бӀасанче хийцай',
 'revdel-restore'             => 'БӀасанче хувца',
 'revdel-restore-deleted'     => 'дӀадаьккха доржамаш',
 'revdel-restore-visible'     => 'бӀаргагушдола доржамаш',
 'pagehist'                   => 'ОагӀува искар',
 'deletedhist'                => 'ДӀадакхамий искар',
-'revdelete-content'          => 'чулоацаро',
-'revdelete-summary'          => 'хувцамий лоацам',
-'revdelete-uname'            => 'дакъалаьцархочунна цIи',
-'revdelete-hid'              => 'къайла я $1',
-'revdelete-log-message'      => '$1ара $2чунна  {{PLURAL:$2|доржама|доржамий}}',
 
 # History merging
 'mergehistory-list'   => 'ВIашагIатоха хувцамий искар',
@@ -507,9 +501,8 @@ $messages = array(
 'nextn-title'                      => '{{PLURAL:$1|$1 тIехьара йоазув|$1 тIехьара йоазувнаш}}',
 'shown-title'                      => 'Укх оагIувни $1 {{PLURAL:$1|йоазув|йоазувнаш}} хьахокха',
 'viewprevnext'                     => '($1 {{int:pipe-separator}} $2) ($3) хьажа',
-'searchmenu-exists'                => "'''Укх вики-хьахьоадайтама чу ер оагув \"[[:\$1]]\" я'''",
+'searchmenu-exists'                => "'''Укх вIикIи-хьахьоадайтама чу ер оагув \"[[:\$1]]\" я'''",
 'searchmenu-new'                   => "'''Укх \"[[:\$1]]\" вики-хьахьоадайтамчоахь оагIув де!'''",
-'searchmenu-new-nocreate'          => '"$1" оагIуви мегаш доаца ци е шун из оагIув де мегаш дац',
 'searchhelp-url'                   => 'Help:Чулоацам',
 'searchprofile-articles'           => 'ЛардоагIувнаш',
 'searchprofile-project'            => 'Дагарчеи хьахьоадайтамеи оагIувнаш',
@@ -567,14 +560,14 @@ $messages = array(
 'searchresultshead'         => 'Лахаp',
 'timezonelegend'            => 'Сахьати юкъ:',
 'localtime'                 => 'Вола/Йола моттиги ха:',
-'timezoneregion-africa'     => 'Эпарке',
-'timezoneregion-america'    => 'Iамрике',
+'timezoneregion-africa'     => 'Эприк',
+'timezoneregion-america'    => 'Iаьмрик',
 'timezoneregion-antarctica' => 'Энтарцит',
 'timezoneregion-arctic'     => 'Эрцит',
-'timezoneregion-asia'       => 'Iазике',
+'timezoneregion-asia'       => 'Iаьзик',
 'timezoneregion-atlantic'   => 'Iатлантицфорд',
-'timezoneregion-australia'  => 'Устралике',
-'timezoneregion-europe'     => 'Эврофаьге',
+'timezoneregion-australia'  => 'Устралик',
+'timezoneregion-europe'     => 'Аьроп',
 'timezoneregion-indian'     => 'ХIинда форд',
 'timezoneregion-pacific'    => 'Тийна форд',
 'prefs-searchoptions'       => 'Тахкама оттамаш',
@@ -652,7 +645,7 @@ $messages = array(
 'diff'                            => 'кхы.',
 'hist'                            => 'искар',
 'hide'                            => 'Къайладаккха',
-'show'                            => 'Хьахокха',
+'show'                            => 'Хьахьокха',
 'minoreditletter'                 => 'м',
 'newpageletter'                   => 'Н',
 'boteditletter'                   => 'б',
@@ -703,7 +696,7 @@ $messages = array(
 'filehist-filesize'         => 'Паьла юстарал',
 'filehist-comment'          => 'ХIамоалар',
 'filehist-missing'          => 'Паьла йоацаш я',
-'imagelinks'                => 'Паьла Iинкаш',
+'imagelinks'                => 'Паьлий пайда эца',
 'linkstoimage'              => '{{PLURAL:$1|ТIехьайоагIа $1 оагIув Iинк ду|ТIехьайоагIа $1 оагIувнаш Iинкаш ду}} укх паьла тIа:',
 'nolinkstoimage'            => 'Йола паьлат  Iинк ю оагIувнаш дац',
 'sharedupload'              => 'Ер паьла $1чера я, кхыча хьахьоадайтамча хьахайраде йийшайолаш я.',
@@ -730,7 +723,7 @@ $messages = array(
 
 # Statistics
 'statistics'       => 'Дагара куц',
-'statistics-pages' => 'ОагIувний',
+'statistics-pages' => 'ОагIувнаш',
 
 'disambiguationspage' => 'Template: ЦаI маIандоацар',
 
@@ -745,7 +738,7 @@ $messages = array(
 'prefixindex'   => 'ОагIувнаший хьалхера цIи хьагойтар',
 'shortpages'    => 'Лоаца оагIувнаш',
 'longpages'     => 'Доккхий оагIувнаш',
-'usercreated'   => '$1ара $2чуча даь да',
+'usercreated'   => '{{GENDER:$3|Чуваьннав|Чуяьннай}} $1  $2',
 'newpages'      => 'Керда оагIувнаш',
 'move'          => 'ЦIи хувца',
 'movethispage'  => 'Укх оагIува цIи хувца',
@@ -778,8 +771,7 @@ $messages = array(
 'linksearch-line' => '$1 тIа Iинк $2 юкъера',
 
 # Special:Log/newusers
-'newuserlogpage'          => 'Дакъалаьцархоший дIаязбeнна таптар',
-'newuserlog-create-entry' => 'Керда дакъалаьцархо',
+'newuserlogpage' => 'Дакъалаьцархоший дIаязбeнна таптар',
 
 # Special:ListGroupRights
 'listgrouprights-members' => '(тоабий дагарче)',
@@ -813,7 +805,6 @@ $messages = array(
 'actionfailed'          => 'Оттам даьдац',
 'deletedtext'           => '"$1" дIаяккха хиннай.
 ТIехьара дIадаьккха дагарчена хьожаргволаш/хьожаргьйолаш, $2 хьажа.',
-'deletedarticle'        => ' "[[$1]]" дIадаьккхад',
 'dellogpage'            => 'ДIадаккхара тептар',
 'deletecomment'         => 'Бахьан:',
 'deleteotherreason'     => 'Кхыдола бахьан/тIатохар:',
@@ -853,7 +844,6 @@ $messages = array(
 # Undelete
 'undeletelink'     => 'БIаргтасса/юхаметтаоттаде',
 'undeleteviewlink' => 'бIаргтасса',
-'undeletedarticle' => '"[[$1]]" юха оттая я',
 
 # Namespace form on various pages
 'namespace'      => 'ЦIерий аренаш',
@@ -944,8 +934,6 @@ $messages = array(
 'talkexists'       => "'''ОагIувни цIи хьийца хиннай, амма дувцама оагIувни цIи хувца мегаш яц, изза мо цIи йолаш оагIув йоландаь. Дехар да, кулга новкъосталца цхьанна вIашагIатоха уш.'''",
 'movedto'          => 'керда цIи тилла я',
 'movetalk'         => 'МаIан чулоаца дувцама оагIувни цIи хувца',
-'1movedto2'        => '[[$1]] цIи цу тIа [[$2]] хийцай',
-'1movedto2_redir'  => '[[$1]] цIи хийцай [[$2]] дIа-хьа оагIува тIа гIолла',
 'movelogpage'      => 'Хувцама тептар',
 'movereason'       => 'Бахьан',
 'revertmove'       => 'юхаяккха',
@@ -1023,17 +1011,13 @@ $messages = array(
 'tooltip-undo'                    => 'Я хувцам дIаяккхи, бIаргатассар хьахокха, кара дале, дIаяккха бахьан Iочуязаде моттигаца.',
 'tooltip-summary'                 => 'Лоаца чулоацам Iочуязаде',
 
-# Patrol log
-'patrol-log-line' => '$1 долачаьрахь $2 $3 хьажав/хьажай',
-'patrol-log-diff' => '$1 доржам',
-
 # Browsing diffs
 'previousdiff' => '← Хьалхара хувцам',
 'nextdiff'     => 'ТIайоагIа хувцам',
 
 # Media information
 'file-info-size' => '$1 × $2 фихсам, паьла дустам: $3, MIME-тайп: $4',
-'file-nohires'   => '<small>Укхал доккхагIа доржам дац</small>',
+'file-nohires'   => 'Укхал доккхагIа доржам дац',
 'svg-long-desc'  => 'SVG-паьл, $1 × $2 фихелашца, паьла дустам: $3',
 'show-big-image' => 'Хьадоккхадаь сурт',
 
@@ -1096,7 +1080,7 @@ $messages = array(
 
 # External editor support
 'edit-externally'      => 'Йола болхоагIувца паьла гIалатахь мукъаяккха',
-'edit-externally-help' => '(ма даррачунга хьажа [http://www.mediawiki.org/wiki/Manual:External_editors хьаоттама кулгалхо])',
+'edit-externally-help' => '(ма даррачунга хьажа [//www.mediawiki.org/wiki/Manual:External_editors хьаоттама кулгалхо])',
 
 # 'all' in various places, this might be different for inflected languages
 'watchlistall2' => 'деррига',

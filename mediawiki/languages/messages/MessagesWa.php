@@ -172,6 +172,8 @@ $messages = array(
 'subcategories'                  => 'Dizo-categoreyes',
 'category-media-header'          => 'Media el categoreye «$1»',
 'category-empty'                 => "''Cisse categoreye ci n' a pol moumint nol årtike ni media.''",
+'category-subcat-count'          => 'Dins cisse categoreye, gn a {{PLURAL:$2|li dzo-categoreye|$2 dizo-categoreyes, inte di zeles {{PLURAL:$1|li cene|les $1}}}} cial pa-dzo.',
+'category-subcat-count-limited'  => "Dins cisse categoreye, gn a {{PLURAL:$1|l' dizo-categoreye|les dzo-categoreyes}} shuvantes.",
 'category-article-count'         => 'Dins cisse categoreye cial, gn a {{PLURAL:$2|li pådje ki shût|$2 pådje, inte di zeles {{PLURAL:$1|li cene|les $1}} cial padzo}}.',
 'category-article-count-limited' => "{{PLURAL:$1|Gn a l' pådje ki shût|Les $1 pådjes ki shuvnut si trovèt ddja}} dins cisse categoreye ci.",
 'category-file-count'            => "{{PLURAL:$2|Dins cisse categoreye ci, gn a k' ene pådje.|{{PLURAL:$1|Gn a cisse pådje ci|Gn a les $1 pådjes ki shuvèt}} dins cisse categoreye ci, po $2 pådjes å totå.}}",
@@ -337,13 +339,12 @@ MySQL a rtourné l' aroke «$3: $4».",
 'cannotdelete'         => "Dji n' sai disfacer l' pådje ou l' imådje dimandêye (ça s' pôreut k' ene ôte sakî l' a ddja disfacé).",
 'badtitle'             => 'Måva tite',
 'badtitletext'         => "Li tite del pådje dimandêye n' esteut nén valide, il estet vude, oudonbén c' esteut on cron loyén eterlingaedje ou eterwiki. Ça s' pout k' il åye onk ou sacwants caracteres ki n' polèt nén esse eployîs dins les tites.",
-'perfcached'           => "Les dnêyes ki shuvèt c' est ene copeye e muchete, et ça s' pout ki ça n' soeye nén ttafwaitmint a djoû.",
-'perfcachedts'         => "Les dnêyes ki shuvèt c' est ene copeye e muchete, ey elle ont stî metowes a djoû pol dierin côp li $1.",
+'perfcached'           => "Les dnêyes ki shuvèt c' est ene copeye e muchete, et ça s' pout ki ça n' soeye nén ttafwaitmint a djoû. A maximum of {{PLURAL:$1|one result is|$1 results are}} available in the cache.",
+'perfcachedts'         => "Les dnêyes ki shuvèt c' est ene copeye e muchete, ey elle ont stî metowes a djoû pol dierin côp li $1. A maximum of {{PLURAL:$4|one result is|$4 results are}} available in the cache.",
 'wrong_wfQuery_params' => 'Parametes incoreks po wfQuery()<br />
 Fonccion: $1<br />
 Cweraedje: $2',
 'viewsource'           => 'Vey côde sourdant',
-'viewsourcefor'        => 'po $1',
 'viewsourcetext'       => 'Loukîz li contnou di l’ årtike, et s’ li rcopyî si vos vloz, por vos bouter dsu foû des fyis :',
 'protectedinterface'   => "Cisse pådje ci dene on tecse d' eterface pol programe, eyet elle a stî protedjeye po s' waeranti siconte des abus.",
 'editinginterface'     => "'''Asteme:''' Vos candjîz ene pådje k' est eployeye po dner on tecse d' eterface pol programe. Les candjmints a cisse pådje ci vont-st aveur èn efet so l' eterface d' uzeu des ôtes uzeus.",
@@ -375,6 +376,7 @@ Vosse conte a stî ahivé.
 'gotaccount'                 => "Vos avoz ddja on conte so ç' wiki ci? '''$1'''.",
 'gotaccountlink'             => 'Elodjîz vs',
 'createaccountmail'          => 'pa emile',
+'createaccountreason'        => 'Råjhon:',
 'badretype'                  => 'Vos avoz dné deus screts diferins.',
 'userexists'                 => "Li no d' uzeu ki vs avoz tchoezi est ddja eployî. Tchoezixhoz è èn ôte s' i vs plait.",
 'loginerror'                 => "Aroke d' elodjaedje",
@@ -461,9 +463,6 @@ Li råjhon dnêye est:<br />''$2''<p>Vos ploz contacter $1 oudonbén onk des
 Notez ki vos n' poloz nén eployî l' fonccion «emiler a l' uzeu» a moens ki vos åyîz ene adresse emile valide dins vos [[Special:Preferences|preferinces]].
 
 Voste adresse IP est $3. S' i vs plait racsegnoz ciste adresse IP la dins les dmandes ki vos frîz.",
-'blockedoriginalsource'      => "Li sourdant di '''$1''' est håyné chal pa dzo:",
-'blockededitsource'          => "Li tecse des '''candjmints da vosse''' di '''$1''' est håyné chal pa dzo:",
-'whitelistedittitle'         => "S' elodjî po candjî",
 'whitelistedittext'          => 'I vs fåt $1 po pleur candjî les årtikes.',
 'confirmedittext'            => "I vs fåt acertiner vost emile po pleur candjî les årtikes. Dinez èn emile eyet l' acertiner dins vos [[Special:Preferences|preferinces d' uzeu]].",
 'loginreqtitle'              => 'I vs fåt esse elodjî',
@@ -586,10 +585,11 @@ Les ôtes manaedjeus so ç' wiki ci pôront todi vey li contnou catchî eyet l' 
 'revdelete-hide-comment'      => "Catchî l' comintaire di candjmint",
 'revdelete-hide-user'         => "Catchî l' no d' uzeu/adresse IP do candjeu",
 'revdelete-hide-restricted'   => 'Apliker ces restrictions ossu åzès manaedjeus',
-'revdelete-log'               => 'Råjhon',
+'revdelete-log'               => 'Råjhon:',
 'revdelete-submit'            => 'Apliker al modêye tchoezeye',
-'revdelete-logentry'          => 'li veyåvisté des modêyes a stî candjeye po [[$1]]',
-'revdelete-hid'               => 'muchyî $1',
+
+# History merging
+'mergehistory-reason' => 'Råjhon:',
 
 # Diffs
 'difference'              => '(Diferinces inte les modêyes)',
@@ -688,11 +688,11 @@ Les ôtes manaedjeus so ç' wiki ci pôront todi vey li contnou catchî eyet l' 
 'userrights-lookup-user'   => "Manaedjî les groupes d' èn uzeu",
 'userrights-user-editname' => "Tapez on no d' uzeu:",
 'editusergroup'            => "Candjî les groupes di l' uzeu",
-'editinguser'              => "Candjant '''[[User:$1|$1]]''' ([[User talk:$1|{{int:talkpagelinktext}}]] | [[Special:Contributions/$1|{{int:contribslink}}]])",
+'editinguser'              => "Candjant '''[[User:$1|$1]]''' $2",
 'userrights-editusergroup' => "Candjî groupes d' uzeus",
 'saveusergroups'           => "Schaper des groupes d' uzeus",
 'userrights-groupsmember'  => 'Mimbes di:',
-'userrights-reason'        => 'Råjhon',
+'userrights-reason'        => 'Råjhon:',
 
 # Groups
 'group'            => 'Groupe:',
@@ -838,12 +838,12 @@ ou co po les sons
 'uploadnewversion-linktext' => 'Eberweter ene nouve modêye di ci fitchî ci',
 
 # File reversion
-'filerevert-comment' => 'Comintaire:',
+'filerevert-comment' => 'Råjhon:',
 
 # File deletion
 'filedelete'         => 'Disfacer $1',
 'filedelete-legend'  => 'Disfacer fitchî',
-'filedelete-comment' => 'Råjhon',
+'filedelete-comment' => 'Råjhon:',
 'filedelete-submit'  => 'Disfacer',
 
 # MIME search
@@ -956,10 +956,8 @@ Vos ploz limiter l' håynaedje tot tchoezixhant ene sôre di djournå, on no d' 
 Also see [[Special:WantedCategories|wanted categories]].',
 
 # Special:Log/newusers
-'newuserlogpage'           => 'Djournå des noveas uzeus',
-'newuserlogpagetext'       => "Chal pa dzo c' est ene djivêye des uzeus novelmint eredjîstrés.",
-'newuserlog-create-entry'  => 'Novea uzeu',
-'newuserlog-create2-entry' => 'conte ahivé po $1',
+'newuserlogpage'     => 'Djournå des noveas uzeus',
+'newuserlogpagetext' => "Chal pa dzo c' est ene djivêye des uzeus novelmint eredjîstrés.",
 
 # E-mail user
 'mailnologin'     => "Nole adresse d' evoyeu",
@@ -978,7 +976,7 @@ po ki l' riçuveu poye risponde.",
 valide, ou n' vout nén rçure des emiles des ôtes uzeus.
 Do côp, c' est nén possibe di lyi evoyî èn emile.",
 'emailfrom'       => 'Di',
-'emailto'         => 'Po',
+'emailto'         => 'Po:',
 'emailsubject'    => 'Sudjet',
 'emailmessage'    => 'Messaedje',
 'emailsend'       => 'Evoyî',
@@ -1041,10 +1039,10 @@ I n\' årè nén d\' ôtes notifiaedjes po ds ôtes candjmints di ç\' minme på
 
 --
 Po candjî l\' apontiaedje di vosse djivêye a shuve, loukîz
-{{fullurl:{{#special:EditWatchlist}}}}
+{{canonicalurl:{{#special:EditWatchlist}}}}
 
 Po pus d\' aidance:
-{{fullurl:{{ns:help}}:Aidance}}',
+{{canonicalurl:{{ns:help}}:Aidance}}',
 
 # Delete
 'deletepage'        => "Disfacer l' pådje",
@@ -1062,12 +1060,11 @@ tot [[{{MediaWiki:Policy-url}}|shuvant les rîles]].",
 'actioncomplete'    => 'Fwait',
 'deletedtext'       => 'Li pådje «$1» a stî disfacêye. Loukîz li $2 po ene
 djivêye des dierins disfaçaedjes.',
-'deletedarticle'    => 'pådje «[[$1]]» disfacêye',
 'dellogpage'        => 'Djournå des disfaçaedjes',
 'dellogpagetext'    => "Chal pa dzo c' est l' djivêye des dierins disfaçaedjes.",
 'deletionlog'       => 'djournå des disfaçaedjes',
 'reverted'          => 'Rimetou ene modêye di dvant',
-'deletecomment'     => 'Råjhon',
+'deletecomment'     => 'Råjhon:',
 
 # Rollback
 'cantrollback'  => "Dji n' sai disfé les candjmints; li dierin contribouweu est li seu oteur po cist årtike ci.",
@@ -1086,7 +1083,7 @@ Li dierin candjmint a stî fwait pa [[User:$3|$3]] ([[User talk:$3|Copene]]).",
 'protect-title'               => 'Protedjant «$1»',
 'prot_1movedto2'              => '[[$1]] displaecî viè [[$2]]',
 'protect-legend'              => "Acertinez l' protedjaedje",
-'protectcomment'              => 'Råjhon',
+'protectcomment'              => 'Råjhon:',
 'protect-text'                => "Vos ploz droci vey eyet candjî l' livea d' protedjaedje pol pådje '''$1'''.",
 'protect-default'             => '(prémetou)',
 'protect-level-autoconfirmed' => 'Bloker les uzeus nén eredjîstrés',
@@ -1117,8 +1114,7 @@ candjî l' pådje divant do disfaçaedje. Li tecse di ces modêyes disfacêyes
 ni pout esse veyou ki des manaedjeus.",
 'undeletebtn'                  => 'Rapexhî!',
 'undeletereset'                => 'Netyî',
-'undeletecomment'              => 'Comintaire:',
-'undeletedarticle'             => "a rapexhî l' pådje «[[$1]]»",
+'undeletecomment'              => 'Råjhon:',
 'undeletedrevisions'           => '{{PLURAL:$1|1 modêye|$1 modêyes}} di rapexheyes',
 'undeletedrevisions-files'     => '{{PLURAL:$1|1 modêye|$1 modêyes}} et {{PLURAL:$2|1 fitchî|$2 fitchîs}} di rapexhîs',
 'undeletedfiles'               => '{{PLURAL:$1|1 fitchî|$1 fitchîs}} di rapexhîs',
@@ -1170,19 +1166,20 @@ Dinez ene råjhon do blocaedje (eg: dijhoz les pådjes k' ont
 stî vandalijheyes).",
 'ipadressorusername'          => "Adresse IP ou no d' uzeu",
 'ipbexpiry'                   => 'Tins do blocaedje',
-'ipbreason'                   => 'Råjhon',
+'ipbreason'                   => 'Råjhon:',
 'ipbsubmit'                   => 'Bloker cist uzeu',
 'ipbother'                    => 'Ôte termene',
 'ipboptions'                  => '2 eures:2 hours,1 djoû:1 day,3 djoûs:3 days,1 samwinne:1 week,2 samwinnes:2 weeks,1 moes:1 month,3 moes:3 months,6 moes:6 months,1 anêye:1 year,po todi:infinite',
 'ipbotheroption'              => 'ôte',
 'badipaddress'                => "Nol uzeu avou ç' no la, ou adresse IP nén valide",
 'blockipsuccesssub'           => 'Li blocaedje a stî comifåt',
-'blockipsuccesstext'          => '«[[Special:Contributions/$1|$1]]» a stî bloké.<br />Loukîz li [[Special:IPBlockList|djivêye des blocaedjes]] po candjî on blocaedje.',
+'blockipsuccesstext'          => '«[[Special:Contributions/$1|$1]]» a stî bloké.<br />Loukîz li [[Special:BlockList|djivêye des blocaedjes]] po candjî on blocaedje.',
 'unblockip'                   => 'Disbloker èn uzeu',
 'unblockiptext'               => "Rimplixhoz les tchamps chal pa dzo po ridner accès e scrijhaedje a èn uzeu ou adresse IP k' estént blokés.",
 'ipusubmit'                   => 'Disbloker ciste adresse ci',
 'unblocked'                   => '«[[User:$1|$1]]» a stî disbloké',
 'ipblocklist'                 => "Djivêye d' adresses IP et di nos d' uzeus ki sont blokés",
+'blocklist-reason'            => 'Råjhon',
 'ipblocklist-submit'          => 'Cweri',
 'infiniteblock'               => 'po todi',
 'expiringblock'               => "disk' å $1 $2",
@@ -1239,11 +1236,9 @@ Tchoezixhoz è èn ôte s' i vs plait.",
 'talkexists'              => "'''Li pådje leye minme a stî displaeceye comifåt, mins nén li pådje di copene, ca i gn aveut ddja ene pådje di copene k' egzistéve al novele plaece. I vs fårè copyî l' tecse del pådje di copene al mwin.'''",
 'movedto'                 => 'displaecî viè',
 'movetalk'                => 'Displaecî li pådje di copene avou, si ça astchait.',
-'1movedto2'               => '[[$1]] displaecî viè [[$2]]',
-'1movedto2_redir'         => '[[$1]] displaecî viè [[$2]] pa dsu on redjiblaedje',
 'movelogpage'             => 'Djournå des displaçaedjes',
 'movelogpagetext'         => "Chal pa dzo c' est ene djivêye des pådjes k' on stî displaceyes.",
-'movereason'              => 'Råjhon',
+'movereason'              => 'Råjhon:',
 'revertmove'              => 'disfé',
 'delete_and_move'         => 'Disfacer et displaecî',
 'delete_and_move_text'    => "==I gn a mezåjhe di disfacer==
@@ -1526,7 +1521,7 @@ est raptiti. Les ôtes seront catchîs.
 
 # External editor support
 'edit-externally'      => "Candjî ç' fitchî ci avou on dfoûtrin programe",
-'edit-externally-help' => "Loukîz les [http://www.mediawiki.org/wiki/Manual:External_editors instruccions d' apontiaedje] po pus di racsegnes.",
+'edit-externally-help' => "Loukîz les [//www.mediawiki.org/wiki/Manual:External_editors instruccions d' apontiaedje] po pus di racsegnes.",
 
 # 'all' in various places, this might be different for inflected languages
 'watchlistall2' => 'totafwait',
@@ -1613,5 +1608,46 @@ Acertinez s' i vs plait ki vos vloz vormint rifé cisse pådje ci.",
 'specialpages-group-users'       => 'Uzeus et abondroets',
 'specialpages-group-highuse'     => 'Eployaedje timpesse des pådjes',
 'specialpages-group-redirects'   => 'Ridjiblaedjes di pådjes sipeciåles',
+
+# Feedback
+'feedback-subject' => 'Sudjet',
+'feedback-message' => 'Messaedje',
+'feedback-cancel'  => 'Rinoncî',
+'feedback-submit'  => "Evoyî l' vosse",
+'feedback-adding'  => 'Vosse messaedje a stî håyné sol pådje...',
+'feedback-error2'  => "Aroke : Li candjaedje n' a nén stî",
+
+# API errors
+'api-error-badaccess-groups'              => "Vos n' avoz nén l' droet d' eberweter des fitchîs so ç' wiki cial",
+'api-error-copyuploaddisabled'            => "Les eberwetaedjes pa URL ni vont nén so ç' sierveu cial.",
+'api-error-duplicate'                     => "N a ddja {{PLURAL:$1|[$2 èn ôte fitchî]|[$2 des ôtes fitchîs]}} avou l' minme contnou so nosse waibe",
+'api-error-duplicate-archive'             => "N aveut ddja {{PLURAL:$1|[$2 èn ôte fitchî]|[$2 des ôtes fitchîs]}} avou l' minme contnou so nosse waibe, mins {{PLURAL:$1|il a stî rsaetchî|il ont stî rsaetchîs}}.",
+'api-error-duplicate-archive-popup-title' => "Ricopyî {{PLURAL:$1|l' fitchî|les fitchîs}} k' {{PLURAL:$1|a stî rsaetchî|k' ont stî rsaetchîs}}",
+'api-error-duplicate-popup-title'         => '{{PLURAL:$1|fitchî|fitchîs}} a dobe',
+'api-error-empty-file'                    => 'Vosse fitchî est vude.',
+'api-error-fetchfileerror'                => 'Aroke divintrinne : ene sacwè a fwait berwete cwand on-z a volou rawè vosse fitchî',
+'api-error-file-too-large'                => 'Vosse fitchî est trop pezant',
+'api-error-filename-tooshort'             => 'Li no do fitchî est trop court',
+'api-error-filetype-banned'               => "On n' pout nén eberweter des sfwaits fitchîs",
+'api-error-filetype-missing'              => 'I manke li cawete do fitchî',
+'api-error-http'                          => 'Aroke divintrinne : nou raloyaedje å sierveu',
+'api-error-illegal-filename'              => "On n' pout nén prinde ci no la pol fitchî",
+'api-error-internal-error'                => "Aroke divintrinne : gn a ene sacwè k' a må stî tins d' l' eredjistrumint d' vost eberwetêye",
+'api-error-invalid-file-key'              => "Aroke divintrinne : Li fitchî n' a nén stî rtrové dins l' eredjistrumint provizwere",
+'api-error-missingparam'                  => 'Aroke divintrinne : i manke des dnêyes dins vosse dimande',
+'api-error-missingresult'                 => "Aroke divintrinne : on n' såreut dire si l' fitchî a bén passé",
+'api-error-mustbeloggedin'                => 'Vos dvoz esse elodjî (eye) po-z aberweter des fitchîs',
+'api-error-mustbeposted'                  => "Aroke divintrinne : li programe n' eploye nén li boune hårdêye HTTP",
+'api-error-noimageinfo'                   => "L' eberwetaedje a bén stî, mins l' sierveu n' a pont dné d' racsegnes sol fitchî",
+'api-error-nomodule'                      => "Aroke divintrinne : pont d' voye d' eberwetaedje tchoezeye",
+'api-error-ok-but-empty'                  => "Aroke divintrinne : li sierveu n' respond nén",
+'api-error-overwrite'                     => "Vos n' ploz nén spotchî on fitchî k' egzistêye dedja",
+'api-error-stashfailed'                   => 'Aroke divintrinne : li sierveu a pierdou les dnêyes provizweres',
+'api-error-timeout'                       => "Li sierveu n' a nén respondou dins les tins",
+'api-error-unclassified'                  => 'Aroke nén cnoxhowe',
+'api-error-unknown-code'                  => 'Aroke nén cnoxhowe : « $1 »',
+'api-error-unknown-error'                 => "Aroke divintrinne : gn a ene sacwè ki n' a nén stî tins d' l' eberwetaedje",
+'api-error-uploaddisabled'                => "L' eberwetaedje ni va nén so ç' wiki cial",
+'api-error-verification-error'            => "Ci fitchî la est cron, oudon-bén si cawete n' est nén boune",
 
 );

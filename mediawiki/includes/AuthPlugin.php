@@ -67,7 +67,7 @@ class AuthPlugin {
 	 * Modify options in the login template.
 	 *
 	 * @param $template UserLoginTemplate object.
-	 * @param $type String 'signup' or 'login'.
+	 * @param $type String 'signup' or 'login'. Added in 1.16.
 	 */
 	public function modifyUITemplate( &$template, &$type ) {
 		# Override this!
@@ -261,6 +261,15 @@ class AuthPlugin {
 	 */
 	public function getUserInstance( User &$user ) {
 		return new AuthPluginUser( $user );
+	}
+
+	/**
+	 * Get a list of domains (in HTMLForm options format) used.
+	 *
+	 * @return array
+	 */
+	public function domainList() {
+		return array();
 	}
 }
 

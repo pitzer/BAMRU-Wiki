@@ -35,28 +35,22 @@ class SpecialUnblock extends SpecialPage {
 	}
 
 	public function execute( $par ){
-		global $wgUser, $wgOut, $wgRequest;
+		$this->checkPermissions();
+		$this->checkReadOnly();
 
-		# Check permissions
-		if( !$this->userCanExecute( $wgUser ) ) {
-			$this->displayRestrictionError();
-			return;
-		}
-
-		# Check for database lock
-		if( wfReadOnly() ) {
-			throw new ReadOnlyError;
-		}
-
-		list( $this->target, $this->type ) = SpecialBlock::getTargetAndType( $par, $wgRequest );
+		list( $this->target, $this->type ) = SpecialBlock::getTargetAndType( $par, $this->getRequest() );
 		$this->block = Block::newFromTarget( $this->target );
 
-		$wgOut->setPageTitle( wfMsg( 'unblockip' ) );
-		$wgOut->addModules( 'mediawiki.special' );
+		$this->setHeaders();
+		$this->outputHeader();
+
+		$out = $this->getOutput();
+		$out->setPageTitle( $this->msg( 'unblockip' ) );
+		$out->addModules( 'mediawiki.special' );
 
 		$form = new HTMLForm( $this->getFields(), $this->getContext() );
 		$form->setWrapperLegend( wfMsg( 'unblockip' ) );
-		$form->setSubmitCallback( array( __CLASS__, 'processUnblock' ) );
+		$form->setSubmitCallback( array( __CLASS__, 'processUIUnblock' ) );
 		$form->setSubmitText( wfMsg( 'ipusubmit' ) );
 		$form->addPreText( wfMsgExt( 'unblockiptext', 'parse' ) );
 
@@ -64,14 +58,14 @@ class SpecialUnblock extends SpecialPage {
 			switch( $this->type ){
 				case Block::TYPE_USER:
 				case Block::TYPE_IP:
-					$wgOut->addWikiMsg( 'unblocked',  $this->target );
+					$out->addWikiMsg( 'unblocked',  $this->target );
 					break;
 				case Block::TYPE_RANGE:
-					$wgOut->addWikiMsg( 'unblocked-range', $this->target );
+					$out->addWikiMsg( 'unblocked-range', $this->target );
 					break;
 				case Block::TYPE_ID:
 				case Block::TYPE_AUTO:
-					$wgOut->addWikiMsg( 'unblocked-id', $this->target );
+					$out->addWikiMsg( 'unblocked-id', $this->target );
 					break;
 			}
 		}
@@ -113,8 +107,7 @@ class SpecialUnblock extends SpecialPage {
 				switch( $type ){
 					case Block::TYPE_USER:
 					case Block::TYPE_IP:
-						$skin = $this->getSkin();
-						$fields['Name']['default'] = $skin->link(
+						$fields['Name']['default'] = Linker::link(
 							$target->getUserPage(),
 							$target->getName()
 						);
@@ -142,12 +135,21 @@ class SpecialUnblock extends SpecialPage {
 	}
 
 	/**
+	 * Submit callback for an HTMLForm object
+	 */
+	public static function processUIUnblock( array $data, HTMLForm $form ) {
+		return self::processUnblock( $data, $form->getContext() );
+	}
+
+	/**
 	 * Process the form
+	 *
+	 * @param $data Array
+	 * @param $context IContextSource
 	 * @return Array( Array(message key, parameters) ) on failure, True on success
 	 */
-	public static function processUnblock( array $data ){
-		global $wgUser;
-
+	public static function processUnblock( array $data, IContextSource $context ){
+		$performer = $context->getUser();
 		$target = $data['Target'];
 		$block = Block::newFromTarget( $data['Target'] );
 
@@ -158,7 +160,7 @@ class SpecialUnblock extends SpecialPage {
 		# bug 15810: blocked admins should have limited access here.  This
 		# won't allow sysops to remove autoblocks on themselves, but they
 		# should have ipblock-exempt anyway
-		$status = SpecialBlock::checkUnblockSelf( $target );
+		$status = SpecialBlock::checkUnblockSelf( $target, $performer );
 		if ( $status !== true ) {
 			throw new ErrorPageError( 'badaccess', $status );
 		}
@@ -173,7 +175,7 @@ class SpecialUnblock extends SpecialPage {
 
 		# If the name was hidden and the blocking user cannot hide
 		# names, then don't allow any block removals...
-		if( !$wgUser->isAllowed( 'hideuser' ) && $block->mHideName ) {
+		if( !$performer->isAllowed( 'hideuser' ) && $block->mHideName ) {
 			return array( 'unblock-hideuser' );
 		}
 
@@ -192,11 +194,17 @@ class SpecialUnblock extends SpecialPage {
 			RevisionDeleteUser::unsuppressUserName( $block->getTarget(), $id );
 		}
 
+		# Redact the name (IP address) for autoblocks
+		if ( $block->getType() == Block::TYPE_AUTO ) {
+			$page = Title::makeTitle( NS_USER, '#' . $block->getId() );
+		} else {
+			$page = $block->getTarget() instanceof User
+				? $block->getTarget()->getUserpage()
+				: Title::makeTitle( NS_USER, $block->getTarget() );
+		}
+
 		# Make log entry
 		$log = new LogPage( 'block' );
-		$page = $block->getTarget() instanceof User
-			? $block->getTarget()->getUserpage()
-			: Title::makeTitle( NS_USER, $block->getTarget() );
 		$log->addEntry( 'unblock', $page, $data['Reason'] );
 
 		return true;

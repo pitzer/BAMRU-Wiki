@@ -24,11 +24,6 @@
  * @file
  */
 
-if ( !defined( 'MEDIAWIKI' ) ) {
-	// Eclipse helper - will be ignored in production
-	require_once( 'ApiQueryBase.php' );
-}
-
 /**
  * Query module to get the results of a QueryPage-based special page
  *
@@ -75,12 +70,11 @@ class ApiQueryQueryPage extends ApiQueryGeneratorBase {
 	 * @param $resultPageSet ApiPageSet
 	 */
 	public function run( $resultPageSet = null ) {
-		global $wgUser;
 		$params = $this->extractRequestParams();
 		$result = $this->getResult();
 
 		$qp = new $this->qpMap[$params['page']]();
-		if ( !$qp->userCanExecute( $wgUser ) ) {
+		if ( !$qp->userCanExecute( $this->getUser() ) ) {
 			$this->dieUsageMsg( 'specialpage-cantexecute' );
 		}
 
@@ -97,13 +91,13 @@ class ApiQueryQueryPage extends ApiQueryGeneratorBase {
 			}
 		}
 		$result->addValue( array( 'query' ), $this->getModuleName(), $r );
-		
+
 		if ( $qp->isCached() && !$qp->isCacheable() ) {
 			// Disabled query page, don't run the query
 			return;
 		}
 
-		$res = $qp->doQuery( $params['limit'] + 1, $params['offset'] );
+		$res = $qp->doQuery( $params['offset'], $params['limit'] + 1 );
 		$count = 0;
 		$titles = array();
 		foreach ( $res as $row ) {
@@ -186,13 +180,13 @@ class ApiQueryQueryPage extends ApiQueryGeneratorBase {
 		) );
 	}
 
-	protected function getExamples() {
+	public function getExamples() {
 		return array(
 			'api.php?action=query&list=querypage&qppage=Ancientpages'
 		);
 	}
 
 	public function getVersion() {
-		return __CLASS__ . ': $Id: ApiQueryQueryPage.php 92762 2011-07-21 18:03:25Z catrope $';
+		return __CLASS__ . ': $Id$';
 	}
 }

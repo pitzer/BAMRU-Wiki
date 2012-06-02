@@ -55,7 +55,7 @@ class SVGReader {
 		$size = filesize( $source );
 		if ( $size === false ) {
 			throw new MWException( "Error getting filesize of SVG." );
-		} 
+		}
 
 		if ( $size > $wgSVGMetadataCutoff ) {
 			$this->debug( "SVG is $size bytes, which is bigger than $wgSVGMetadataCutoff. Truncating." );
@@ -67,6 +67,12 @@ class SVGReader {
 		} else {
 			$this->reader->open( $source, null, LIBXML_NOERROR | LIBXML_NOWARNING );
 		}
+
+		// Expand entities, since Adobe Illustrator uses them for xmlns 
+		// attributes (bug 31719). Note that libxml2 has some protection 
+		// against large recursive entity expansions so this is not as 
+		// insecure as it might appear to be.
+		$this->reader->setParserProperty( XMLReader::SUBST_ENTITIES, true );
 
 		$this->metadata['width'] = self::DEFAULT_WIDTH;
 		$this->metadata['height'] = self::DEFAULT_HEIGHT;
@@ -157,7 +163,7 @@ class SVGReader {
 		}
 		$keepReading = $this->reader->read();
 		while( $keepReading ) {
-			if( $this->reader->localName == $name && $this->namespaceURI == self::NS_SVG && $this->reader->nodeType == XmlReader::END_ELEMENT ) {
+			if( $this->reader->localName == $name && $this->reader->namespaceURI == self::NS_SVG && $this->reader->nodeType == XmlReader::END_ELEMENT ) {
 				break;
 			} elseif( $this->reader->nodeType == XmlReader::TEXT ){
 				$this->metadata[$metafield] = trim( $this->reader->value );
@@ -166,7 +172,7 @@ class SVGReader {
 		}
 	}
 
-	/*
+	/**
 	 * Read an XML snippet from an element
 	 *
 	 * @param String $metafield that we will fill with the result

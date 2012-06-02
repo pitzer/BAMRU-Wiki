@@ -24,11 +24,6 @@
  * @file
  */
 
-if ( !defined( 'MEDIAWIKI' ) ) {
-	// Eclipse helper - will be ignored in production
-	require_once( 'ApiQueryBase.php' );
-}
-
 /**
  * This query action allows clients to retrieve a list of recently modified pages
  * that are part of the logged-in user's watchlist.
@@ -118,7 +113,6 @@ class ApiQueryWatchlist extends ApiQueryGeneratorBase {
 		$this->addTables( array(
 			'recentchanges',
 			'watchlist',
-			'page',
 		) );
 
 		$userId = $user->getId();
@@ -128,7 +122,6 @@ class ApiQueryWatchlist extends ApiQueryGeneratorBase {
 				'wl_namespace=rc_namespace',
 				'wl_title=rc_title'
 		) ) ) );
-		$this->addJoinConds( array( 'page' => array( 'LEFT JOIN','rc_cur_id=page_id' ) ) );
 
 		$this->addWhere( array(
 			'rc_deleted' => 0,
@@ -136,11 +129,15 @@ class ApiQueryWatchlist extends ApiQueryGeneratorBase {
 
 		$db = $this->getDB();
 
-		$this->addWhereRange( 'rc_timestamp', $params['dir'],
-			$db->timestamp( $params['start'] ),
-			$db->timestamp( $params['end'] ) );
+		$this->addTimestampWhereRange( 'rc_timestamp', $params['dir'],
+			$params['start'], $params['end'] );
 		$this->addWhereFld( 'wl_namespace', $params['namespace'] );
-		$this->addWhereIf( 'rc_this_oldid=page_latest OR rc_type=' . RC_LOG, !$params['allrev'] );
+
+		if ( !$params['allrev'] ) {
+			$this->addTables( 'page' );
+			$this->addJoinConds( array( 'page' => array( 'LEFT JOIN','rc_cur_id=page_id' ) ) );
+			$this->addWhere( 'rc_this_oldid=page_latest OR rc_type=' . RC_LOG );
+		}
 
 		if ( !is_null( $params['show'] ) ) {
 			$show = array_flip( $params['show'] );
@@ -157,8 +154,8 @@ class ApiQueryWatchlist extends ApiQueryGeneratorBase {
 
 			// Check permissions.
 			if ( isset( $show['patrolled'] ) || isset( $show['!patrolled'] ) ) {
-				global $wgUser;
-				if ( !$wgUser->useRCPatrol() && !$wgUser->useNPPatrol() ) {
+				$user = $this->getUser();
+				if ( !$user->useRCPatrol() && !$user->useNPPatrol() ) {
 					$this->dieUsage( 'You need the patrol right to request the patrolled flag', 'permissiondenied' );
 				}
 			}
@@ -292,7 +289,7 @@ class ApiQueryWatchlist extends ApiQueryGeneratorBase {
 		}
 
 		if ( $this->fld_parsedcomment && isset( $row->rc_comment ) ) {
-			$vals['parsedcomment'] = $this->getSkin()->formatComment( $row->rc_comment, $title );
+			$vals['parsedcomment'] = Linker::formatComment( $row->rc_comment, $title );
 		}
 
 		if ( $this->fld_loginfo && $row->rc_type == RC_LOG ) {
@@ -407,7 +404,7 @@ class ApiQueryWatchlist extends ApiQueryGeneratorBase {
 				' parsedcomment          - Adds parsed comment of the edit',
 				' timestamp              - Adds timestamp of the edit',
 				' patrol                 - Tags edits that are patrolled',
-				' size                   - Adds the old and new lengths of the page',
+				' sizes                  - Adds the old and new lengths of the page',
 				' notificationtimestamp  - Adds timestamp of when the user was last notified about the edit',
 				' loginfo                - Adds log information where appropriate',
 			),
@@ -436,7 +433,7 @@ class ApiQueryWatchlist extends ApiQueryGeneratorBase {
 		) );
 	}
 
-	protected function getExamples() {
+	public function getExamples() {
 		return array(
 			'api.php?action=query&list=watchlist',
 			'api.php?action=query&list=watchlist&wlprop=ids|title|timestamp|user|comment',
@@ -448,10 +445,10 @@ class ApiQueryWatchlist extends ApiQueryGeneratorBase {
 	}
 
 	public function getHelpUrls() {
-		return 'http://www.mediawiki.org/wiki/API:Watchlist';
+		return 'https://www.mediawiki.org/wiki/API:Watchlist';
 	}
 
 	public function getVersion() {
-		return __CLASS__ . ': $Id: ApiQueryWatchlist.php 92570 2011-07-19 20:28:02Z platonides $';
+		return __CLASS__ . ': $Id$';
 	}
 }

@@ -28,7 +28,11 @@ class JpegMetadataExtractor {
 
 		$segmentCount = 0;
 
-		$segments = array( 'XMP_ext' => array(), 'COM' => array() );
+		$segments = array(
+			'XMP_ext' => array(),
+			'COM' => array(),
+			'PSIR' => array(),
+		);
 
 		if ( !$filename ) {
 			throw new MWException( "No filename specified for " . __METHOD__ );
@@ -55,10 +59,14 @@ class JpegMetadataExtractor {
 				throw new MWException( 'Too many jpeg segments. Aborting' );
 			}
 			if ( $buffer !== "\xFF" ) {
-				throw new MWException( "Error reading jpeg file marker" );
+				throw new MWException( "Error reading jpeg file marker. Expected 0xFF but got " . bin2hex( $buffer ) );
 			}
 
 			$buffer = fread( $fh, 1 );
+			while( $buffer === "\xFF" && !feof( $fh ) ) {
+				// Skip through any 0xFF padding bytes.
+				$buffer = fread( $fh, 1 );
+			}
 			if ( $buffer === "\xFE" ) {
 
 				// COM section -- file comment
@@ -82,36 +90,47 @@ class JpegMetadataExtractor {
 					wfDebug( __METHOD__ . ' Ignoring JPEG comment as is garbage.' );
 				}
 
-			} elseif ( $buffer === "\xE1" && $showXMP ) {
+			} elseif ( $buffer === "\xE1" ) {
 				// APP1 section (Exif, XMP, and XMP extended)
 				// only extract if XMP is enabled.
 				$temp = self::jpegExtractMarker( $fh );
-
 				// check what type of app segment this is.
-				if ( substr( $temp, 0, 29 ) === "http://ns.adobe.com/xap/1.0/\x00" ) {
+				if ( substr( $temp, 0, 29 ) === "http://ns.adobe.com/xap/1.0/\x00" && $showXMP ) {
 					$segments["XMP"] = substr( $temp, 29 );
-				} elseif ( substr( $temp, 0, 35 ) === "http://ns.adobe.com/xmp/extension/\x00" ) {
+				} elseif ( substr( $temp, 0, 35 ) === "http://ns.adobe.com/xmp/extension/\x00" && $showXMP ) {
 					$segments["XMP_ext"][] = substr( $temp, 35 );
-				} elseif ( substr( $temp, 0, 29 ) === "XMP\x00://ns.adobe.com/xap/1.0/\x00" ) {
+				} elseif ( substr( $temp, 0, 29 ) === "XMP\x00://ns.adobe.com/xap/1.0/\x00" && $showXMP ) {
 					// Some images (especially flickr images) seem to have this.
 					// I really have no idea what the deal is with them, but
 					// whatever...
 					$segments["XMP"] = substr( $temp, 29 );
 					wfDebug( __METHOD__ . ' Found XMP section with wrong app identifier '
 						. "Using anyways.\n" ); 
+				} elseif ( substr( $temp, 0, 6 ) === "Exif\0\0" ) {
+					// Just need to find out what the byte order is.
+					// because php's exif plugin sucks...
+					// This is a II for little Endian, MM for big. Not a unicode BOM.
+					$byteOrderMarker = substr( $temp, 6, 2 );
+					if ( $byteOrderMarker === 'MM' ) {
+						$segments['byteOrder'] = 'BE';
+					} elseif ( $byteOrderMarker === 'II' ) {
+						$segments['byteOrder'] = 'LE';
+					} else {
+						wfDebug( __METHOD__ . ' Invalid byte ordering?!' );
+					}
 				}
 			} elseif ( $buffer === "\xED" ) {
 				// APP13 - PSIR. IPTC and some photoshop stuff
 				$temp = self::jpegExtractMarker( $fh );
 				if ( substr( $temp, 0, 14 ) === "Photoshop 3.0\x00" ) {
-					$segments["PSIR"] = $temp;
+					$segments["PSIR"][] = $temp;
 				}
 			} elseif ( $buffer === "\xD9" || $buffer === "\xDA" ) {
 				// EOI - end of image or SOS - start of scan. either way we're past any interesting segments
 				return $segments;
 			} else {
 				// segment we don't care about, so skip
-				$size = unpack( "nint", fread( $fh, 2 ) );
+				$size = wfUnpack( "nint", fread( $fh, 2 ), 2 );
 				if ( $size['int'] <= 2 ) throw new MWException( "invalid marker size in jpeg" );
 				fseek( $fh, $size['int'] - 2, SEEK_CUR );
 			}
@@ -127,9 +146,11 @@ class JpegMetadataExtractor {
 	* @return data content of segment.
 	*/
 	private static function jpegExtractMarker( &$fh ) {
-		$size = unpack( "nint", fread( $fh, 2 ) );
+		$size = wfUnpack( "nint", fread( $fh, 2 ), 2 );
 		if ( $size['int'] <= 2 ) throw new MWException( "invalid marker size in jpeg" );
-		return fread( $fh, $size['int'] - 2 );
+		$segment = fread( $fh, $size['int'] - 2 );
+		if ( strlen( $segment ) !== $size['int'] - 2 ) throw new MWException( "Segment shorter than expected" );
+		return $segment;
 	}
 
 	/**
@@ -142,11 +163,12 @@ class JpegMetadataExtractor {
 	* This should generally be called by BitmapMetadataHandler::doApp13()
 	*
 	* @param String $app13 photoshop psir app13 block from jpg.
+	* @throws MWException (It gets caught next level up though)
 	* @return String if the iptc hash is good or not.
 	*/
 	public static function doPSIR ( $app13 ) {
 		if ( !$app13 ) {
-			return;
+			throw new MWException( "No App13 segment given" );
 		}
 		// First compare hash with real thing
 		// 0x404 contains IPTC, 0x425 has hash
@@ -188,13 +210,18 @@ class JpegMetadataExtractor {
 			$offset += $lenName;
 
 			// now length of data (unsigned long big endian)
-			$lenData = unpack( 'Nlen', substr( $app13, $offset, 4 ) );
+			$lenData = wfUnpack( 'Nlen', substr( $app13, $offset, 4 ), 4 );
+			// PHP can take issue with very large unsigned ints and make them negative.
+			// Which should never ever happen, as this has to be inside a segment
+			// which is limited to a 16 bit number.
+			if ( $lenData['len'] < 0 ) throw new MWException( "Too big PSIR (" . $lenData['len'] . ')' );
+
 			$offset += 4; // 4bytes length field;
 
 			// this should not happen, but check.
 			if ( $lenData['len'] + $offset > $appLen ) {
-				wfDebug( __METHOD__ . " PSIR data too long.\n" );
-				return 'iptc-no-hash';
+				throw new MWException( "PSIR data too long. (item length=" . $lenData['len']
+					. "; offset=$offset; total length=$appLen)" );
 			}
 
 			if ( $valid ) {

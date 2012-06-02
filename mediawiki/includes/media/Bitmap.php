@@ -12,66 +12,62 @@
  * @ingroup Media
  */
 class BitmapHandler extends ImageHandler {
-
 	/**
 	 * @param $image File
-	 * @param  $params
+	 * @param $params array Transform parameters. Entries with the keys 'width'
+	 * and 'height' are the respective screen width and height, while the keys
+	 * 'physicalWidth' and 'physicalHeight' indicate the thumbnail dimensions.
 	 * @return bool
 	 */
 	function normaliseParams( $image, &$params ) {
-		global $wgMaxImageArea;
 		if ( !parent::normaliseParams( $image, $params ) ) {
 			return false;
 		}
 
-		$mimeType = $image->getMimeType();
+		# Obtain the source, pre-rotation dimensions
 		$srcWidth = $image->getWidth( $params['page'] );
 		$srcHeight = $image->getHeight( $params['page'] );
 
-		$swapDimensions = false;
-		if ( self::canRotate() ) {
-			$rotation = $this->getRotation( $image );
-			if ( $rotation == 90 || $rotation == 270 ) {
-				wfDebug( __METHOD__ . ": Swapping width and height because the file will be rotated $rotation degrees\n" );
-
-				$swapDimensions = true;
-				list( $params['width'], $params['height'] ) =
-					array(  $params['width'], $params['height'] );
-				list( $params['physicalWidth'], $params['physicalHeight'] ) =
-					array( $params['physicalWidth'], $params['physicalHeight'] );
-			}
-		}
-
 		# Don't make an image bigger than the source
 		if ( $params['physicalWidth'] >= $srcWidth ) {
-			if ( $swapDimensions ) {
-				$params['physicalWidth'] = $srcHeight;
-				$params['physicalHeight'] = $srcWidth;
-			} else {
-				$params['physicalWidth'] = $srcWidth;
-				$params['physicalHeight'] = $srcHeight;
+			$params['physicalWidth'] = $srcWidth;
+			$params['physicalHeight'] = $srcHeight;
+
+			# Skip scaling limit checks if no scaling is required
+			# due to requested size being bigger than source.
+			if ( !$image->mustRender() ) {
+				return true;
 			}
 		}
 
-		# Skip scaling limit checks if no scaling is required
-		if ( !$image->mustRender() )
-			return true;
+		# Check if the file is smaller than the maximum image area for thumbnailing
+		$checkImageAreaHookResult = null;
+		wfRunHooks( 'BitmapHandlerCheckImageArea', array( $image, &$params, &$checkImageAreaHookResult ) );
+		if ( is_null( $checkImageAreaHookResult ) ) {
+			global $wgMaxImageArea;
 
-		# Don't thumbnail an image so big that it will fill hard drives and send servers into swap
-		# JPEG has the handy property of allowing thumbnailing without full decompression, so we make
-		# an exception for it.
-		# @todo FIXME: This actually only applies to ImageMagick
-		if ( $mimeType !== 'image/jpeg' &&
-			$srcWidth * $srcHeight > $wgMaxImageArea )
-		{
-			return false;
+			if ( $srcWidth * $srcHeight > $wgMaxImageArea &&
+					!( $image->getMimeType() == 'image/jpeg' &&
+						self::getScalerType( false, false ) == 'im' ) ) {
+				# Only ImageMagick can efficiently downsize jpg images without loading
+				# the entire file in memory
+				return false;
+			}
+		} else {
+			return $checkImageAreaHookResult;
 		}
 
 		return true;
 	}
 
+
 	/**
 	 * Extracts the width/height if the image will be scaled before rotating
+	 *
+	 * This will match the physical size/aspect ratio of the original image
+	 * prior to application of the rotation -- so for a portrait image that's
+	 * stored as raw landscape with 90-degress rotation, the resulting size
+	 * will be wider than it is tall.
 	 *
 	 * @param $params array Parameters as returned by normaliseParams
 	 * @param $rotation int The rotation angle that will be applied
@@ -90,10 +86,15 @@ class BitmapHandler extends ImageHandler {
 	}
 
 
-	// Function that returns the number of pixels to be thumbnailed.
-	// Intended for animated GIFs to multiply by the number of frames.
-	function getImageArea( $image, $width, $height ) {
-		return $width * $height;
+	/**
+	 * Function that returns the number of pixels to be thumbnailed.
+	 * Intended for animated GIFs to multiply by the number of frames.
+	 *
+	 * @param File $image
+	 * @return int
+	 */
+	function getImageArea( $image ) {
+		return $image->getWidth() * $image->getHeight();
 	}
 
 	/**
@@ -124,12 +125,14 @@ class BitmapHandler extends ImageHandler {
 			'srcWidth' => $image->getWidth(),
 			'srcHeight' => $image->getHeight(),
 			'mimeType' => $image->getMimeType(),
-			'srcPath' => $image->getPath(),
 			'dstPath' => $dstPath,
 			'dstUrl' => $dstUrl,
 		);
 
-		wfDebug( __METHOD__ . ": creating {$scalerParams['physicalDimensions']} thumbnail at $dstPath\n" );
+		# Determine scaler type
+		$scaler = self::getScalerType( $dstPath );
+
+		wfDebug( __METHOD__ . ": creating {$scalerParams['physicalDimensions']} thumbnail at $dstPath using scaler $scaler\n" );
 
 		if ( !$image->mustRender() &&
 				$scalerParams['physicalWidth'] == $scalerParams['srcWidth']
@@ -140,9 +143,6 @@ class BitmapHandler extends ImageHandler {
 			return $this->getClientScalingThumbnailImage( $image, $scalerParams );
 		}
 
-		# Determine scaler type
-		$scaler = self::getScalerType( $dstPath );
-		wfDebug( __METHOD__ . ": scaler $scaler\n" );
 
 		if ( $scaler == 'client' ) {
 			# Client-side image scaling, use the source URL
@@ -153,7 +153,7 @@ class BitmapHandler extends ImageHandler {
 		if ( $flags & self::TRANSFORM_LATER ) {
 			wfDebug( __METHOD__ . ": Transforming later per flags.\n" );
 			return new ThumbnailImage( $image, $dstUrl, $scalerParams['clientWidth'],
-				$scalerParams['clientHeight'], $dstPath );
+				$scalerParams['clientHeight'], false );
 		}
 
 		# Try to make a target path for the thumbnail
@@ -161,6 +161,9 @@ class BitmapHandler extends ImageHandler {
 			wfDebug( __METHOD__ . ": Unable to create thumbnail destination directory, falling back to client scaling\n" );
 			return $this->getClientScalingThumbnailImage( $image, $scalerParams );
 		}
+
+		# Transform functions and binaries need a FS source file
+		$scalerParams['srcPath'] = $image->getLocalRefPath();
 
 		# Try a hook
 		$mto = null;
@@ -232,13 +235,6 @@ class BitmapHandler extends ImageHandler {
 		} else {
 			$scaler = 'client';
 		}
-
-		if ( $scaler != 'client' && $dstPath ) {
-			if ( !wfMkdirParents( dirname( $dstPath ), null, __METHOD__ ) ) {
-				# Unable to create a path for the thumbnail
-				return 'client';
-			}
-		}
 		return $scaler;
 	}
 
@@ -249,10 +245,12 @@ class BitmapHandler extends ImageHandler {
 	 * @param $image File File associated with this thumbnail
 	 * @param $params array Array with scaler params
 	 * @return ThumbnailImage
+	 *
+	 * @fixme no rotation support
 	 */
 	protected function getClientScalingThumbnailImage( $image, $params ) {
 		return new ThumbnailImage( $image, $image->getURL(),
-				$params['clientWidth'], $params['clientHeight'], $params['srcPath'] );
+			$params['clientWidth'], $params['clientHeight'], null );
 	}
 
 	/**
@@ -283,15 +281,16 @@ class BitmapHandler extends ImageHandler {
 					< $wgSharpenReductionThreshold ) {
 				$sharpen = "-sharpen " . wfEscapeShellArg( $wgSharpenParameter );
 			}
-			// JPEG decoder hint to reduce memory, available since IM 6.5.6-2
-			$decoderHint = "-define jpeg:size={$params['physicalDimensions']}";
+			if ( version_compare( $this->getMagickVersion(), "6.5.6" ) >= 0 ) {
+				// JPEG decoder hint to reduce memory, available since IM 6.5.6-2
+				$decoderHint = "-define jpeg:size={$params['physicalDimensions']}";
+			}
 
 		} elseif ( $params['mimeType'] == 'image/png' ) {
 			$quality = "-quality 95"; // zlib 9, adaptive filtering
 
 		} elseif ( $params['mimeType'] == 'image/gif' ) {
-			if ( $this->getImageArea( $image, $params['srcWidth'],
-					$params['srcHeight'] ) > $wgMaxAnimatedGifArea ) {
+			if ( $this->getImageArea( $image ) > $wgMaxAnimatedGifArea ) {
 				// Extract initial frame only; we're so big it'll
 				// be a total drag. :P
 				$scene = 0;
@@ -305,6 +304,8 @@ class BitmapHandler extends ImageHandler {
 					$animation_post = '-fuzz 5% -layers optimizeTransparency';
 				}
 			}
+		} elseif ( $params['mimeType'] == 'image/x-xcf' ) {
+			$animation_post = '-layers merge';
 		}
 
 		// Use one thread only, to avoid deadlock bugs on OOM
@@ -332,7 +333,8 @@ class BitmapHandler extends ImageHandler {
 			( $params['comment'] !== ''
 				? " -set comment " . wfEscapeShellArg( $this->escapeMagickProperty( $params['comment'] ) )
 				: '' ) .
-			" -depth 8 $sharpen -auto-orient" .
+			" -depth 8 $sharpen " .
+			" -rotate -$rotation " .
 			" {$animation_post} " .
 			wfEscapeShellArg( $this->escapeMagickOutput( $params['dstPath'] ) ) . " 2>&1";
 
@@ -378,8 +380,7 @@ class BitmapHandler extends ImageHandler {
 			} elseif( $params['mimeType'] == 'image/png' ) {
 				$im->setCompressionQuality( 95 );
 			} elseif ( $params['mimeType'] == 'image/gif' ) {
-				if ( $this->getImageArea( $image, $params['srcWidth'],
-						$params['srcHeight'] ) > $wgMaxAnimatedGifArea ) {
+				if ( $this->getImageArea( $image ) > $wgMaxAnimatedGifArea ) {
 					// Extract initial frame only; we're so big it'll
 					// be a total drag. :P
 					$im->setImageScene( 0 );
@@ -508,7 +509,7 @@ class BitmapHandler extends ImageHandler {
 		if ( !isset( $typemap[$params['mimeType']] ) ) {
 			$err = 'Image type not supported';
 			wfDebug( "$err\n" );
-			$errMsg = wfMsg ( 'thumbnail_image-type' );
+			$errMsg = wfMsg( 'thumbnail_image-type' );
 			return $this->getMediaTransformError( $params, $errMsg );
 		}
 		list( $loader, $colorStyle, $saveType ) = $typemap[$params['mimeType']];
@@ -516,14 +517,14 @@ class BitmapHandler extends ImageHandler {
 		if ( !function_exists( $loader ) ) {
 			$err = "Incomplete GD library configuration: missing function $loader";
 			wfDebug( "$err\n" );
-			$errMsg = wfMsg ( 'thumbnail_gd-library', $loader );
+			$errMsg = wfMsg( 'thumbnail_gd-library', $loader );
 			return $this->getMediaTransformError( $params, $errMsg );
 		}
 
 		if ( !file_exists( $params['srcPath'] ) ) {
 			$err = "File seems to be missing: {$params['srcPath']}";
 			wfDebug( "$err\n" );
-			$errMsg = wfMsg ( 'thumbnail_image-missing', $params['srcPath'] );
+			$errMsg = wfMsg( 'thumbnail_image-missing', $params['srcPath'] );
 			return $this->getMediaTransformError( $params, $errMsg );
 		}
 
@@ -685,33 +686,21 @@ class BitmapHandler extends ImageHandler {
 	}
 
 	/**
-	 * Try to read out the orientation of the file and return the angle that
-	 * the file needs to be rotated to be viewed
+	 * On supporting image formats, try to read out the low-level orientation
+	 * of the file and return the angle that the file needs to be rotated to
+	 * be viewed.
+	 *
+	 * This information is only useful when manipulating the original file;
+	 * the width and height we normally work with is logical, and will match
+	 * any produced output views.
+	 *
+	 * The base BitmapHandler doesn't understand any metadata formats, so this
+	 * is left up to child classes to implement.
 	 *
 	 * @param $file File
 	 * @return int 0, 90, 180 or 270
 	 */
 	public function getRotation( $file ) {
-		$data = $file->getMetadata();
-		if ( !$data ) {
-			return 0;
-		}
-		wfSuppressWarnings();
-		$data = unserialize( $data );
-		wfRestoreWarnings();
-		if ( isset( $data['Orientation'] ) ) {
-			# See http://sylvana.net/jpegcrop/exif_orientation.html
-			switch ( $data['Orientation'] ) {
-				case 8:
-					return 90;
-				case 3:
-					return 180;
-				case 6:
-					return 270;
-				default:
-					return 0;
-			}
-		}
 		return 0;
 	}
 

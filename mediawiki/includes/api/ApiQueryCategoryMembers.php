@@ -24,11 +24,6 @@
  * @file
  */
 
-if ( !defined( 'MEDIAWIKI' ) ) {
-	// Eclipse helper - will be ignored in production
-	require_once( "ApiQueryBase.php" );
-}
-
 /**
  * A query module to enumerate pages that belong to a category.
  *
@@ -143,13 +138,22 @@ class ApiQueryCategoryMembers extends ApiQueryGeneratorBase {
 				$contWhere = "cl_sortkey $op $escSortkey OR " .
 					"(cl_sortkey = $escSortkey AND " .
 					"cl_from $op= $from)";
-
+				// The below produces ORDER BY cl_sortkey, cl_from, possibly with DESC added to each of them
+				$this->addWhereRange( 'cl_sortkey', $dir, null, null );
+				$this->addWhereRange( 'cl_from', $dir, null, null );
 			} else {
+				$startsortkey = $params['startsortkeyprefix'] !== null ?
+					Collation::singleton()->getSortkey( $params['startsortkeyprefix'] ) :
+					$params['startsortkey'];
+				$endsortkey = $params['endsortkeyprefix'] !== null ?
+					Collation::singleton()->getSortkey( $params['endsortkeyprefix'] ) :
+					$params['endsortkey'];
+
 				// The below produces ORDER BY cl_sortkey, cl_from, possibly with DESC added to each of them
 				$this->addWhereRange( 'cl_sortkey',
 					$dir,
-					$params['startsortkey'],
-					$params['endsortkey'] );
+					$startsortkey,
+					$endsortkey );
 				$this->addWhereRange( 'cl_from', $dir, null, null );
 			}
 			$this->addOption( 'USE INDEX', 'cl_sortkey' );
@@ -323,6 +327,8 @@ class ApiQueryCategoryMembers extends ApiQueryGeneratorBase {
 			),
 			'startsortkey' => null,
 			'endsortkey' => null,
+			'startsortkeyprefix' => null,
+			'endsortkeyprefix' => null,
 		);
 	}
 
@@ -349,6 +355,8 @@ class ApiQueryCategoryMembers extends ApiQueryGeneratorBase {
 			'end' => "Timestamp to end listing at. Can only be used with {$p}sort=timestamp",
 			'startsortkey' => "Sortkey to start listing from. Must be given in binary format. Can only be used with {$p}sort=sortkey",
 			'endsortkey' => "Sortkey to end listing at. Must be given in binary format. Can only be used with {$p}sort=sortkey",
+			'startsortkeyprefix' => "Sortkey prefix to start listing from. Can only be used with {$p}sort=sortkey. Overrides {$p}startsortkey",
+			'endsortkeyprefix' => "Sortkey prefix to end listing BEFORE (not at, if this value occurs it will not be included!). Can only be used with {$p}sort=sortkey. Overrides {$p}endsortkey",
 			'continue' => 'For large categories, give the value retured from previous query',
 			'limit' => 'The maximum number of pages to return.',
 		);
@@ -379,20 +387,18 @@ class ApiQueryCategoryMembers extends ApiQueryGeneratorBase {
 		);
 	}
 
-	protected function getExamples() {
+	public function getExamples() {
 		return array(
-			'Get first 10 pages in [[Category:Physics]]:',
-			'  api.php?action=query&list=categorymembers&cmtitle=Category:Physics',
-			'Get page info about first 10 pages in [[Category:Physics]]:',
-			'  api.php?action=query&generator=categorymembers&gcmtitle=Category:Physics&prop=info',
+			'api.php?action=query&list=categorymembers&cmtitle=Category:Physics' => 'Get first 10 pages in [[Category:Physics]]',
+			'api.php?action=query&generator=categorymembers&gcmtitle=Category:Physics&prop=info' => 'Get page info about first 10 pages in [[Category:Physics]]',
 		);
 	}
 
 	public function getHelpUrls() {
-		return 'http://www.mediawiki.org/wiki/API:Categorymembers';
+		return 'https://www.mediawiki.org/wiki/API:Categorymembers';
 	}
 
 	public function getVersion() {
-		return __CLASS__ . ': $Id: ApiQueryCategoryMembers.php 92401 2011-07-17 17:02:06Z reedy $';
+		return __CLASS__ . ': $Id$';
 	}
 }

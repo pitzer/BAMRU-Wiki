@@ -7,7 +7,9 @@
  * @ingroup Language
  * @file
  *
+ * @author Kuailong
  * @author PhiLiP
+ * @author Shizhao
  * @author Wong128hk
  */
 
@@ -174,8 +176,13 @@ $messages = array(
 # User preference toggles
 'tog-norollbackdiff' => '進行回退後略過差異比較',
 
-# Move page
-'move-redirect-suppressed' => '已禁止重新定向',
+'newpage' => '最新页面',
+
+# Edit pages
+'editing' => '正在编辑 $1',
+
+# Miscellaneous special pages
+'newpages' => '最新页面',
 
 /*
 Short names for language variants used for language conversion links.

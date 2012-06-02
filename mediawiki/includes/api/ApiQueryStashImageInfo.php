@@ -127,7 +127,7 @@ class ApiQueryStashImageInfo extends ApiQueryImageInfo {
 		return 'Returns image information for stashed images';
 	}
 
-	protected function getExamples() {
+	public function getExamples() {
 		return array(
 			'api.php?action=query&prop=stashimageinfo&siifilekey=124sd34rsdf567',
 			'api.php?action=query&prop=stashimageinfo&siifilekey=b34edoe3|bceffd4&siiurlwidth=120&siiprop=url',
@@ -135,7 +135,7 @@ class ApiQueryStashImageInfo extends ApiQueryImageInfo {
 	}
 
 	public function getVersion() {
-		return __CLASS__ . ': $Id: ApiQueryStashImageInfo.php 92815 2011-07-21 22:28:11Z raindrift $';
+		return __CLASS__ . ': $Id$';
 	}
 
 }

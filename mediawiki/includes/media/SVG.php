@@ -58,12 +58,21 @@ class SvgHandler extends ImageHandler {
 		if ( !parent::normaliseParams( $image, $params ) ) {
 			return false;
 		}
-		# Don't make an image bigger than wgMaxSVGSize
-		if ( $params['physicalWidth'] > $wgSVGMaxSize ) {
-			$srcWidth = $image->getWidth( $params['page'] );
-			$srcHeight = $image->getHeight( $params['page'] );
-			$params['physicalWidth'] = $wgSVGMaxSize;
-			$params['physicalHeight'] = File::scaleHeight( $srcWidth, $srcHeight, $wgSVGMaxSize );
+		# Don't make an image bigger than wgMaxSVGSize on the smaller side
+		if ( $params['physicalWidth'] <= $params['physicalHeight'] ) {
+			if ( $params['physicalWidth'] > $wgSVGMaxSize ) {
+				$srcWidth = $image->getWidth( $params['page'] );
+				$srcHeight = $image->getHeight( $params['page'] );
+				$params['physicalWidth'] = $wgSVGMaxSize;
+				$params['physicalHeight'] = File::scaleHeight( $srcWidth, $srcHeight, $wgSVGMaxSize );
+			}
+		} else {
+			if ( $params['physicalHeight'] > $wgSVGMaxSize ) {
+				$srcWidth = $image->getWidth( $params['page'] );
+				$srcHeight = $image->getHeight( $params['page'] );
+				$params['physicalWidth'] = File::scaleHeight( $srcHeight, $srcWidth, $wgSVGMaxSize );
+				$params['physicalHeight'] = $wgSVGMaxSize;
+			}
 		}
 		return true;
 	}
@@ -84,7 +93,7 @@ class SvgHandler extends ImageHandler {
 		$clientHeight = $params['height'];
 		$physicalWidth = $params['physicalWidth'];
 		$physicalHeight = $params['physicalHeight'];
-		$srcPath = $image->getPath();
+		$srcPath = $image->getLocalRefPath();
 
 		if ( $flags & self::TRANSFORM_LATER ) {
 			return new ThumbnailImage( $image, $dstUrl, $clientWidth, $clientHeight, $dstPath );
@@ -110,7 +119,7 @@ class SvgHandler extends ImageHandler {
 	* @param string $dstPath
 	* @param string $width
 	* @param string $height
-	* @returns TRUE/MediaTransformError
+	* @return true|MediaTransformError
 	*/
 	public function rasterize( $srcPath, $dstPath, $width, $height ) {
 		global $wgSVGConverters, $wgSVGConverter, $wgSVGConverterPath;

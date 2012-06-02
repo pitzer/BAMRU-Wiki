@@ -3,18 +3,6 @@
  * Special handling for category pages
  */
 class WikiCategoryPage extends WikiPage {
-	/**
-	 * Constructor from a page id
-	 * @param $id Int article ID to load
-	 *
-	 * @return WikiCategoryPage
-	 */
-	public static function newFromID( $id ) {
-		$t = Title::newFromID( $id );
-		# @todo FIXME: Doesn't inherit right
-		return $t == null ? null : new self( $t );
-		# return $t == null ? null : new static( $t ); // PHP 5.3
-	}
 
 	/**
 	 * Don't return a 404 for categories in use.

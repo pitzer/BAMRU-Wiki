@@ -24,11 +24,6 @@
  * @file
  */
 
-if ( !defined( 'MEDIAWIKI' ) ) {
-	// Eclipse helper - will be ignored in production
-	require_once( 'ApiBase.php' );
-}
-
 /**
  * This is the abstract base class for API formatters.
  *
@@ -169,7 +164,7 @@ abstract class ApiFormatBase extends ApiBase {
 <small>
 You are looking at the HTML representation of the <?php echo( $this->mFormat ); ?> format.<br />
 HTML is good for debugging, but probably is not suitable for your application.<br />
-See <a href='http://www.mediawiki.org/wiki/API'>complete documentation</a>, or
+See <a href='https://www.mediawiki.org/wiki/API'>complete documentation</a>, or
 <a href='<?php echo( $script ); ?>'>API help</a> for more information.
 </small>
 <?php
@@ -235,8 +230,10 @@ See <a href='http://www.mediawiki.org/wiki/API'>complete documentation</a>, or
 	public function getBuffer() {
 		return $this->mBuffer;
 	}
+
 	/**
 	 * Set the flag to buffer the result instead of printing it.
+	 * @param $value bool
 	 */
 	public function setBufferResult( $value ) {
 		$this->mBufferResult = $value;
@@ -263,11 +260,11 @@ See <a href='http://www.mediawiki.org/wiki/API'>complete documentation</a>, or
 		// encode all comments or tags as safe blue strings
 		$text = preg_replace( '/\&lt;(!--.*?--|.*?)\&gt;/', '<span style="color:blue;">&lt;\1&gt;</span>', $text );
 		// identify URLs
-		$protos = wfUrlProtocols();
+		$protos = wfUrlProtocolsWithoutProtRel();
 		// This regex hacks around bug 13218 (&quot; included in the URL)
 		$text = preg_replace( "#(($protos).*?)(&quot;)?([ \\'\"<>\n]|&lt;|&gt;|&quot;)#", '<a href="\\1">\\1</a>\\3\\4', $text );
 		// identify requests to api.php
-		$text = preg_replace( "#api\\.php\\?[^ \\()<\n\t]+#", '<a href="\\0">\\0</a>', $text );
+		$text = preg_replace( "#api\\.php\\?[^ <\n\t]+#", '<a href="\\0">\\0</a>', $text );
 		if ( $this->mHelp ) {
 			// make strings inside * bold
 			$text = preg_replace( "#\\*[^<>\n]+\\*#", '<b>\\0</b>', $text );
@@ -288,12 +285,15 @@ See <a href='http://www.mediawiki.org/wiki/API'>complete documentation</a>, or
 		return $text;
 	}
 
-	protected function getExamples() {
-		return 'api.php?action=query&meta=siteinfo&siprop=namespaces&format=' . $this->getModuleName();
+	public function getExamples() {
+		return array(
+			'api.php?action=query&meta=siteinfo&siprop=namespaces&format=' . $this->getModuleName()
+				=> "Format the query result in the {$this->getModuleName()} format",
+		);
 	}
 
 	public function getHelpUrls() {
-		return 'http://www.mediawiki.org/wiki/API:Data_formats';
+		return 'https://www.mediawiki.org/wiki/API:Data_formats';
 	}
 
 	public function getDescription() {
@@ -301,7 +301,7 @@ See <a href='http://www.mediawiki.org/wiki/API'>complete documentation</a>, or
 	}
 
 	public static function getBaseVersion() {
-		return __CLASS__ . ': $Id: ApiFormatBase.php 92573 2011-07-19 20:31:48Z platonides $';
+		return __CLASS__ . ': $Id$';
 	}
 }
 
@@ -335,6 +335,8 @@ class ApiFormatFeedWrapper extends ApiFormatBase {
 
 	/**
 	 * Feed does its own headers
+	 *
+	 * @return null
 	 */
 	public function getMimeType() {
 		return null;
@@ -342,6 +344,8 @@ class ApiFormatFeedWrapper extends ApiFormatBase {
 
 	/**
 	 * Optimization - no need to sanitize data that will not be needed
+	 *
+	 * @return bool
 	 */
 	public function getNeedsRawData() {
 		return true;
@@ -370,6 +374,6 @@ class ApiFormatFeedWrapper extends ApiFormatBase {
 	}
 
 	public function getVersion() {
-		return __CLASS__ . ': $Id: ApiFormatBase.php 92573 2011-07-19 20:31:48Z platonides $';
+		return __CLASS__ . ': $Id$';
 	}
 }

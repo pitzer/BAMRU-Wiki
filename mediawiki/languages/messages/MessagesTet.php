@@ -198,8 +198,8 @@ $messages = array(
 'protect'           => 'Proteje',
 'protect_change'    => 'muda',
 'protectthispage'   => "Proteje pájina ne'e",
-'unprotect'         => 'La proteje',
-'unprotectthispage' => "La proteje pájina ne'e",
+'unprotect'         => 'Muda protesaun',
+'unprotectthispage' => "Muda protesaun pájina ne'e nian",
 'newpage'           => 'Pájina foun',
 'talkpage'          => "Diskusaun kona-ba pájina ne'e",
 'talkpagelinktext'  => 'Diskusaun',
@@ -273,6 +273,7 @@ $messages = array(
 'nstab-user'      => "Pájina uza-na'in",
 'nstab-special'   => 'Pájina espesiál',
 'nstab-project'   => 'Pájina projetu nian',
+'nstab-image'     => 'Fail',
 'nstab-mediawiki' => 'Mensajen',
 'nstab-help'      => 'Pájina ajuda',
 'nstab-category'  => 'Kategoria',
@@ -288,7 +289,6 @@ Lista ida pájina espesiál nian [[Special:SpecialPages|iha ne'e]].",
 'missingarticle-rev'  => '(version#: $1)',
 'missingarticle-diff' => '(Dif.: $1, $2)',
 'viewsource'          => 'Lee testu',
-'viewsourcefor'       => 'ba $1',
 'viewsourcetext'      => 'Ó bele lee no kopia testu pájina nian:',
 'namespaceprotected'  => "Ó la iha priviléjiu ba edita pájina sira iha espasu '''$1'''.",
 'ns-specialprotected' => 'La ema ida bele edita pájina espesiál sira.',
@@ -308,7 +308,8 @@ La haluha muda Ita-nia [[Special:Preferences|preferénsia]].",
 'createaccount'           => "Registrar uza-na'in",
 'gotaccount'              => "Ó iha konta ona? '''$1'''.",
 'gotaccountlink'          => 'Log in',
-'userexists'              => "Uza-na'in ne'e ona iha wiki. Favór ida lori naran seluk.",
+'userexists'              => "Naran uza-na'in ne'e ona iha wiki.
+Favór ida lori naran seluk.",
 'nosuchuser'              => 'Konta uza-na\'in (naran "$1") la iha.
 User names are case sensitive.
 Check your spelling, ka [[Special:UserLogin/signup|kria konta foun]].',
@@ -387,8 +388,6 @@ Check your spelling, ka [[Special:UserLogin/signup|kria konta foun]].',
 'revdelete-hide-user'        => "Subar naran edita-na'in/IP",
 'revdelete-radio-set'        => 'Sin',
 'revdelete-radio-unset'      => 'Lae',
-'revdelete-uname'            => "naran uza-na'in",
-'revdelete-hid'              => 'subar $1',
 'revdelete-edit-reasonlist'  => 'Edita lista motivu nian',
 
 # Diffs
@@ -450,11 +449,11 @@ Check your spelling, ka [[Special:UserLogin/signup|kria konta foun]].',
 'group-suppress'   => "Oversight-na'in sira",
 'group-all'        => '(hotu)',
 
-'group-user-member'       => "Uza-na'in",
-'group-bot-member'        => 'Bot',
-'group-sysop-member'      => 'Administradór',
-'group-bureaucrat-member' => 'Burokrata',
-'group-suppress-member'   => "Oversight-na'in",
+'group-user-member'       => "{{GENDER:$1|Uza-na'in}}",
+'group-bot-member'        => '{{GENDER:$1|Bot}}',
+'group-sysop-member'      => '{{GENDER:$1|Administradór|Administradóra}}',
+'group-bureaucrat-member' => '{{GENDER:$1|Burokrata}}',
+'group-suppress-member'   => "{{GENDER:$1|Oversight-na'in}}",
 
 'grouppage-user'       => "{{ns:project}}:Uza-na'in sira",
 'grouppage-bot'        => '{{ns:project}}:Bot sira',
@@ -527,18 +526,20 @@ Check your spelling, ka [[Special:UserLogin/signup|kria konta foun]].',
 'license-header' => 'Lisensa:',
 
 # Special:ListFiles
+'imgfile'        => 'fail',
 'listfiles_date' => 'Tempu',
 'listfiles_name' => 'Naran',
 'listfiles_user' => "Uza-na'in",
 
 # File description page
+'file-anchor-link'   => 'Fail',
 'filehist-deleteall' => 'halakon hotu',
 'filehist-deleteone' => 'halakon',
 'filehist-current'   => 'atuál',
 'filehist-datetime'  => 'Loron/Tempu',
 'filehist-user'      => "Uza-na'in",
 'filehist-comment'   => 'Komentáriu',
-'imagelinks'         => 'Ligasaun',
+'imagelinks'         => "Pájina iha ne'ebá fixeiru ne'e",
 
 # File reversion
 'filerevert-comment' => 'Razaun:',
@@ -582,8 +583,8 @@ Check your spelling, ka [[Special:UserLogin/signup|kria konta foun]].',
 'booksources-go' => 'Bá',
 
 # Special:Log
-'specialloguserlabel'  => "Uza-na'in:",
-'speciallogtitlelabel' => 'Títulu:',
+'specialloguserlabel'  => "Uza-na'in ne'ebé halo:",
+'speciallogtitlelabel' => "Objetivu (títulu ka uza-na'in):",
 
 # Special:AllPages
 'allpages'          => 'Pájina hotu',
@@ -601,7 +602,8 @@ Check your spelling, ka [[Special:UserLogin/signup|kria konta foun]].',
 'allpagesprefix'    => 'Hatudu pájina sira ho prefiksu:',
 
 # Special:Categories
-'categories' => 'Kategoria sira',
+'categories'                  => 'Kategoria sira',
+'special-categories-sort-abc' => 'tau tuir alfabetu',
 
 # Special:LinkSearch
 'linksearch-ns' => 'Espasu pájina nian:',
@@ -610,11 +612,13 @@ Check your spelling, ka [[Special:UserLogin/signup|kria konta foun]].',
 # Special:ListUsers
 'listusers-submit' => 'Hatudu',
 
+# Special:ActiveUsers
+'activeusers-hidebots'   => 'Subar bot sira',
+'activeusers-hidesysops' => 'Subar administradór sira',
+
 # Special:Log/newusers
-'newuserlogpage'           => "Lista kria uza-na'in",
-'newuserlogpagetext'       => "Ne'e lista kria uza-na'in.",
-'newuserlog-create-entry'  => "Uza-na'in foun",
-'newuserlog-create2-entry' => 'registrar tiha konta foun $1',
+'newuserlogpage'     => "Lista kria uza-na'in",
+'newuserlogpagetext' => "Ne'e lista kria uza-na'in.",
 
 # Special:ListGroupRights
 'listgrouprights-group'   => 'Grupu',
@@ -623,7 +627,7 @@ Check your spelling, ka [[Special:UserLogin/signup|kria konta foun]].',
 
 # E-mail user
 'emailuser'       => "Haruka korreiu eletróniku ba uza-na'in ne'e",
-'defemailsubject' => '{{SITENAME}} korreiu eletróniku',
+'defemailsubject' => '{{SITENAME}} - korreiu eletróniku husi uza-na\'in "$1"',
 'noemailtitle'    => "Lá'os diresaun korreiu eletróniku",
 'emailusername'   => "Naran uza-na'in:",
 'emailsend'       => 'Haruka',
@@ -656,7 +660,6 @@ Check your spelling, ka [[Special:UserLogin/signup|kria konta foun]].',
 'delete-legend'          => 'Halakon',
 'actioncomplete'         => 'operasaun remata',
 'deletedtext'            => 'Ita foin halakon pájina "$1". Haree $2 ba "operasaun halakon" seluk.',
-'deletedarticle'         => 'halakon "[[$1]]"',
 'dellogpage'             => 'Lista halakon',
 'deletionlog'            => 'lista halakon',
 'deletecomment'          => 'Motivu:',
@@ -693,7 +696,6 @@ Check your spelling, ka [[Special:UserLogin/signup|kria konta foun]].',
 'undeletelink'              => 'lee/restaurar',
 'undeleteviewlink'          => 'haree',
 'undeletecomment'           => 'Razaun:',
-'undeletedarticle'          => 'restaurar "[[$1]]"',
 'undeletedrevisions'        => 'restaurar {{PLURAL:$1|versaun|versaun}} $1',
 'undelete-search-submit'    => 'Buka',
 'undelete-show-file-submit' => 'Sin',
@@ -722,7 +724,7 @@ Check your spelling, ka [[Special:UserLogin/signup|kria konta foun]].',
 'whatlinkshere-title'     => 'Pájina sira ne\'ebé bá "$1".',
 'whatlinkshere-page'      => 'Pájina:',
 'linkshere'               => "Pájina sira ne'e link ba '''[[:$1]]''':",
-'isimage'                 => 'ligasaun ba imajen ida',
+'isimage'                 => 'ligasaun ba fixeiru',
 'whatlinkshere-prev'      => '{{PLURAL:$1|oinmai|oinmai $1}}',
 'whatlinkshere-next'      => '{{PLURAL:$1|molok|molok $1}}',
 'whatlinkshere-links'     => '← ligasaun',
@@ -758,7 +760,6 @@ Check your spelling, ka [[Special:UserLogin/signup|kria konta foun]].',
 'movepagebtn'             => 'Book pájina',
 'movedto'                 => 'book tiha ba',
 'movetalk'                => 'Book pájina diskusaun mós',
-'1movedto2'               => 'book tiha [[$1]] ba [[$2]]',
 'movelogpage'             => 'Lista book',
 'movereason'              => 'Motivu:',
 'delete_and_move'         => 'Halakon ho book',
@@ -883,7 +884,7 @@ Check your spelling, ka [[Special:UserLogin/signup|kria konta foun]].',
 'exif-urgency-high'   => 'Aas ($1)',
 
 # External editor support
-'edit-externally-help' => "(Haree [http://www.mediawiki.org/wiki/Manual:External_editors iha ne'e] ba informasaun barak liu)",
+'edit-externally-help' => "(Haree [//www.mediawiki.org/wiki/Manual:External_editors iha ne'e] ba informasaun barak liu)",
 
 # 'all' in various places, this might be different for inflected languages
 'watchlistall2' => 'hotu',
@@ -927,6 +928,7 @@ Check your spelling, ka [[Special:UserLogin/signup|kria konta foun]].',
 'version-software-version' => 'Versaun',
 
 # Special:FilePath
+'filepath-page'   => 'Fail:',
 'filepath-submit' => 'Bá',
 
 # Special:FileDuplicateSearch

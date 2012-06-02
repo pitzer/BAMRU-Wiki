@@ -30,15 +30,29 @@ class OracleUpdater extends DatabaseUpdater {
 			array( 'doSchemaUpgrade17' ),
 			array( 'doInsertPage0' ),
 			array( 'doRemoveNotNullEmptyDefaults' ),
+			array( 'addTable', 'user_former_groups', 'patch-user_former_groups.sql' ),
 
 			//1.18
 			array( 'addIndex',	'user',          'i02',       'patch-user_email_index.sql' ),
 			array( 'modifyField', 'user_properties', 'up_property', 'patch-up_property.sql' ),
+			array( 'addTable', 'uploadstash', 'patch-uploadstash.sql' ),
+			array( 'doRecentchangesFK2Cascade' ),
 
-			// 1.19
-			array( 'addTable', 'config', 'patch-config.sql' ),
+			//1.19
+			array( 'addIndex', 'logging',       'i05',      'patch-logging_type_action_index.sql'),
+			array( 'addTable', 'globaltemplatelinks', 'patch-globaltemplatelinks.sql' ),
+			array( 'addTable', 'globalnamespaces', 'patch-globalnamespaces.sql' ),
+			array( 'addTable', 'globalinterwiki', 'patch-globalinterwiki.sql' ),
+			array( 'addField', 'revision', 'rev_sha1', 'patch-rev_sha1_field.sql' ),
+			array( 'addField', 'archive', 'ar_sha1', 'patch-ar_sha1_field.sql' ),
+			array( 'doRemoveNotNullEmptyDefaults2' ),
+			array( 'addIndex', 'page', 'i03', 'patch-page_redirect_namespace_len.sql' ),
+			array( 'modifyField', 'user', 'ug_group', 'patch-ug_group-length-increase.sql' ),
+			array( 'addField', 'uploadstash', 'us_chunk_inx', 'patch-us_chunk_inx_field.sql' ),
+			array( 'addField', 'job', 'job_timestamp', 'patch-job_timestamp_field.sql' ),
+			array( 'addIndex', 'job', 'i02', 'patch-job_timestamp_index.sql' ),
 
-			// till 2.0 i guess
+			// KEEP THIS AT THE BOTTOM!!
 			array( 'doRebuildDuplicateFunction' ),
 
 		);
@@ -136,6 +150,34 @@ class OracleUpdater extends DatabaseUpdater {
 		$this->applyPatch( 'patch_remove_not_null_empty_defs.sql', false );
 		$this->output( "ok\n" );
 	}
+	protected function doRemoveNotNullEmptyDefaults2() {
+		$this->output( "Removing not null empty constraints ... " );
+		$meta = $this->db->fieldInfo( 'ipblocks' , 'ipb_by_text' );
+		if ( $meta->isNullable() ) {
+			$this->output( "constraints seem to be removed\n" );
+			return;
+		}
+		$this->applyPatch( 'patch_remove_not_null_empty_defs2.sql', false );
+		$this->output( "ok\n" );
+	}
+
+	/**
+	 * Removed forcing of invalid state on recentchanges_fk2.
+	 * cascading taken in account in the deleting function
+	 */
+	protected function doRecentchangesFK2Cascade() {
+		$this->output( "Altering RECENTCHANGES_FK2 ... " );
+
+		$meta = $this->db->query( 'SELECT 1 FROM all_constraints WHERE owner = \''.strtoupper($this->db->getDBname()).'\' AND constraint_name = \''.$this->db->tablePrefix().'RECENTCHANGES_FK2\' AND delete_rule = \'CASCADE\'' );
+		$row = $meta->fetchRow();
+		if ( $row ) {
+			$this->output( "FK up to date\n" );
+			return;
+		}
+
+		$this->applyPatch( 'patch_recentchanges_fk2_cascade.sql', false );
+		$this->output( "ok\n" );
+	}
 
 	/**
 	 * rebuilding of the function that duplicates tables for tests
@@ -151,10 +193,21 @@ class OracleUpdater extends DatabaseUpdater {
 	 *
 	 * @param $what array
 	 */
-	public function doUpdates( $what = array( 'core', 'extensions', 'purge' ) ) {
+	public function doUpdates( $what = array( 'core', 'extensions', 'purge', 'stats' ) ) {
 		parent::doUpdates( $what );
 
 		$this->db->query( 'BEGIN fill_wiki_info; END;' );
+	}
+
+	/**
+	 * Overload: because of the DDL_MODE tablename escaping is a bit dodgy
+	 */
+	protected function purgeCache() {
+		# We can't guarantee that the user will be able to use TRUNCATE,
+		# but we know that DELETE is available to us
+		$this->output( "Purging caches..." );
+		$this->db->delete( '/*Q*/'.$this->db->tableName( 'objectcache' ), '*', __METHOD__ );
+		$this->output( "done.\n" );
 	}
 
 }

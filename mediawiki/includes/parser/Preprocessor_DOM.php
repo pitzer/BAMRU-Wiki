@@ -81,7 +81,7 @@ class Preprocessor_DOM implements Preprocessor {
 	 */
 	function memCheck() {
 		if ( $this->memoryLimit === false ) {
-			return;
+			return true;
 		}
 		$usage = memory_get_usage();
 		if ( $usage > $this->memoryLimit * 0.9 ) {
@@ -155,7 +155,8 @@ class Preprocessor_DOM implements Preprocessor {
 		if ( !$result ) {
 			// Try running the XML through UtfNormal to get rid of invalid characters
 			$xml = UtfNormal::cleanUp( $xml );
-			$result = $dom->loadXML( $xml );
+			// 1 << 19 == XML_PARSE_HUGE, needed so newer versions of libxml2 don't barf when the XML is >256 levels deep
+			$result = $dom->loadXML( $xml, 1 << 19 );
 			if ( !$result ) {
 				throw new MWException( __METHOD__.' generated invalid XML' );
 			}
@@ -542,7 +543,7 @@ class Preprocessor_DOM implements Preprocessor {
 						'open' => $curChar,
 						'close' => $rule['end'],
 						'count' => $count,
-						'lineStart' => ($i == 0 || $text[$i-1] == "\n"),
+						'lineStart' => ($i > 0 && $text[$i-1] == "\n"),
 					);
 
 					$stack->push( $piece );
@@ -956,12 +957,11 @@ class PPFrame_DOM implements PPFrame {
 			return $root;
 		}
 
-		if ( is_object( $this->parser->mOptions ) && ++$this->parser->mPPNodeCount > $this->parser->mOptions->getMaxPPNodeCount() )
-		{
+		if ( ++$this->parser->mPPNodeCount > $this->parser->mOptions->getMaxPPNodeCount() ) {
 			return '<span class="error">Node-count limit exceeded</span>';
 		}
 
-		if ( is_object( $this->parser->mOptions ) && $expansionDepth > $this->parser->mOptions->getMaxPPExpandDepth() ) {
+		if ( $expansionDepth > $this->parser->mOptions->getMaxPPExpandDepth() ) {
 			return '<span class="error">Expansion depth limit exceeded</span>';
 		}
 		wfProfileIn( __METHOD__ );
@@ -1338,6 +1338,15 @@ class PPFrame_DOM implements PPFrame {
 	 */
 	function isTemplate() {
 		return false;
+	}
+
+	/**
+	 * Get a title of frame
+	 *
+	 * @return Title
+	 */
+	function getTitle() {
+		return $this->title;
 	}
 }
 

@@ -47,7 +47,7 @@ Probeer het over een aantal minuten opnieuw.',
 'viewsourcetext'      => 'Je kunt de brontekst van deze pagina bekijken en kopiëren:',
 'editinginterface'    => "'''Waarschuwing:''' Je bewerkt een pagina die gebruikt wordt door de software.
 Bewerkingen op deze pagina beïnvloeden de gebruikersinterface van iedereen.
-Overweeg voor vertalingen om [http://translatewiki.net/wiki/Main_Page?setlang=nl translatewiki.net] te gebruiken, het vertalingsproject voor MediaWiki.",
+Overweeg voor vertalingen om [//translatewiki.net/wiki/Main_Page?setlang=nl translatewiki.net] te gebruiken, het vertalingsproject voor MediaWiki.",
 'namespaceprotected'  => "Je hebt geen rechten om pagina's in de naamruimte '''$1''' te bewerken.",
 
 # Login and logout pages
@@ -157,7 +157,6 @@ Je kunt geen gebruik maken van de functie "Deze gebruiker e-mailen", tenzij je e
 
 Je huidige IP-adres is $3 en het blokkadenummer is #$5.
 Vermeld alle bovenstaande gegevens als je ergens op deze blokkade reageert.',
-'blockededitsource'                => "Hieronder staat de tekst van '''je bewerkingen''' aan '''$1''':",
 'whitelistedittext'                => "Je moet $1 om pagina's te bewerken.",
 'confirmedittext'                  => 'Je moet je e-mailadres bevestigen voor je kunt bewerken.
 Voer je e-mailadres in en bevestig het via [[Special:Preferences|je voorkeuren]].',
@@ -265,8 +264,8 @@ Als beheerder kun je [$1 de verschillen bekijken] als je wil.",
 'rev-suppressed-unhide-diff'  => "Een van de versies in deze verschillen is '''onderdrukt'''.
 Achtergronden zijn mogelijk te vinden in het [{{fullurl:{{#Special:Log}}/suppress|page={{FULLPAGENAMEE}}}} verbergingslogboek].
 Als beheerder kunt je [$1 deze versie bekijken] als je wil.",
-'rev-deleted-diff-view'       => "Een van de bewerkingen voor de verschillen die je hebt opgevraagd, is '''verwijderd'''.
-Als beheerder kunt je deze verschillen bekijken. Mogelijk zijn details zichtbaar in het [{{fullurl:{{#Special:Log}}/delete|page={{FULLPAGENAMEE}}}} verwijderlogboek].",
+'rev-deleted-diff-view'       => "Een van de versies voor de verschillen die je hebt opgevraagd, is '''verwijderd'''.
+Jij kunt deze verschillen bekijken. Mogelijk zijn details zichtbaar in het [{{fullurl:{{#Special:Log}}/delete|page={{FULLPAGENAMEE}}}} verwijderlogboek].",
 'rev-suppressed-diff-view'    => "Een van de bewerkingen voor de verschillen die je hebt opgevraagd, is '''onderdrukt'''.
 Als beheerder kun je deze verschillen bekijken. Mogelijk zijn details zichtbaar in het [{{fullurl:{{#Special:Log}}/suppress|page={{FULLPAGENAMEE}}}} verbergingslogboek].",
 'revdelete-nooldid-text'      => 'Je hebt geen doelversie(s) voor deze handeling opgegeven, de aangegeven versie bestaat niet of je probeert de laatste versie te verbergen.',
@@ -369,7 +368,7 @@ Ga terug naar het [[Special:Upload/stash/$1|uploadformulier]] om dit probleem te
 'img-auth-nopathinfo' => 'PATH_INFO mist.
 Je server is niet ingesteld om deze informatie door te geven.
 Misschien gebruikt deze CGI, en dan wordt img_auth niet ondersteund.
-Zie http://www.mediawiki.org/wiki/Manual:Image_Authorization voor meer informatie.',
+Zie https://www.mediawiki.org/wiki/Manual:Image_Authorization voor meer informatie.',
 'img-auth-nologinnWL' => 'Je bent niet aangemeld en "$1" staat niet op de witte lijst.',
 'img-auth-isdir'      => 'Je probeert de map "$1" te benaderen.
 Alleen toegang tot bestanden is toegestaan.',
@@ -413,7 +412,7 @@ De ontvanger kan dus direct naar je reageren.',
 
 # Watchlist
 'nowatchlist'          => 'Je volglijst is leeg.',
-'watchlistanontext'    => '$1 is noodzakelijk om je volglijst in te zien of te wijzigen.',
+'watchlistanontext'    => 'Om je volglijst te bekijken of te bewerken moet je je $1.',
 'watchnologintext'     => 'Je dient [[Special:UserLogin|aangemeld]] te zijn om je volglijst te bewerken.',
 'addedwatchtext'       => "De pagina \"[[:\$1]]\" is toegevoegd aan je [[Special:Watchlist|volglijst]].
 Toekomstige bewerkingen van deze pagina en de bijbehorende overlegpagina worden op [[Special:Watchlist|je volglijst]] vermeld en worden '''vet''' weergegeven in de [[Special:RecentChanges|lijst van recente wijzigingen]].",
@@ -442,13 +441,13 @@ Tenzij je deze pagina bezoekt, komen er geen verdere berichten. Op je volglijst 
 
 --
 Je kunt je volglijstinstellingen wijzigen op:
-{{fullurl:Special:Watchlist/edit}}
+{{canonicalurl:Special:Watchlist/edit}}
 
 Je kunt de pagina van uw volglijst verwijderen via de volgende verwijzing:
 $UNWATCHURL
 
 Feedback en andere assistentie:
-{{fullurl:{{MediaWiki:Helppage}}}}',
+{{canonicalurl:{{MediaWiki:Helppage}}}}',
 
 # Delete
 'historywarning'    => "'''Waarschuwing:''' de pagina die je wilt verwijderen heeft ongeveer $1 {{PLURAL:$1|versie|versies}}:",
@@ -538,7 +537,7 @@ In het laatste geval kun je ook een verwijzing gebruiken, bijvoorbeeld [[{{#Spec
 
 # Namespace 8 related
 'allmessagestext' => 'Hieronder staan de systeemberichten uit de MediaWiki-naamruimte.
-Ga naar [http://www.mediawiki.org/wiki/Localisation MediaWiki-lokalisatie] en [http://translatewiki.net translatewiki.net] als je wilt bijdragen aan de algemene vertaling voor MediaWiki.',
+Ga naar [//www.mediawiki.org/wiki/Localisation MediaWiki-lokalisatie] en [//translatewiki.net translatewiki.net] als je wilt bijdragen aan de algemene vertaling voor MediaWiki.',
 
 # Special:Import
 'importtext' => 'Gebruik de [[Special:Export|exportfunctie]] in de wiki waar de informatie vandaan komt, sla de uitvoer op je eigen systeem op, en voeg die daarna hier toe.',
@@ -641,7 +640,7 @@ Je kunt ook [[Special:EditWatchlist|het standaard bewerkingsscherm gebruiken]].'
 
 MediaWiki wordt verspreid in de hoop dat het nuttig is, maar ZONDER ENIGE GARANTIE; zonder zelfs de implicitiete garantie van VERKOOPBAARHEID of GESCHIKHEID VOOR ENIG DOEL IN HET BIJZONDER. Zie de GNU General Public License voor meer informatie.
 
-Samen met dit programma hoor je een [{{SERVER}}{{SCRIPTPATH}}/COPYING kopie van de GNU General Public License] te hebben ontvangen; zo niet, schrijf dan naar de Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA of [http://www.gnu.org/licenses/old-licenses/gpl-2.0.html lees de licentie online].',
+Samen met dit programma hoor je een [{{SERVER}}{{SCRIPTPATH}}/COPYING kopie van de GNU General Public License] te hebben ontvangen; zo niet, schrijf dan naar de Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA of [//www.gnu.org/licenses/old-licenses/gpl-2.0.html lees de licentie online].',
 
 # Database error messages
 'dberr-usegoogle' => 'Wellicht kun je in de tussentijd zoeken via Google.',

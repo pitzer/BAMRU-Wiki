@@ -21,17 +21,17 @@
 	 * @return {Title} this
 	 */
 var	Title = function( title, namespace ) {
-			this._ns = 0; // integer namespace id
-			this._name = null; // name in canonical 'database' form
-			this._ext = null; // extension
+		this._ns = 0; // integer namespace id
+		this._name = null; // name in canonical 'database' form
+		this._ext = null; // extension
 
-			if ( arguments.length === 2 ) {
-				setNameAndExtension( this, title );
-				this._ns = fixNsId( namespace );
-			} else if ( arguments.length === 1 ) {
-				setAll( this, title );
-			}
-			return this;
+		if ( arguments.length === 2 ) {
+			setNameAndExtension( this, title );
+			this._ns = fixNsId( namespace );
+		} else if ( arguments.length === 1 ) {
+			setAll( this, title );
+		}
+		return this;
 	},
 
 	/**
@@ -61,21 +61,21 @@ var	Title = function( title, namespace ) {
 	},
 
 	/**
-	 * Sanatize name.
+	 * Sanitize name.
 	 */
 	fixName = function( s ) {
 		return clean( $.trim( s ) );
 	},
 
 	/**
-	 * Sanatize name.
+	 * Sanitize name.
 	 */
 	fixExt = function( s ) {
-		return clean( s.toLowerCase() );
+		return clean( s );
 	},
 
 	/**
-	 * Sanatize namespace id.
+	 * Sanitize namespace id.
 	 * @param id {Number} Namespace id.
 	 * @return {Number|Boolean} The id as-is or boolean false if invalid.
 	 */
@@ -120,14 +120,20 @@ var	Title = function( title, namespace ) {
 	 * @return {mw.Title}
 	 */
 	setAll = function( title, s ) {
-		var	matches = s.match( /^(?:([^:]+):)?(.*?)(?:\.(\w{1,5}))?$/ );
+		// In normal browsers the match-array contains null/undefined if there's no match,
+		// IE returns an empty string.
+		var	matches = s.match( /^(?:([^:]+):)?(.*?)(?:\.(\w{1,5}))?$/ ),
 			ns_match = getNsIdByName( matches[1] );
-		if ( matches.length && ns_match ) {
-			if ( matches[1] ) { title._ns = ns_match; }
-			if ( matches[2] ) { title._name = fixName( matches[2] ); }
-			if ( matches[3] ) { title._ext = fixExt( matches[3] ); }
+
+		// Namespace must be valid, and title must be a non-empty string.
+		if ( ns_match && typeof matches[2] === 'string' && matches[2] !== '' ) {
+			title._ns = ns_match;
+			title._name = fixName( matches[2] );
+			if ( typeof matches[3] === 'string' && matches[3] !== '' ) {
+				title._ext = fixExt( matches[3] );
+			}
 		} else {
-			// Consistency with MediaWiki: Unknown namespace > fallback to main namespace.
+			// Consistency with MediaWiki PHP: Unknown namespace -> fallback to main namespace.
 			title._ns = 0;
 			setNameAndExtension( title, s );
 		}
@@ -142,26 +148,32 @@ var	Title = function( title, namespace ) {
 	 * @return {mw.Title}
 	 */
 	setNameAndExtension = function( title, raw ) {
+		// In normal browsers the match-array contains null/undefined if there's no match,
+		// IE returns an empty string.
 		var matches = raw.match( /^(?:)?(.*?)(?:\.(\w{1,5}))?$/ );
-		if ( matches.length ) {
-			if ( matches[1] ) { title._name = fixName( matches[1] ); }
-			if ( matches[2] ) { title._ext = fixExt( matches[2] ); }
+
+		// Title must be a non-empty string.
+		if ( typeof matches[1] === 'string' && matches[1] !== '' ) {
+			title._name = fixName( matches[1] );
+			if ( typeof matches[2] === 'string' && matches[2] !== '' ) {
+				title._ext = fixExt( matches[2] );
+			}
 		} else {
 			throw new Error( 'mw.Title: Could not parse title "' + raw + '"' );
 		}
 		return title;
 	};
-	 
+
 
 	/* Static space */
 
 	/**
-	 * Wether this title exists on the wiki.
+	 * Whether this title exists on the wiki.
 	 * @param title {mixed} prefixed db-key name (string) or instance of Title
 	 * @return {mixed} Boolean true/false if the information is available. Otherwise null.
 	 */
 	Title.exists = function( title ) {
-		var	type = $.type( title ), obj = Title.exist.pages, match;
+		var type = $.type( title ), obj = Title.exist.pages, match;
 		if ( type === 'string' ) {
 			match = obj[title];
 		} else if ( type === 'object' && title instanceof Title ) {
@@ -186,7 +198,7 @@ var	Title = function( title, namespace ) {
 		pages: {},
 		/**
 		 * @example Declare existing titles: Title.exist.set(['User:John_Doe', ...]);
-		 * @example Declare titles inexisting: Title.exist.set(['File:Foo_bar.jpg', ...], false);
+		 * @example Declare titles nonexistent: Title.exist.set(['File:Foo_bar.jpg', ...], false);
 		 * @param titles {String|Array} Title(s) in strict prefixedDb title form.
 		 * @param state {Boolean} (optional) State of the given titles. Defaults to true.
 		 * @return {Boolean}
@@ -194,7 +206,7 @@ var	Title = function( title, namespace ) {
 		set: function( titles, state ) {
 			titles = $.isArray( titles ) ? titles : [titles];
 			state = state === undefined ? true : !!state;
-			var	pages = this.pages, i, len = titles.length;
+			var pages = this.pages, i, len = titles.length;
 			for ( i = 0; i < len; i++ ) {
 				pages[ titles[i] ] = state;
 			}
@@ -301,7 +313,7 @@ var	Title = function( title, namespace ) {
 		},
 
 		/**
-		 * Wether this title exists on the wiki.
+		 * Whether this title exists on the wiki.
 		 * @return {mixed} Boolean true/false if the information is available. Otherwise null.
 		 */
 		exists: function() {

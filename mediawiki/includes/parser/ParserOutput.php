@@ -122,7 +122,7 @@ class ParserOutput extends CacheTime {
 		$mTemplates = array(),        # 2-D map of NS/DBK to ID for the template references. ID=zero for broken.
 		$mTemplateIds = array(),      # 2-D map of NS/DBK to rev ID for the template references. ID=zero for broken.
 		$mImages = array(),           # DB keys of the images used, in the array key only
-		$mImageTimeKeys = array(),	  # DB keys of the images used mapped to sha1 and MW timestamp
+		$mFileSearchOptions = array(), # DB keys of the images used mapped to sha1 and MW timestamp
 		$mExternalLinks = array(),    # External link URLs, in the key only
 		$mInterwikiLinks = array(),   # 2-D map of prefix/DBK (in keys only) for the inline interwiki links in the document.
 		$mNewSection = false,         # Show a new section link?
@@ -130,13 +130,17 @@ class ParserOutput extends CacheTime {
 		$mNoGallery = false,          # No gallery on category page? (__NOGALLERY__)
 		$mHeadItems = array(),        # Items to put in the <head> section
 		$mModules = array(),          # Modules to be loaded by the resource loader
+		$mModuleScripts = array(),    # Modules of which only the JS will be loaded by the resource loader
+		$mModuleStyles = array(),     # Modules of which only the CSSS will be loaded by the resource loader
+		$mModuleMessages = array(),   # Modules of which only the messages will be loaded by the resource loader
 		$mOutputHooks = array(),      # Hook tags as per $wgParserOutputHooks
 		$mWarnings = array(),         # Warning text to be returned to the user. Wikitext formatted, in the key only
 		$mSections = array(),         # Table of contents
 		$mEditSectionTokens = false,  # prefix/suffix markers if edit sections were output as tokens
 		$mProperties = array(),       # Name/value pairs to be cached in the DB
-		$mTOCHTML = '';	              # HTML of the TOC
-	private $mIndexPolicy = '';	      # 'index' or 'noindex'?  Any other value will result in no change.
+		$mTOCHTML = '',               # HTML of the TOC
+		$mTimestamp;                  # Timestamp of the revision
+	private $mIndexPolicy = '';       # 'index' or 'noindex'?  Any other value will result in no change.
 	private $mAccessedOptions = array(); # List of ParserOptions (stored in the keys)
 
 	const EDITSECTION_REGEX = '#<(?:mw:)?editsection page="(.*?)" section="(.*?)"(?:/>|>(.*?)(</(?:mw:)?editsection>))#';
@@ -156,7 +160,7 @@ class ParserOutput extends CacheTime {
 			return preg_replace_callback( ParserOutput::EDITSECTION_REGEX,
 				array( &$this, 'replaceEditSectionLinksCallback' ), $this->mText );
 		}
-		return $this->mText;
+		return preg_replace( ParserOutput::EDITSECTION_REGEX, '', $this->mText );
 	}
 
 	/**
@@ -190,15 +194,19 @@ class ParserOutput extends CacheTime {
 	function &getTemplates()             { return $this->mTemplates; }
 	function &getTemplateIds()           { return $this->mTemplateIds; }
 	function &getImages()                { return $this->mImages; }
-	function &getImageTimeKeys()         { return $this->mImageTimeKeys; }
+	function &getFileSearchOptions()     { return $this->mFileSearchOptions; }
 	function &getExternalLinks()         { return $this->mExternalLinks; }
 	function getNoGallery()              { return $this->mNoGallery; }
 	function getHeadItems()              { return $this->mHeadItems; }
 	function getModules()                { return $this->mModules; }
+	function getModuleScripts()          { return $this->mModuleScripts; }
+	function getModuleStyles()           { return $this->mModuleStyles; }
+	function getModuleMessages()         { return $this->mModuleMessages; }
 	function getOutputHooks()            { return (array)$this->mOutputHooks; }
 	function getWarnings()               { return array_keys( $this->mWarnings ); }
 	function getIndexPolicy()            { return $this->mIndexPolicy; }
 	function getTOCHTML()                { return $this->mTOCHTML; }
+	function getTimestamp()              { return $this->mTimestamp; }
 
 	function setText( $text )            { return wfSetVar( $this->mText, $text ); }
 	function setLanguageLinks( $ll )     { return wfSetVar( $this->mLanguageLinks, $ll ); }
@@ -209,6 +217,7 @@ class ParserOutput extends CacheTime {
 	function setEditSectionTokens( $t )  { return wfSetVar( $this->mEditSectionTokens, $t ); }
 	function setIndexPolicy( $policy )   { return wfSetVar( $this->mIndexPolicy, $policy ); }
 	function setTOCHTML( $tochtml )      { return wfSetVar( $this->mTOCHTML, $tochtml ); }
+	function setTimestamp( $timestamp )  { return wfSetVar( $this->mTimestamp, $timestamp ); }
 
 	function addCategory( $c, $sort )    { $this->mCategories[$c] = $sort; }
 	function addLanguageLink( $t )       { $this->mLanguageLinks[] = $t; }
@@ -276,13 +285,13 @@ class ParserOutput extends CacheTime {
 	 * Register a file dependency for this output
 	 * @param $name string Title dbKey
 	 * @param $timestamp string MW timestamp of file creation (or false if non-existing)
-	 * @param $sha string base 36 SHA-1 of file (or false if non-existing)
+	 * @param $sha1 string base 36 SHA-1 of file (or false if non-existing)
 	 * @return void
 	 */
 	function addImage( $name, $timestamp = null, $sha1 = null ) {
 		$this->mImages[$name] = 1;
 		if ( $timestamp !== null && $sha1 !== null ) {
-			$this->mImageTimeKeys[$name] = array( 'time' => $timestamp, 'sha1' => $sha1 );
+			$this->mFileSearchOptions[$name] = array( 'time' => $timestamp, 'sha1' => $sha1 );
 		}
 	}
 
@@ -334,8 +343,34 @@ class ParserOutput extends CacheTime {
 		}
 	}
 
-	function addModules( $modules ) {
+	public function addModules( $modules ) {
 		$this->mModules = array_merge( $this->mModules, (array) $modules );
+	}
+
+	public function addModuleScripts( $modules ) {
+		$this->mModuleScripts = array_merge( $this->mModuleScripts, (array)$modules );
+	}
+
+	public function addModuleStyles( $modules ) {
+		$this->mModuleStyles = array_merge( $this->mModuleStyles, (array)$modules );
+	}
+
+	public function addModuleMessages( $modules ) {
+		$this->mModuleMessages = array_merge( $this->mModuleMessages, (array)$modules );
+	}
+
+	/**
+	 * Copy items from the OutputPage object into this one
+	 *
+	 * @param $out OutputPage object
+	 */
+	public function addOutputPageMetadata( OutputPage $out ) {
+		$this->addModules( $out->getModules() );
+		$this->addModuleScripts( $out->getModuleScripts() );
+		$this->addModuleStyles( $out->getModuleStyles() );
+		$this->addModuleMessages( $out->getModuleMessages() );
+
+		$this->mHeadItems = array_merge( $this->mHeadItems, $out->getHeadItemsArray() );
 	}
 
 	/**

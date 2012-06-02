@@ -48,8 +48,8 @@ $messages = array(
 'tog-shownumberswatching'     => 'Tujuakkan jumlah pamantau',
 'tog-oldsig'                  => 'Pratayang tando tangan:',
 'tog-fancysig'                => 'Palakuan tando tangan sabagai teks wiki (tanpa suatu tautan otomatis)',
-'tog-externaleditor'          => 'Gunokan editor eksternal sacaro bawaan (untuak nan ahli sajo, kabutuahan pangaturan khusus pado komputer Sanak [http://www.mediawiki.org/wiki/Manual:External_editors Informasi labiah lanjuik.].)',
-'tog-externaldiff'            => 'Gunokan diff eksternal sacaro bawaan (untuak nan ahli sajo, kabutuahan pangaturan khusus pado komputer Sanak [http://www.mediawiki.org/wiki/Manual:External_editors Informasi labiah lanjuik.].)',
+'tog-externaleditor'          => 'Gunokan editor eksternal sacaro bawaan (untuak nan ahli sajo, kabutuahan pangaturan khusus pado komputer Sanak [//www.mediawiki.org/wiki/Manual:External_editors Informasi labiah lanjuik.].)',
+'tog-externaldiff'            => 'Gunokan diff eksternal sacaro bawaan (untuak nan ahli sajo, kabutuahan pangaturan khusus pado komputer Sanak [//www.mediawiki.org/wiki/Manual:External_editors Informasi labiah lanjuik.].)',
 'tog-showjumplinks'           => 'Aktifkan tautan pambantu "langsuang ka"',
 'tog-uselivepreview'          => 'Gunokan pratayang langsuang (JavaScript) (eksperimental)',
 'tog-forceeditsummary'        => 'Ingekkan awak bilo kotak ringkasan suntiangan masih kosoang',
@@ -371,19 +371,18 @@ Sila laporkan ka [[Special:ListUsers/sysop|Pengurus]], dengan manandokan alamat 
 Mungkin alah dihapuih jo urang lain.',
 'badtitle'             => 'Judul indak sah',
 'badtitletext'         => 'Permintaan judul laman indak sah, kosong, atau antarbaso atau antarwiki yang salah sambuang. Mungkin juo ado kandungan karakter yang indak buliah digunoan untuak judul.',
-'perfcached'           => 'Data barikuik iko diambiak dari singgahan dan mungkin indak data nan baharu:',
-'perfcachedts'         => 'Data barikut iko diambiak dari singgahan dan tarakhir dipabaharui pado $1.',
+'perfcached'           => 'Data barikuik iko diambiak dari singgahan dan mungkin indak data nan baharu. A maximum of {{PLURAL:$1|one result is|$1 results are}} available in the cache.',
+'perfcachedts'         => 'Data barikut iko diambiak dari singgahan dan tarakhir dipabaharui pado $1. A maximum of {{PLURAL:$4|one result is|$4 results are}} available in the cache.',
 'querypage-no-updates' => 'Pamutakhiran dari laman iko sadang dimatian. Data nan ado di siko saat iko indak akan dimuaik ulang.',
 'wrong_wfQuery_params' => 'Parameter salah ka wfQuery()<br />Fungsi: $1<br />Pamintaan: $2',
 'viewsource'           => 'Lihek sumber',
-'viewsourcefor'        => 'untuak $1',
 'actionthrottled'      => 'Tindakan dibatasi',
 'actionthrottledtext'  => 'Anda dibatasi untuak malakuan tindakan iko talalu banyak dalam waktu singkek. Sila mancubo laik satalah bara menit.',
 'protectedpagetext'    => 'Laman iko alah dikunci untuak manghindari panyuntiangan.',
 'viewsourcetext'       => 'Sanak dapek malihek atau manyalin sumber laman iko:',
 'protectedinterface'   => 'Laman iko barisi teks antarmuko untuak digunoan oleh parangkaik lunak dan alah dikunci untuak manghindari kasalahan.',
 'editinginterface'     => "'''Paringatan:''' Sanak manyuntiang suatu laman nan digunoan untuak manyediakan teks antarmuko untuak parangkaik lunak situs iko. Parubahan teks iko akan mampangaruhi tampilan pado antarmuko pangguno untuak pangguno lain.
-Untuak tarjamahan, harap gunokan [http://translatewiki.net/wiki/Main_Page?setlang=id translatewiki.net], proyek palokalan MediaWiki.",
+Untuak tarjamahan, harap gunokan [//translatewiki.net/wiki/Main_Page?setlang=id translatewiki.net], proyek palokalan MediaWiki.",
 'sqlhidden'            => '(Pamintaan SQL disuruakkan)',
 'cascadeprotected'     => 'Laman iko alah dilindungi dari panyuntiangan karano disartokan di {{PLURAL:$1|laman|laman-laman}} barikuik nan alah dilindungi jo opsi "runtun":
 $2',
@@ -615,9 +614,6 @@ Sanak indak dapek manggunoan fitur "kirim surel ka pangguno iko" kacuali Sanak a
 Alamat IP Sanak saat ini adolah $3, dan ID pamblokiran adolah #$5.
 Toloang saratokan informasi-informasi iko dalam satiok patanyaan Sanak.',
 'blockednoreason'                  => 'indak ado alasan nan diagiah.',
-'blockedoriginalsource'            => "Isi sumber dari '''$1''' ditunjuakan barikuik iko:",
-'blockededitsource'                => "Teks '''suntiangan Sanak''' tahadap '''$1''' ditunjuakan barikuik iko:",
-'whitelistedittitle'               => 'Paralu masuak log untuak manyuntiang',
 'whitelistedittext'                => 'Sanak harus $1 untuak dapek manyuntiang laman.',
 'confirmedittext'                  => 'Sanak harus mangkonfirmasian dahulu alamaik surel Sanak sabalun manyuntiang laman.
 Harap masuakan dan validasian alamaik surel Sanak malalui [[Special:Preferences|laman preferensi pangguno]] Sanak.',
@@ -767,13 +763,9 @@ Legend: '''({{int:kini}})''' = perbedaan jo revisi terakhir, '''({{int:dulu}})''
 
 # Revision deletion
 'rev-delundel'           => 'tampilkan/suruakkan',
-'revdelete-logentry'     => 'Maubah tampilan revisi untuak "[[$1]]"',
 'revdel-restore'         => 'Ganti tampilan',
 'revdel-restore-deleted' => 'revisi nan lah tahapuih',
 'revdel-restore-visible' => 'tampilan revisi',
-'revdelete-content'      => 'kandungan',
-'revdelete-hid'          => 'suruakan $1',
-'revdelete-log-message'  => '$1 untuak $2 {{PLURAL:$2|revisi|revisi}}',
 
 # Merge log
 'revertmerge' => 'Batal bergabung',
@@ -802,7 +794,6 @@ Legend: '''({{int:kini}})''' = perbedaan jo revisi terakhir, '''({{int:dulu}})''
 'viewprevnext'                     => 'Tampilkan ($1 {{int:pipe-separator}} $2) ($3)',
 'searchmenu-exists'                => "'''Ado laman nan banamo \"[[:\$1]]\" pado wiki ko.'''",
 'searchmenu-new'                   => "'''Buek laman \"[[:\$1]]\" di wiki ko!'''",
-'searchmenu-new-nocreate'          => '"$1" bukan namo laman yang sah atau indak buliah dibuek dek awak ang.',
 'searchprofile-articles'           => 'Artikel',
 'searchprofile-project'            => '↓ Laman Bantuan dan Proyek',
 'searchprofile-images'             => '↓ Multimedia',
@@ -970,8 +961,7 @@ Deskripsi dari [$2 laman deskripsi berkas] ditampilkan di bawah.',
 'linksearch-line' => '$1 tapauik dari $2',
 
 # Special:Log/newusers
-'newuserlogpage'          => 'Log pangguno baru',
-'newuserlog-create-entry' => 'Mendaftar sabagai pangguno',
+'newuserlogpage' => 'Log pangguno baru',
 
 # Special:ListGroupRights
 'listgrouprights-members' => '(senarai anggota)',
@@ -1005,7 +995,6 @@ Pastikan awak mainginkannyo, dan awak lah tahu sagalo akibatnyo dan sasuai jo [[
 'actionfailed'          => 'Aksi gagal',
 'deletedtext'           => '"$1" lah dihapuih.
 Lihek $2 untuak rekam jejak laman yang lah dihapuih.',
-'deletedarticle'        => 'dihapuih "[[$1]]"',
 'dellogpage'            => 'Log penghapusan',
 'deletecomment'         => 'Alasan:',
 'deleteotherreason'     => 'Alasan lain/tambahan:',
@@ -1041,7 +1030,6 @@ Awak dapek maubah tingkek perlindungannyo, walaupun indak pangaruah pado perlind
 # Undelete
 'undeletelink'     => 'tampilkan/pulihkan',
 'undeleteviewlink' => 'liek',
-'undeletedarticle' => 'dipulihkan "[[$1]]"',
 
 # Namespace form on various pages
 'namespace'      => 'Ruangnamo:',
@@ -1120,8 +1108,6 @@ Dalam kasus tu, apobilo diinginkan, awak dapek mamindahkan atau manggabuangkan l
 'talkexists'       => "'''Laman tersebut berhasil dipindahkan, tapi laman otanyo indak dapek dipindahkan karano lah ado laman ota pado judul yang baru. Silakan digabuang laman ota tu sacaro manual.'''",
 'movedto'          => 'dipindahkan ka',
 'movetalk'         => 'Pindahkan laman ota yang takaik',
-'1movedto2'        => 'mamindahkan [[$1]] ka [[$2]]',
-'1movedto2_redir'  => 'mamindahkan [[$1]] ka [[$2]] malalui peralihan',
 'movelogpage'      => 'Log pemindahan',
 'movereason'       => 'Alasan:',
 'revertmove'       => 'kembalikan',
@@ -1201,17 +1187,13 @@ Awak hanyo buliah lihek sumber se',
 # Metadata
 'notacceptable' => 'Layanan wiki indak manyadioan data dalam format yang dapek dibaco dek pelanggan awak.',
 
-# Patrol log
-'patrol-log-line' => 'manandoi $1 dari $2 nan tajago $3',
-'patrol-log-diff' => 'revisi $1',
-
 # Browsing diffs
 'previousdiff' => '← Revisi sabalunnyo',
 'nextdiff'     => 'Revisi salanjuiknyo →',
 
 # Media information
 'file-info-size' => '$1 × $2 piksel, ukuran berkas: $3, tipe MIME: $4',
-'file-nohires'   => '<small>Indak tasadio resolusi yang labiah tinggi.</small>',
+'file-nohires'   => 'Indak tasadio resolusi yang labiah tinggi.',
 'svg-long-desc'  => 'SVG berkas, nominal $1 × $2 piksel, ukuran berkas: $3',
 'show-big-image' => 'Resolusi penuh',
 
@@ -1245,7 +1227,7 @@ Nan lainnyo akan tasuruak sacaro default.
 
 # External editor support
 'edit-externally'      => 'Suntiang berkas ko dengan aplikasi lua',
-'edit-externally-help' => '(Lihek [http://www.mediawiki.org/wiki/Manual:External_editors instruksi pengaturan] untuak maklumat lanjutnyo)',
+'edit-externally-help' => '(Lihek [//www.mediawiki.org/wiki/Manual:External_editors instruksi pengaturan] untuak maklumat lanjutnyo)',
 
 # 'all' in various places, this might be different for inflected languages
 'watchlistall2' => 'semua',

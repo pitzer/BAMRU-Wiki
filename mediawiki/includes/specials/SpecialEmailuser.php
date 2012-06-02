@@ -61,7 +61,7 @@ class SpecialEmailUser extends UnlistedSpecialPage {
 			),
 			'Subject' => array(
 				'type' => 'text',
-				'default' => wfMsgExt( 'defemailsubject', array( 'content', 'parsemag' ) ),
+				'default' => wfMsgExt( 'defemailsubject', array( 'content', 'parsemag' ), $this->getUser()->getName() ),
 				'label-message' => 'emailsubject',
 				'maxlength' => 200,
 				'size' => 60,
@@ -115,15 +115,15 @@ class SpecialEmailUser extends UnlistedSpecialPage {
 		if( !$ret instanceof User ) {
 			if( $this->mTarget != '' ) {
 				$ret = ( $ret == 'notarget' ) ? 'emailnotarget' : ( $ret . 'text' );
-				$out->addHTML( '<p class="error">' . wfMessage( $ret )->parse() . '</p>' );
+				$out->wrapWikiMsg( "<p class='error'>$1</p>", $ret );
 			}
-			$out->addHTML( self::userForm( $this->mTarget ) );
+			$out->addHTML( $this->userForm( $this->mTarget ) );
 			return false;
 		}
 
 		$this->mTargetObj = $ret;
 
-		$form = new HTMLForm( $this->getFormFields() );
+		$form = new HTMLForm( $this->getFormFields(), $this->getContext() );
 		$form->addPreText( wfMsgExt( 'emailpagetext', 'parseinline' ) );
 		$form->setSubmitText( wfMsg( 'emailsend' ) );
 		$form->setTitle( $this->getTitle() );
@@ -135,11 +135,11 @@ class SpecialEmailUser extends UnlistedSpecialPage {
 			return false;
 		}
 
-		$out->setPageTitle( wfMsg( 'emailpage' ) );
+		$out->setPageTitle( $this->msg( 'emailpage' ) );
 		$result = $form->show();
 
 		if( $result === true || ( $result instanceof Status && $result->isGood() ) ) {
-			$out->setPageTitle( wfMsg( 'emailsent' ) );
+			$out->setPageTitle( $this->msg( 'emailsent' ) );
 			$out->addWikiMsg( 'emailsenttext' );
 			$out->returnToMain( false, $this->mTargetObj->getUserPage() );
 		}
@@ -219,17 +219,16 @@ class SpecialEmailUser extends UnlistedSpecialPage {
 	 * @param $name String: user name submitted.
 	 * @return String: form asking for user name.
 	 */
-
-	function userForm( $name ) {
-		global $wgScript ;
+	protected function userForm( $name ) {
+		global $wgScript;
 		$string = Xml::openElement( 'form', array( 'method' => 'get', 'action' => $wgScript, 'id' => 'askusername' ) ) .
-				Html::hidden( 'title', $this->getTitle()->getPrefixedText() ) .
-				Xml::openElement( 'fieldset' ) .
-				Html::rawElement( 'legend', null, wfMessage( 'emailtarget' )->parse() ) .
-				Xml::inputLabel( wfMessage( 'emailusername' )->text(), 'target', 'emailusertarget', 30, $name ) . ' ' .
-				Xml::submitButton( wfMessage( 'emailusernamesubmit' )->text() ) .
-				Xml::closeElement( 'fieldset' ) .
-				Xml::closeElement( 'form' ) . "\n";
+			Html::hidden( 'title', $this->getTitle()->getPrefixedText() ) .
+			Xml::openElement( 'fieldset' ) .
+			Html::rawElement( 'legend', null, wfMessage( 'emailtarget' )->parse() ) .
+			Xml::inputLabel( wfMessage( 'emailusername' )->text(), 'target', 'emailusertarget', 30, $name ) . ' ' .
+			Xml::submitButton( wfMessage( 'emailusernamesubmit' )->text() ) .
+			Xml::closeElement( 'fieldset' ) .
+			Xml::closeElement( 'form' ) . "\n";
 		return $string;
 	}
 

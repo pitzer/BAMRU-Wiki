@@ -24,11 +24,6 @@
  * @file
  */
 
-if ( !defined( 'MEDIAWIKI' ) ) {
-	// Eclipse helper - will be ignored in production
-	require_once( 'ApiQueryBase.php' );
-}
-
 /**
  * A query action to return meta information about the wiki site.
  *
@@ -43,6 +38,7 @@ class ApiQuerySiteinfo extends ApiQueryBase {
 	public function execute() {
 		$params = $this->extractRequestParams();
 		$done = array();
+		$fit = false;
 		foreach ( $params['prop'] as $p ) {
 			switch ( $p ) {
 				case 'general':
@@ -117,7 +113,7 @@ class ApiQuerySiteinfo extends ApiQueryBase {
 		$data = array();
 		$mainPage = Title::newMainPage();
 		$data['mainpage'] = $mainPage->getPrefixedText();
-		$data['base'] = wfExpandUrl( $mainPage->getFullUrl() );
+		$data['base'] = wfExpandUrl( $mainPage->getFullUrl(), PROTO_CURRENT );
 		$data['sitename'] = $GLOBALS['wgSitename'];
 		$data['generator'] = "MediaWiki {$GLOBALS['wgVersion']}";
 		$data['phpversion'] = phpversion();
@@ -138,6 +134,14 @@ class ApiQuerySiteinfo extends ApiQueryBase {
 		}
 		$data['rights'] = $GLOBALS['wgRightsText'];
 		$data['lang'] = $GLOBALS['wgLanguageCode'];
+
+		$fallbacks = array();
+		foreach( $wgContLang->getFallbackLanguages() as $code ) {
+			$fallbacks[] = array( 'code' => $code );
+		}
+		$data['fallback'] = $fallbacks;
+		$this->getResult()->setIndexedTagName( $data['fallback'], 'lang' );
+
 		if ( $wgContLang->isRTL() ) {
 			$data['rtl'] = '';
 		}
@@ -266,7 +270,7 @@ class ApiQuerySiteinfo extends ApiQueryBase {
 		}
 
 		$params = $this->extractRequestParams();
-		$langCode = isset( $params['languagecode'] ) ? $params['languagecode'] : '';
+		$langCode = isset( $params['inlanguagecode'] ) ? $params['inlanguagecode'] : '';
 
 		if( $langCode ) {
 			$langNames = Language::getTranslatedLanguageNames( $langCode );
@@ -288,7 +292,7 @@ class ApiQuerySiteinfo extends ApiQueryBase {
 			if ( isset( $langNames[$prefix] ) ) {
 				$val['language'] = $langNames[$prefix];
 			}
-			$val['url'] = wfExpandUrl( $row['iw_url'] );
+			$val['url'] = wfExpandUrl( $row['iw_url'], PROTO_CURRENT );
 			if( isset( $row['iw_wikiid'] ) ) {
 				$val['wikiid'] = $row['iw_wikiid'];
 			}
@@ -456,7 +460,7 @@ class ApiQuerySiteinfo extends ApiQueryBase {
 	protected function appendRightsInfo( $property ) {
 		global $wgRightsPage, $wgRightsUrl, $wgRightsText;
 		$title = Title::newFromText( $wgRightsPage );
-		$url = $title ? wfExpandUrl( $title->getFullURL() ) : $wgRightsUrl;
+		$url = $title ? wfExpandUrl( $title->getFullURL(), PROTO_CURRENT ) : $wgRightsUrl;
 		$text = $wgRightsText;
 		if ( !$text && $title ) {
 			$text = $title->getPrefixedText();
@@ -472,7 +476,7 @@ class ApiQuerySiteinfo extends ApiQueryBase {
 
 	public function appendLanguages( $property ) {
 		$params = $this->extractRequestParams();
-		$langCode = isset( $params['languagecode'] ) ? $params['languagecode'] : '';
+		$langCode = isset( $params['inlanguagecode'] ) ? $params['inlanguagecode'] : '';
 
 		if( $langCode ) {
 			$langNames = Language::getTranslatedLanguageNames( $langCode );
@@ -579,11 +583,12 @@ class ApiQuerySiteinfo extends ApiQueryBase {
 			),
 			'showalldb' => false,
 			'numberingroup' => false,
-			'languagecode' => null,
+			'inlanguagecode' => null,
 		);
 	}
 
 	public function getParamDescription() {
+		$p = $this->getModulePrefix();
 		return array(
 			'prop' => array(
 				'Which sysinfo properties to get:',
@@ -593,13 +598,13 @@ class ApiQuerySiteinfo extends ApiQueryBase {
 				' specialpagealiases    - List of special page aliases',
 				' magicwords            - List of magic words and their aliases',
 				' statistics            - Returns site statistics',
-				' interwikimap          - Returns interwiki map (optionally filtered, (optionally localised))',
+				" interwikimap          - Returns interwiki map (optionally filtered, (optionally localised by using {$p}inlanguagecode))",
 				' dbrepllag             - Returns database server with the highest replication lag',
 				' usergroups            - Returns user groups and the associated permissions',
 				' extensions            - Returns extensions installed on the wiki',
 				' fileextensions        - Returns list of file extensions allowed to be uploaded',
 				' rightsinfo            - Returns wiki rights (license) information if available',
-				' languages             - Returns a list of languages MediaWiki supports (optionally localised)',
+				" languages             - Returns a list of languages MediaWiki supports (optionally localised by using {$p}inlanguagecode)",
 				' skins                 - Returns a list of all enabled skins',
 				' extensiontags         - Returns a list of parser extension tags',
 				' functionhooks         - Returns a list of parser function hooks',
@@ -608,7 +613,7 @@ class ApiQuerySiteinfo extends ApiQueryBase {
 			'filteriw' =>  'Return only local or only nonlocal entries of the interwiki map',
 			'showalldb' => 'List all database servers, not just the one lagging the most',
 			'numberingroup' => 'Lists the number of users in user groups',
-			'languagecode' => 'Language code for localised language names (best effort, use CLDR extension)',
+			'inlanguagecode' => 'Language code for localised language names (best effort, use CLDR extension)',
 		);
 	}
 
@@ -622,7 +627,7 @@ class ApiQuerySiteinfo extends ApiQueryBase {
 		) );
 	}
 
-	protected function getExamples() {
+	public function getExamples() {
 		return array(
 			'api.php?action=query&meta=siteinfo&siprop=general|namespaces|namespacealiases|statistics',
 			'api.php?action=query&meta=siteinfo&siprop=interwikimap&sifilteriw=local',
@@ -631,10 +636,10 @@ class ApiQuerySiteinfo extends ApiQueryBase {
 	}
 
 	public function getHelpUrls() {
-		return 'http://www.mediawiki.org/wiki/API:Meta#siteinfo_.2F_si';
+		return 'https://www.mediawiki.org/wiki/API:Meta#siteinfo_.2F_si';
 	}
 
 	public function getVersion() {
-		return __CLASS__ . ': $Id: ApiQuerySiteinfo.php 93314 2011-07-27 21:16:32Z siebrand $';
+		return __CLASS__ . ': $Id$';
 	}
 }

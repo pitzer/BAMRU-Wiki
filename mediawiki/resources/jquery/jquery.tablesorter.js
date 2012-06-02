@@ -8,8 +8,9 @@
  * http://www.opensource.org/licenses/mit-license.php
  * http://www.gnu.org/licenses/gpl.html
  *
- * @depends on mw.config (wgDigitTransformTable, wgMonthNames, wgMonthNamesShort,
+ * Depends on mw.config (wgDigitTransformTable, wgMonthNames, wgMonthNamesShort,
  * wgDefaultDateFormat, wgContentLanguage)
+ * Uses 'tableSorterCollation' in mw.config (if available)
  */
 /**
  *
@@ -75,10 +76,12 @@
 	}
 
 	function getElementText( node ) {
-		if ( node.hasAttribute && node.hasAttribute( 'data-sort-value' ) ) {
-			return node.getAttribute( 'data-sort-value' );
+		var $node = $( node ),
+			data = $node.attr( 'data-sort-value' );
+		if ( data !== undefined ) {
+			return data;
 		} else {
-			return $( node ).text();
+			return $node.text();
 		}
 	}
 
@@ -215,14 +218,51 @@
 		}
 		table.tBodies[0].appendChild( fragment );
 	}
+	
+	/**
+	 * Find all header rows in a thead-less table and put them in a <thead> tag.
+	 * This only treats a row as a header row if it contains only <th>s (no <td>s)
+	 * and if it is preceded entirely by header rows. The algorithm stops when
+	 * it encounters the first non-header row.
+	 * 
+	 * After this, it will look at all rows at the bottom for footer rows
+	 * And place these in a tfoot using similar rules.
+	 * @param $table jQuery object for a <table>
+	 */ 
+	function emulateTHeadAndFoot( $table ) {
+		var $rows = $table.find( '> tbody > tr' );
+		if( !$table.get(0).tHead ) {
+			var $thead = $( '<thead>' );
+			$rows.each( function() {
+				if ( $(this).children( 'td' ).length > 0 ) {
+					// This row contains a <td>, so it's not a header row
+					// Stop here
+					return false;
+				}
+				$thead.append( this );
+			} );
+			$table.find(' > tbody:first').before( $thead );
+		}
+		if( !$table.get(0).tFoot ) {
+			var $tfoot = $( '<tfoot>' );
+			var len = $rows.length;
+			for ( var i = len-1; i >= 0; i-- ) {
+				if( $( $rows[i] ).children( 'td' ).length > 0 ){
+					break;
+				}
+				$tfoot.prepend( $( $rows[i] ));
+			} 
+			$table.append( $tfoot );
+		}
+	}
 
 	function buildHeaders( table, msg ) {
 		var	maxSeen = 0,
 			longest,
 			realCellIndex = 0,
-			$tableHeaders = $( 'thead:eq(0) tr', table );
+			$tableHeaders = $( 'thead:eq(0) > tr', table );
 		if ( $tableHeaders.length > 1 ) {
-			$tableHeaders.each(function() {
+			$tableHeaders.each( function() {
 				if ( this.cells.length > maxSeen ) {
 					maxSeen = this.cells.length;
 					longest = this;
@@ -230,7 +270,7 @@
 			});
 			$tableHeaders = $( longest );
 		}
-		$tableHeaders = $tableHeaders.find( 'th' ).each( function( index ) {
+		$tableHeaders = $tableHeaders.children( 'th' ).each( function( index ) {
 			this.column = realCellIndex;
 
 			var colspan = this.colspan;
@@ -402,13 +442,13 @@
 
 	function explodeRowspans( $table ) {
 		// Split multi row cells into multiple cells with the same content
-		$table.find( '[rowspan]' ).each(function() {
+		$table.find( '> tbody > tr > [rowspan]' ).each(function() {
 			var rowSpan = this.rowSpan;
 			this.rowSpan = 1;
 			var cell = $( this );
 			var next = cell.parent().nextAll();
 			for ( var i = 0; i < rowSpan - 1; i++ ) {
-				var td = next.eq( i ).find( 'td' );
+				var td = next.eq( i ).children( 'td' );
 				if ( !td.length ) {
 					next.eq( i ).append( cell.clone() );
 				} else if ( this.cellIndex === 0 ) {
@@ -497,16 +537,27 @@
 			 */
 			construct: function( $tables, settings ) {
 				return $tables.each( function( i, table ) {
-
-					// Quit if no thead or tbody.
-					if ( !table.tHead || !table.tBodies ) {
-						return;
-					}
 					// Declare and cache.
 					var	$document, $headers, cache, config, sortOrder,
 						$table = $( table ),
 						shiftDown = 0,
 						firstTime = true;
+
+					// Quit if no tbody
+					if ( !table.tBodies ) {
+						return;
+					}
+					if ( !table.tHead ) {
+						// No thead found. Look for rows with <th>s and
+						// move them into a <thead> tag or a <tfoot> tag
+						emulateTHeadAndFoot( $table );
+						
+						// Still no thead? Then quit
+						if ( !table.tHead ) {
+							return;
+						}
+					}
+					$table.addClass( "jquery-tablesorter" );
 
 					// New config object.
 					table.config = {};
@@ -534,18 +585,30 @@
 					cacheRegexs();
 
 					// Apply event handling to headers
-					// this is to big, perhaps break it out?
+					// this is too big, perhaps break it out?
 					$headers.click( function( e ) {
+						if ( e.target.nodeName.toLowerCase() == 'a' ) {
+							// The user clicked on a link inside a table header
+							// Do nothing and let the default link click action continue
+							return true;
+						}
 
 						if ( firstTime ) {
 							firstTime = false;
-							
+
 							// Legacy fix of .sortbottoms
 							// Wrap them inside inside a tfoot (because that's what they actually want to be) &
-							// Move them up one level in the DOM
-							var sortbottoms = $table.find('tr.sortbottom').wrap('<tfoot>');
-							sortbottoms.parents('table').append(sortbottoms.parent());
-							
+							// and put the <tfoot> at the end of the <table>
+							var $sortbottoms = $table.find( '> tbody > tr.sortbottom' );
+							if ( $sortbottoms.length ) {
+								var $tfoot = $table.children( 'tfoot' );
+								if ( $tfoot.length ) {
+									$tfoot.eq(0).prepend( $sortbottoms );
+								} else {
+									$table.append( $( '<tfoot>' ).append( $sortbottoms ) );
+								}
+							}
+
 							explodeRowspans( $table );
 							// try to auto detect column type, and store in tables config
 							table.config.parsers = buildParserCache( table, $headers );
@@ -611,7 +674,6 @@
 							return false;
 						}
 					} );
-
 				} );
 			},
 

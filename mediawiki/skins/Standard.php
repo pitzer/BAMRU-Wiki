@@ -29,21 +29,24 @@ class SkinStandard extends SkinLegacy {
 		$rules = array();
 
 		if ( 2 == $qb ) { # Right
-			$rules[] = "#quickbar { position: absolute; top: 4px; right: 4px; border-left: 2px solid #000000; }";
-			$rules[] = "#article, #mw-data-after-content { margin-left: 4px; margin-right: 152px; }";
+			$rules[] = "/* @noflip */#quickbar { position: absolute; top: 4px; right: 4px; border-left: 2px solid #000000; }";
+			$rules[] = "/* @noflip */#article, #mw-data-after-content { margin-left: 4px; margin-right: 152px; }";
+			$rules[] = "/* @noflip */#topbar, #footer { margin-right: 152px; }";
 		} elseif ( 1 == $qb || 3 == $qb ) {
-			$rules[] = "#quickbar { position: absolute; top: 4px; left: 4px; border-right: 1px solid gray; }";
-			$rules[] = "#article, #mw-data-after-content { margin-left: 152px; margin-right: 4px; }";
+			$rules[] = "/* @noflip */#quickbar { position: absolute; top: 4px; left: 4px; border-right: 1px solid gray; }";
+			$rules[] = "/* @noflip */#article, #mw-data-after-content { margin-left: 152px; margin-right: 4px; }";
+			$rules[] = "/* @noflip */#topbar, #footer { margin-left: 152px; }";
 			if( 3 == $qb ) {
-				$rules[] = "#quickbar { position: fixed; padding: 4px; }";
+				$rules[] = "/* @noflip */#quickbar { position: fixed; padding: 4px; }";
 			}
 		} elseif ( 4 == $qb ) {
-			$rules[] = "#quickbar { position: fixed; right: 0px; top: 0px; padding: 4px;}";
-			$rules[] = "#quickbar { border-right: 1px solid gray; }";
-			$rules[] = "#article, #mw-data-after-content { margin-right: 152px; margin-left: 4px; }";
+			$rules[] = "/* @noflip */#quickbar { position: fixed; right: 0; top: 0; padding: 4px; }";
+			$rules[] = "/* @noflip */#quickbar { border-right: 1px solid gray; }";
+			$rules[] = "/* @noflip */#article, #mw-data-after-content { margin-right: 152px; margin-left: 4px; }";
+			$rules[] = "/* @noflip */#topbar, #footer { margin-right: 152px; }";
 		}
- 		$style = implode( "\n", $rules );
-		$out->addInlineStyle( $style );
+		$style = implode( "\n", $rules );
+		$out->addInlineStyle( $style, 'flip' );
 	}
 
 }
@@ -54,7 +57,6 @@ class StandardTemplate extends LegacyTemplate {
 	 * @return string
 	 */
 	function doAfterContent() {
-		global $wgContLang, $wgLang;
 		wfProfileIn( __METHOD__ );
 		wfProfileIn( __METHOD__ . '-1' );
 
@@ -64,21 +66,11 @@ class StandardTemplate extends LegacyTemplate {
 
 		wfProfileOut( __METHOD__ . '-1' );
 		wfProfileIn( __METHOD__ . '-2' );
-
-		$qb = $this->getSkin()->qbSetting();
-		$shove = ( $qb != 0 );
-		$left = ( $qb == 1 || $qb == 3 );
-
-		if ( $shove && $left ) { # Left
-			$s .= $this->getQuickbarCompensator();
-		}
-		wfProfileOut( __METHOD__ . '-2' );
-		wfProfileIn( __METHOD__ . '-3' );
-		$l = $wgContLang->alignStart();
+		$l = $this->getSkin()->getLanguage()->alignStart();
 		$s .= "<td class='bottom' align='$l' valign='top'>";
 
 		$s .= $this->bottomLinks();
-		$s .= "\n<br />" . $wgLang->pipeList( array(
+		$s .= "\n<br />" . $this->getSkin()->getLanguage()->pipeList( array(
 			$this->getSkin()->mainPageLink(),
 			$this->getSkin()->aboutLink(),
 			Linker::specialLink( 'Recentchanges' ),
@@ -86,17 +78,14 @@ class StandardTemplate extends LegacyTemplate {
 			. '<br /><span id="pagestats">' . $this->pageStats() . '</span>';
 
 		$s .= '</td>';
-		if ( $shove && !$left ) { # Right
-			$s .= $this->getQuickbarCompensator();
-		}
 		$s .= "</tr></table>\n</div>\n</div>\n";
 
-		wfProfileOut( __METHOD__ . '-3' );
-		wfProfileIn( __METHOD__ . '-4' );
-		if ( 0 != $qb ) {
+		wfProfileOut( __METHOD__ . '-2' );
+		wfProfileIn( __METHOD__ . '-3' );
+		if ( $this->getSkin()->qbSetting() != 0 ) {
 			$s .= $this->quickBar();
 		}
-		wfProfileOut( __METHOD__ . '-4' );
+		wfProfileOut( __METHOD__ . '-3' );
 		wfProfileOut( __METHOD__ );
 		return $s;
 	}
@@ -105,12 +94,12 @@ class StandardTemplate extends LegacyTemplate {
 	 * @return string
 	 */
 	function quickBar() {
-		global $wgOut, $wgUser, $wgRequest, $wgContLang;
+		global $wgContLang;
 
 		wfProfileIn( __METHOD__ );
 
-		$action = $wgRequest->getText( 'action' );
-		$wpPreview = $wgRequest->getBool( 'wpPreview' );
+		$action = $this->getSkin()->getRequest()->getText( 'action' );
+		$wpPreview = $this->getSkin()->getRequest()->getBool( 'wpPreview' );
 		$title = $this->getSkin()->getTitle();
 		$tns = $title->getNamespace();
 
@@ -127,24 +116,26 @@ class StandardTemplate extends LegacyTemplate {
 
 		$barnumber = 1;
 		foreach ( $bar as $browseLinks ) {
-			if ( $barnumber > 1 ) {
-				$s .= "\n<hr class='sep' />";
-			} 
-			foreach ( $browseLinks as $link ) {
-				if ( $link['text'] != '-' ) {
-					$s .= "<a href=\"{$link['href']}\">" .
-						htmlspecialchars( $link['text'] ) . '</a>' . $sep;
+			if ( is_array( $browseLinks ) ) {
+				if ( $barnumber > 1 ) {
+					$s .= "\n<hr class='sep' />";
+				}
+				foreach ( $browseLinks as $link ) {
+					if ( $link['text'] != '-' ) {
+						$s .= "<a href=\"{$link['href']}\">" .
+							htmlspecialchars( $link['text'] ) . '</a>' . $sep;
+					}
 				}
 			}
 			if ( $barnumber == 1 ) {
 				// only show watchlist link if logged in
-				if( $wgUser->isLoggedIn() ) {
+				if( $this->data['loggedin'] ) {
 					$s.= Linker::specialLink( 'Watchlist' ) ;
 					$s .= $sep . Linker::linkKnown(
 						SpecialPage::getTitleFor( 'Contributions' ),
 						wfMsg( 'mycontris' ),
 						array(),
-						array( 'target' => $wgUser->getName() )
+						array( 'target' => $this->data['username'] )
 					);
 				}
 			}
@@ -153,8 +144,8 @@ class StandardTemplate extends LegacyTemplate {
 
 		$s .= "\n<hr class='sep' />";
 		$articleExists = $title->getArticleId();
-		if ( $wgOut->isArticle() || $action == 'edit' || $action == 'history' || $wpPreview ) {
-			if( $wgOut->isArticle() ) {
+		if ( $this->data['isarticle'] || $action == 'edit' || $action == 'history' || $wpPreview ) {
+			if( $this->data['isarticle'] ) {
 				$s .= '<strong>' . $this->editThisPage() . '</strong>';
 			} else { # backlink to the article in edit or history mode
 				if( $articleExists ){ # no backlink if no article
@@ -212,7 +203,7 @@ class StandardTemplate extends LegacyTemplate {
 			}
 
 			# "Post a comment" link
-			if( ( $title->isTalkPage() || $wgOut->showNewSectionLink() ) && $action != 'edit' && !$wpPreview )
+			if( ( $title->isTalkPage() || $this->getSkin()->getOutput()->showNewSectionLink() ) && $action != 'edit' && !$wpPreview )
 				$s .= '<br />' . Linker::link(
 					$title,
 					wfMsg( 'postcomment' ),
@@ -223,20 +214,20 @@ class StandardTemplate extends LegacyTemplate {
 					)
 				);
 
-			/*
-			watching could cause problems in edit mode:
-			if user edits article, then loads "watch this article" in background and then saves
-			article with "Watch this article" checkbox disabled, the article is transparently
-			unwatched. Therefore we do not show the "Watch this page" link in edit mode
-			*/
-			if ( $wgUser->isLoggedIn() && $articleExists ) {
+			/**
+			 * Watching could cause problems in edit mode:
+			 * if user edits article, then loads "watch this article" in background and then saves
+			 * article with "Watch this article" checkbox disabled, the article is transparently
+			 * unwatched. Therefore we do not show the "Watch this page" link in edit mode.
+			 */
+			if ( $this->data['loggedin'] && $articleExists ) {
 				if( $action != 'edit' && $action != 'submit' ) {
 					$s .= $sep . $this->watchThisPage();
 				}
 				if ( $title->userCan( 'edit' ) )
 					$s .= $sep . $this->moveThisPage();
 			}
-			if ( $wgUser->isAllowed( 'delete' ) && $articleExists ) {
+			if ( $this->getSkin()->getUser()->isAllowed( 'delete' ) && $articleExists ) {
 				$s .= $sep . $this->deleteThisPage() .
 				$sep . $this->protectThisPage();
 			}
@@ -246,7 +237,7 @@ class StandardTemplate extends LegacyTemplate {
 			}
 			$s .= $sep . $this->whatLinksHere();
 
-			if( $wgOut->isArticleRelated() ) {
+			if( $this->getSkin()->getOutput()->isArticleRelated() ) {
 				$s .= $sep . $this->watchPageLinksLink();
 			}
 
@@ -268,7 +259,7 @@ class StandardTemplate extends LegacyTemplate {
 			$s .= "\n<br /><hr class='sep' />";
 		}
 
-		if( UploadBase::isEnabled() && UploadBase::isAllowed( $wgUser ) === true ) {
+		if( UploadBase::isEnabled() && UploadBase::isAllowed( $this->getSkin()->getUser() ) === true ) {
 			$s .= $this->getUploadLink() . $sep;
 		}
 
@@ -277,7 +268,7 @@ class StandardTemplate extends LegacyTemplate {
 		global $wgSiteSupportPage;
 		if( $wgSiteSupportPage ) {
 			$s .= "\n<br /><a href=\"" . htmlspecialchars( $wgSiteSupportPage ) .
-			  '" class="internal">' . wfMsg( 'sitesupport' ) . '</a>';
+			'" class="internal">' . wfMsg( 'sitesupport' ) . '</a>';
 		}
 
 		$s .= "\n<br /></div>\n";

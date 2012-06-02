@@ -24,11 +24,6 @@
  * @file
  */
 
-if ( !defined( 'MEDIAWIKI' ) ) {
-	// Eclipse helper - will be ignored in production
-	require_once( 'ApiQueryBase.php' );
-}
-
 /**
  * A query action to get image information and upload history.
  *
@@ -318,8 +313,7 @@ class ApiQueryImageInfo extends ApiQueryBase {
 				$vals['commenthidden'] = '';
 			} else {
 				if ( $pcomment ) {
-					global $wgUser;
-					$vals['parsedcomment'] = $wgUser->getSkin()->formatComment(
+					$vals['parsedcomment'] = Linker::formatComment(
 						$file->getDescription(), $file->getTitle() );
 				}
 				if ( $comment ) {
@@ -348,7 +342,7 @@ class ApiQueryImageInfo extends ApiQueryBase {
 			if ( !is_null( $thumbParams ) ) {
 				$mto = $file->transform( $thumbParams );
 				if ( $mto && !$mto->isError() ) {
-					$vals['thumburl'] = wfExpandUrl( $mto->getUrl() );
+					$vals['thumburl'] = wfExpandUrl( $mto->getUrl(), PROTO_CURRENT );
 
 					// bug 23834 - If the URL's are the same, we haven't resized it, so shouldn't give the wanted
 					// thumbnail sizes for the thumbnail actual size
@@ -370,8 +364,8 @@ class ApiQueryImageInfo extends ApiQueryBase {
 					$vals['thumberror'] = $mto->toText();
 				}
 			}
-			$vals['url'] = wfExpandUrl( $file->getFullURL() );
-			$vals['descriptionurl'] = wfExpandUrl( $file->getDescriptionUrl() );
+			$vals['url'] = wfExpandUrl( $file->getFullURL(), PROTO_CURRENT );
+			$vals['descriptionurl'] = wfExpandUrl( $file->getDescriptionUrl(), PROTO_CURRENT );
 		}
 
 		if ( $sha1 ) {
@@ -568,7 +562,7 @@ class ApiQueryImageInfo extends ApiQueryBase {
 		) );
 	}
 
-	protected function getExamples() {
+	public function getExamples() {
 		return array(
 			'api.php?action=query&titles=File:Albert%20Einstein%20Head.jpg&prop=imageinfo',
 			'api.php?action=query&titles=File:Test.jpg&prop=imageinfo&iilimit=50&iiend=20071231235959&iiprop=timestamp|user|url',
@@ -576,10 +570,10 @@ class ApiQueryImageInfo extends ApiQueryBase {
 	}
 
 	public function getHelpUrls() {
-		return 'http://www.mediawiki.org/wiki/API:Properties#imageinfo_.2F_ii';
+		return 'https://www.mediawiki.org/wiki/API:Properties#imageinfo_.2F_ii';
 	}
 
 	public function getVersion() {
-		return __CLASS__ . ': $Id: ApiQueryImageInfo.php 92400 2011-07-17 16:51:11Z reedy $';
+		return __CLASS__ . ': $Id$';
 	}
 }

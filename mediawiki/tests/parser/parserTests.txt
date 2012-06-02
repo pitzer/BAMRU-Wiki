@@ -615,6 +615,26 @@ disabled
 </dl>
 !! end
 
+!! test
+Definition and unordered list using wiki syntax nested in unordered list using html tags.
+!! input
+<ul><li>
+; term : description 
+* unordered
+</li>
+</ul>
+!! result
+<ul><li>
+<dl><dt> term&#160;</dt><dd> description 
+</dd></dl>
+<ul><li> unordered
+</li></ul>
+</li>
+</ul>
+
+!! end
+
+
 ###
 ### External links
 ###
@@ -740,6 +760,15 @@ External links: protocol-relative URL in free text is left alone
 <p>//example.com/Foo
 </p>
 !!end
+
+!! test
+External links: protocol-relative URL in the middle of a word is left alone (bug 30269)
+!! input
+foo//example.com/Foo
+!! result
+<p>foo//example.com/Foo
+</p>
+!! end
 
 !! test
 External image
@@ -1041,8 +1070,10 @@ http://www.example.com/?title=AT%26T
 </p>
 !! end
 
+# According to http://dev.w3.org/html5/spec/Overview.html#parsing-urls a plain
+# % is actually legal in HTML5. Any change in output would need testing though.
 !! test
-Bug 4781, 5267: %26 in URL
+Bug 4781, 5267: %25 in URL
 !! input
 http://www.example.com/?title=100%25_Bran
 !! result
@@ -1160,6 +1191,29 @@ URL-encoding in URL functions (multiple parameters)
 </p>
 !! end
 
+!! test
+Brackets in urls
+!! input
+http://example.com/index.php?foozoid%5B%5D=bar
+
+http://example.com/index.php?foozoid&#x5B;&#x5D;=bar
+!! result
+<p><a rel="nofollow" class="external free" href="http://example.com/index.php?foozoid%5B%5D=bar">http://example.com/index.php?foozoid%5B%5D=bar</a>
+</p><p><a rel="nofollow" class="external free" href="http://example.com/index.php?foozoid%5B%5D=bar">http://example.com/index.php?foozoid%5B%5D=bar</a>
+</p>
+!! end
+
+!! test
+IPv6 urls (bug 21261)
+!! options
+disabled
+!! input
+http://[2404:130:0:1000::187:2]/index.php
+!! result
+<p><a rel="nofollow" class="external free" href="http://[2404:130:0:1000::187:2]/index.php">http://[2404:130:0:1000::187:2]/index.php</a>
+</p>
+!! end
+
 ###
 ### Quotes
 ###
@@ -1237,10 +1291,8 @@ A table with nothing but a caption
 |}
 !! result
 <table>
-<caption>caption
-</caption>
-<tr><td></td></tr>
-</table>
+<caption> caption
+</caption><tr><td></td></tr></table>
 
 !! end
 
@@ -1255,372 +1307,13 @@ Simple table
 !! result
 <table>
 <tr>
-<td>1
-</td>
-<td>2
-</td>
-</tr>
+<td> 1 </td>
+<td> 2
+</td></tr>
 <tr>
-<td>3
-</td>
-<td>4
-</td>
-</tr>
-</table>
-
-!! end
-
-!! test
-Table inside unclosed table w/o cells
-!! input
-{|
-{| 
-| foo bar
-|}
-
-!! result
-<table>
-<tr>
-<td>
-<table>
-<tr>
-<td>foo bar
-</td>
-</tr>
-</table>
-<p><br />
-</p>
-</td>
-</tr>
-</table>
-
-!! end
-
-!! test
-Table with thead
-!! input
-{| 
-! Number !! Another number
-|-
-| 1 || 2
-|- 
-| 3 || 4
-|}
-!! result
-<table>
-<thead>
-<tr>
-<th>Number
-</th>
-<th>Another number
-</th>
-</tr></thead>
-<tbody>
-<tr>
-<td>1
-</td>
-<td>2
-</td>
-</tr>
-<tr>
-<td>3
-</td>
-<td>4
-</td>
-</tr></tbody>
-</table>
-
-!! end
-
-!! test
-Table with multiple captions: Only keep first
-!! input
-{|
-|+ caption 1
-|+ caption 2
-|}
-!! result
-<table>
-<caption>caption 1
-</caption>
-<tr><td></td></tr>
-</table>
-
-!! end
-
-!! test
-Table with multiline caption
-!! input
-{|
-|+ caption 1
-further caption
-|}
-!! result
-<table>
-<caption>caption 1
-further caption
-</caption>
-<tr><td></td></tr>
-</table>
-
-!! end
-!! test
-Table with multiple thead
-!! input
-{| 
-! Number !! Another number
-|-
-| 1 || 2
-|- 
-! Some other number !! Another number
-|-
-| 3 || 4
-|}
-!! result
-<table>
-<thead>
-<tr>
-<th>Number
-</th>
-<th>Another number
-</th>
-</tr></thead>
-<tbody>
-<tr>
-<td>1
-</td>
-<td>2
-</td>
-</tr></tbody>
-<thead>
-<tr>
-<th>Some other number
-</th>
-<th>Another number
-</th>
-</tr></thead>
-<tbody>
-<tr>
-<td>3
-</td>
-<td>4
-</td>
-</tr></tbody>
-</table>
-
-!! end
-!! test
-Table with thead & tfoot
-!! input
-{| 
-! Number !! Another number
-|-
-| 1 || 2
-|- 
-! Some other number !! Another number
-|-
-| 3 || 4
-|-
-! Total: 4 !! Total: 6
-|}
-!! result
-<table>
-<thead>
-<tr>
-<th>Number
-</th>
-<th>Another number
-</th>
-</tr></thead>
-<tbody>
-<tr>
-<td>1
-</td>
-<td>2
-</td>
-</tr></tbody>
-<thead>
-<tr>
-<th>Some other number
-</th>
-<th>Another number
-</th>
-</tr></thead>
-<tbody>
-<tr>
-<td>3
-</td>
-<td>4
-</td>
-</tr></tbody>
-<tfoot>
-<tr>
-<th>Total: 4
-</th>
-<th>Total: 6
-</th>
-</tr></tfoot>
-</table>
-
-!! end
-
-!! test
-Table have th inside tfoot
-!! input
-{| 
-| cell1 || cell2
-|-
-! Footer1 !! Footer2
-|}
-!! result
-<table>
-<tbody>
-<tr>
-<td>cell1
-</td>
-<td>cell2
-</td>
-</tr></tbody>
-<tfoot>
-<tr>
-<th>Footer1
-</th>
-<th>Footer2
-</th>
-</tr></tfoot>
-</table>
-
-!! end
-
-!! test
-Table have th inside thead
-!! input
-{| 
-! Header1 !! Header2
-|-
-| cell1 || cell2
-|}
-!! result
-<table>
-<thead>
-<tr>
-<th>Header1
-</th>
-<th>Header2
-</th>
-</tr></thead>
-<tbody>
-<tr>
-<td>cell1
-</td>
-<td>cell2
-</td>
-</tr></tbody>
-</table>
-
-!! end
-
-!! test
-Table with list inside
-!! input
-{|
-|style="width: 5em; text-align: center"| gives
-|style="border: 1px dashed #2F6FAB; padding: 0.5em; margin: 0.5em"|
-# Some
-# list
-# Lorem
-# ipsum
-# dolor
-|}
-!! result
-<table>
-<tr>
-<td style="width: 5em; text-align: center">gives
-</td>
-<td style="border: 1px dashed #2F6FAB; padding: 0.5em; margin: 0.5em">
-<ol><li> Some
-</li><li> list
-</li><li> Lorem
-</li><li> ipsum
-</li><li> dolor
-</li></ol>
-</td>
-</tr>
-</table>
-
-!! end
-!! test
-Table with broken up list inside
-!! input
-{|
-|style="width: 5em; text-align: center"| gives
-|style="border: 1px dashed #2F6FAB; padding: 0.5em; margin: 0.5em"|
-# Some
-# list
-# Lorem
-
-# ipsum
-# dolor
-|}
-!! result
-<table>
-<tr>
-<td style="width: 5em; text-align: center">gives
-</td>
-<td style="border: 1px dashed #2F6FAB; padding: 0.5em; margin: 0.5em">
-<ol><li> Some
-</li><li> list
-</li><li> Lorem
-</li></ol>
-<ol><li> ipsum
-</li><li> dolor
-</li></ol>
-</td>
-</tr>
-</table>
-
-!! end
-
-!! test
-Indented table wrapped in html tags (Related to Bug 26362)
-!! input
-<div>
-:{|
-|-
-| test
-|}</div>
-
-!! result
-<div>
-<dl><dd><table>
-<tr>
-<td>test
-</td>
-</tr>
-</table></dd></dl></div>
-
-!! end
-
-!! test
-Table with multiline contents
-!! input
-{|
-| Alice
-Bob
-dfdfg
-dfg
-|}
-!! result
-<table>
-<tr>
-<td>Alice
-<p>Bob
-dfdfg
-dfg
-</p>
-</td>
-</tr>
-</table>
+<td> 3 </td>
+<td> 4
+</td></tr></table>
 
 !! end
 
@@ -1651,76 +1344,54 @@ Multiplication table
 <table border="1" cellpadding="2">
 <caption>Multiplication table
 </caption>
-<thead>
 <tr>
-<th>&#215;
-</th>
-<th>1
-</th>
-<th>2
-</th>
-<th>3
-</th>
-</tr></thead>
-<tbody>
+<th> &#215; </th>
+<th> 1 </th>
+<th> 2 </th>
+<th> 3
+</th></tr>
 <tr>
-<th>1
+<th> 1
 </th>
-<td>1
-</td>
-<td>2
-</td>
-<td>3
-</td>
-</tr>
+<td> 1 </td>
+<td> 2 </td>
+<td> 3
+</td></tr>
 <tr>
-<th>2
+<th> 2
 </th>
-<td>2
-</td>
-<td>4
-</td>
-<td>6
-</td>
-</tr>
+<td> 2 </td>
+<td> 4 </td>
+<td> 6
+</td></tr>
 <tr>
-<th>3
+<th> 3
 </th>
-<td>3
-</td>
-<td>6
-</td>
-<td>9
-</td>
-</tr>
+<td> 3 </td>
+<td> 6 </td>
+<td> 9
+</td></tr>
 <tr>
-<th>4
+<th> 4
 </th>
-<td>4
-</td>
-<td>8
-</td>
-<td>12
-</td>
-</tr>
+<td> 4 </td>
+<td> 8 </td>
+<td> 12
+</td></tr>
 <tr>
-<th>5
+<th> 5
 </th>
-<td>5
-</td>
-<td>10
-</td>
-<td>15
-</td>
-</tr></tbody>
-</table>
+<td> 5 </td>
+<td> 10 </td>
+<td> 15
+</td></tr></table>
 
 !! end
 
 !! test
 Table rowspan
 !! input
-{| align=right border=1
+{| border=1
 | Cell 1, row 1 
 |rowspan=2| Cell 2, row 1 (and 2) 
 | Cell 3, row 1 
@@ -1729,22 +1400,19 @@ Table rowspan
 | Cell 3, row 2 
 |}
 !! result
-<table align="right" border="1">
+<table border="1">
 <tr>
-<td>Cell 1, row 1
+<td> Cell 1, row 1
 </td>
-<td rowspan="2">Cell 2, row 1 (and 2)
+<td rowspan="2"> Cell 2, row 1 (and 2)
 </td>
-<td>Cell 3, row 1
-</td>
-</tr>
+<td> Cell 3, row 1
+</td></tr>
 <tr>
-<td>Cell 1, row 2
+<td> Cell 1, row 2
 </td>
-<td>Cell 3, row 2
-</td>
-</tr>
-</table>
+<td> Cell 3, row 2
+</td></tr></table>
 
 !! end
 
@@ -1764,24 +1432,19 @@ Nested table
 !! result
 <table border="1">
 <tr>
-<td>&#945;
+<td> &#945;
 </td>
 <td>
 <table bgcolor="#ABCDEF" border="2">
 <tr>
 <td>nested
-</td>
-</tr>
+</td></tr>
 <tr>
 <td>table
-</td>
-</tr>
-</table>
+</td></tr></table>
 </td>
 <td>the original table again
-</td>
-</tr>
-</table>
+</td></tr></table>
 
 !! end
 
@@ -1795,85 +1458,10 @@ Invalid attributes in table cell (bug 1830)
 <table>
 <tr>
 <td>broken
-</td>
-</tr>
-</table>
+</td></tr></table>
 
 !! end
 
-!! test
-Heading inside table (affected by r85922)
-!! input
-{|
-|- valign="top"
-|
-=== Heading ===
-|}
-!! result
-<table>
-<tr valign="top">
-<td>
-<h3><span class="editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: Heading">edit</a>]</span> <span class="mw-headline" id="Heading"> Heading </span></h3>
-</td>
-</tr>
-</table>
-
-!! end
-
-!! test
-A table with a caption with unclosed italic
-!! input 
-{|
-|+ ''caption
-|  Cell
-|}
-!! result
-<table>
-<caption><i>caption</i>
-</caption>
-<tr>
-<td>Cell
-</td>
-</tr>
-</table>
-
-!! end
-
-!! test
-A table with unclosed italic in a cell
-!! input 
-{|
-| ''Cell
-|}
-!! result
-<table>
-<tr>
-<td><i>Cell</i>
-</td>
-</tr>
-</table>
-
-!! end
-
-!! test
-A table with unclosed italic in a th
-!! input
-{|
-|-
-! ''Cell
-|| Value
-|}
-!! result
-<table>
-<tr>
-<th><i>Cell</i>
-</th>
-<td>Value
-</td>
-</tr>
-</table>
-
-!! end
 
 !! test
 Table security: embedded pipes (http://lists.wikimedia.org/mailman/htdig/wikitech-l/2006-April/022293.html)
@@ -1883,8 +1471,7 @@ Table security: embedded pipes (http://lists.wikimedia.org/mailman/htdig/wikitec
 !! result
 <table>
 <tr>
-<td>[<a rel="nofollow" class="external free" href="ftp://%7Cx">ftp://%7Cx</a>
-</td>
+<td>[<a rel="nofollow" class="external free" href="ftp://%7Cx">ftp://%7Cx</a></td>
 <td>]" onmouseover="alert(document.cookie)"&gt;test
 </td>
 </tr>
@@ -1892,69 +1479,26 @@ Table security: embedded pipes (http://lists.wikimedia.org/mailman/htdig/wikitec
 
 !! end
 
-!! test
-Indented Tables, bug 20078
-!! input
-: {| 
-| 1 || 2
-|- 
-| 3 || 4
-|}
-!! result
-<dl><dd><table>
-<tr>
-<td>1
-</td>
-<td>2
-</td>
-</tr>
-<tr>
-<td>3
-</td>
-<td>4
-</td>
-</tr>
-</table></dd></dl>
-
-!! end
 
 !! test
-Arbitrary whitespace should not be prepended
+Indented table markup mixed with indented pre content (proposed in bug 6200)
 !! input
-{| 
-| 1 || 2
-
-|- 
-
-
-| 3 || 4
-|-
-
-| 6 || 8
-|}
+ <table>
+ <tr>
+ <td>
+ Text that should be rendered preformatted
+ </td>
+ </tr>
+ </table>
 !! result
-<table>
-<tr>
-<td>1
-</td>
-<td>2
-<p><br />
-</p>
-</td>
-</tr>
-<tr>
-<td>3
-</td>
-<td>4
-</td>
-</tr>
-<tr>
-<td>6
-</td>
-<td>8
-</td>
-</tr>
-</table>
+ <table>
+ <tr>
+ <td>
+<pre>Text that should be rendered preformatted
+</pre>
+ </td>
+ </tr>
+ </table>
 
 !! end
 
@@ -2197,6 +1741,34 @@ Plain link to URL
 </p>
 !! end
 
+!! test
+Plain link to URL with link text
+!! input
+[[http://www.example.com Link text]]
+!! result
+<p>[<a rel="nofollow" class="external text" href="http://www.example.com">Link text</a>]
+</p>
+!! end
+
+!! test
+Plain link to protocol-relative URL
+!! input
+[[//www.example.com]]
+!! result
+<p>[<a rel="nofollow" class="external autonumber" href="//www.example.com">[1]</a>]
+</p>
+!! end
+
+!! test
+Plain link to protocol-relative URL with link text
+!! input
+[[//www.example.com Link text]]
+!! result
+<p>[<a rel="nofollow" class="external text" href="//www.example.com">Link text</a>]
+</p>
+!! end
+
+
 # I'm fairly sure the expected result here is wrong.
 # We want these to be URL links, not pseudo-pages with URLs for titles....
 # However the current output is also pretty screwy.
@@ -2367,7 +1939,7 @@ Inline interwiki link with empty title (bug 2372)
 !! input
 [[MeatBall:]]
 !! result
-<p><a href="http://www.usemod.com/cgi-bin/mb.pl?" class="extiw" title="meatball:">MeatBall:</a>
+<p><a href="http://www.usemod.com/cgi-bin/mb.pl" class="extiw" title="meatball:">MeatBall:</a>
 </p>
 !! end
 
@@ -2464,13 +2036,13 @@ Incorrecly removing closing slashes from correctly formed XHTML
 !! test 
 Failing to transform badly formed HTML into correct XHTML
 !! input
-<br clear=left>
-<br clear=right>
-<br clear=all>
+<br style="clear: left;">
+<br style="clear: right;">
+<br style="clear: both;">
 !! result
-<p><br clear="left" />
-<br clear="right" />
-<br clear="all" />
+<p><br style="clear: left;" />
+<br style="clear: right;" />
+<br style="clear: both;" />
 </p>
 !!end
 
@@ -2974,7 +2546,7 @@ Magic links: RFC (bug 479)
 !! input
 RFC 822
 !! result
-<p><a class="external mw-magiclink-rfc" href="http://tools.ietf.org/html/rfc822">RFC 822</a>
+<p><a class="external mw-magiclink-rfc" href="//tools.ietf.org/html/rfc822">RFC 822</a>
 </p>
 !! end
 
@@ -2992,7 +2564,7 @@ Magic links: PMID incorrectly converts space to underscore
 !! input
 PMID 1234
 !! result
-<p><a class="external mw-magiclink-pmid" href="http://www.ncbi.nlm.nih.gov/pubmed/1234?dopt=Abstract">PMID 1234</a>
+<p><a class="external mw-magiclink-pmid" href="//www.ncbi.nlm.nih.gov/pubmed/1234?dopt=Abstract">PMID 1234</a>
 </p>
 !! end
 
@@ -3219,9 +2791,7 @@ BUG 553: link with two variables in a piped link
 <table>
 <tr>
 <td>[[{{{1}}}|{{{2}}}]]
-</td>
-</tr>
-</table>
+</td></tr></table>
 
 !! end
 
@@ -3330,18 +2900,13 @@ foo {{table}}
 </p>
 <table>
 <tr>
-<td>1
-</td>
-<td>2
-</td>
-</tr>
+<td> 1 </td>
+<td> 2
+</td></tr>
 <tr>
-<td>3
-</td>
-<td>4
-</td>
-</tr>
-</table>
+<td> 3 </td>
+<td> 4
+</td></tr></table>
 
 !! end
 
@@ -3355,18 +2920,13 @@ foo
 </p>
 <table>
 <tr>
-<td>1
-</td>
-<td>2
-</td>
-</tr>
+<td> 1 </td>
+<td> 2
+</td></tr>
 <tr>
-<td>3
-</td>
-<td>4
-</td>
-</tr>
-</table>
+<td> 3 </td>
+<td> 4
+</td></tr></table>
 
 !! end
 
@@ -3533,35 +3093,6 @@ section=1
 ==Section 1==
 !! result
 ==Section 1==
-!! end
-!! article
-Template:Top-level template
-!! text
-{{Nested template}}
-!! endarticle
-
-!! article
-Template:Nested template
-!! text
-*Item 1
-*Item 2
-!! endarticle
-
-!! test
-Line-start flag in a nested template call
-!! input
-*Item A
-*Item B
-
-{{Top-level template}}
-!! result
-<ul><li>Item A
-</li><li>Item B
-</li></ul>
-<ul><li>Item 1
-</li><li>Item 2
-</li></ul>
-
 !! end
 
 ###
@@ -3988,66 +3519,6 @@ pst
 !! end
 
 !! test
-pre-save transform: context links ("pipe trick") with full-width parens and no space (Japanese and Chinese style, bug 30149)
-!! options
-pst
-!! input
-[[Article（context）|]]
-[[Bar:Article（context）|]]
-[[:Bar:Article（context）|]]
-[[|Article（context）]]
-[[Bar:X （Y） Z|]]
-[[:Bar:X （Y） Z|]]
-!! result
-[[Article（context）|Article]]
-[[Bar:Article（context）|Article]]
-[[:Bar:Article（context）|Article]]
-[[Article（context）]]
-[[Bar:X （Y） Z|X （Y） Z]]
-[[:Bar:X （Y） Z|X （Y） Z]]
-!! end
-
-!! test
-pre-save transform: context links ("pipe trick") with full-width parens and space (Japanese and Chinese style, bug 30149)
-!! options
-pst
-!! input
-[[Article （context）|]]
-[[Bar:Article （context）|]]
-[[:Bar:Article （context）|]]
-[[|Article （context）]]
-[[Bar:X （Y） Z|]]
-[[:Bar:X （Y） Z|]]
-!! result
-[[Article （context）|Article]]
-[[Bar:Article （context）|Article]]
-[[:Bar:Article （context）|Article]]
-[[Article （context）]]
-[[Bar:X （Y） Z|X （Y） Z]]
-[[:Bar:X （Y） Z|X （Y） Z]]
-!! end
-
-!! test
-pre-save transform: context links ("pipe trick") with parens and no space (Korean style, bug 30149)
-!! options
-pst
-!! input
-[[Article(context)|]]
-[[Bar:Article(context)|]]
-[[:Bar:Article(context)|]]
-[[|Article(context)]]
-[[Bar:X(Y)Z|]]
-[[:Bar:X(Y)Z|]]
-!! result
-[[Article(context)|Article]]
-[[Bar:Article(context)|Article]]
-[[:Bar:Article(context)|Article]]
-[[Article(context)]]
-[[Bar:X(Y)Z|X(Y)Z]]
-[[:Bar:X(Y)Z|X(Y)Z]]
-!! end
-
-!! test
 pre-save transform: trim trailing empty lines
 !! options
 pst
@@ -4407,7 +3878,7 @@ BUG 1887: A RFC with a thumbnail
 !! input
 [[Image:foobar.jpg|thumb|This is RFC 12354]]
 !! result
-<div class="thumb tright"><div class="thumbinner" style="width:182px;"><a href="/wiki/File:Foobar.jpg" class="image"><img alt="" src="http://example.com/images/3/3a/Foobar.jpg" width="180" height="20" class="thumbimage" /></a>  <div class="thumbcaption"><div class="magnify"><a href="/wiki/File:Foobar.jpg" class="internal" title="Enlarge"><img src="/skins/common/images/magnify-clip.png" width="15" height="11" alt="" /></a></div>This is <a class="external mw-magiclink-rfc" href="http://tools.ietf.org/html/rfc12354">RFC 12354</a></div></div></div>
+<div class="thumb tright"><div class="thumbinner" style="width:182px;"><a href="/wiki/File:Foobar.jpg" class="image"><img alt="" src="http://example.com/images/3/3a/Foobar.jpg" width="180" height="20" class="thumbimage" /></a>  <div class="thumbcaption"><div class="magnify"><a href="/wiki/File:Foobar.jpg" class="internal" title="Enlarge"><img src="/skins/common/images/magnify-clip.png" width="15" height="11" alt="" /></a></div>This is <a class="external mw-magiclink-rfc" href="//tools.ietf.org/html/rfc12354">RFC 12354</a></div></div></div>
 
 !! end
 
@@ -5114,9 +4585,9 @@ div with unquoted attribute
 !! test
 div with illegal double attributes
 !! input
-<div align="center" align="right">HTML rocks</div>
+<div id="a" id="b">HTML rocks</div>
 !! result
-<div align="right">HTML rocks</div>
+<div id="b">HTML rocks</div>
 
 !!end
 
@@ -5138,19 +4609,17 @@ Table multiple attributes correction
 !! result
 <table>
 <tr>
-<th class="awesome">status
-</th>
-</tr>
-</table>
+<th class="awesome"> status
+</th></tr></table>
 
 !!end
 
 !! test
 DIV IN UPPERCASE
 !! input
-<DIV ALIGN="center">HTML ROCKS</DIV>
+<DIV ID="x">HTML ROCKS</DIV>
 !! result
-<div align="center">HTML ROCKS</div>
+<div id="x">HTML ROCKS</div>
 
 !!end
 
@@ -5585,10 +5054,8 @@ Table attribute legitimate extension
 !! result
 <table>
 <tr>
-<th style="color:blue">status
-</th>
-</tr>
-</table>
+<th style="color:blue"> status
+</th></tr></table>
 
 !!end
 
@@ -5601,10 +5068,8 @@ Table attribute safety
 !! result
 <table>
 <tr>
-<th style="/* insecure input */">status
-</th>
-</tr>
-</table>
+<th style="/* insecure input */"> status
+</th></tr></table>
 
 !! end
 
@@ -6226,7 +5691,8 @@ Fuzz testing: Parser13
 !! result
 <table>
 <tr>
-<td></td>
+<td>
+</td>
 </tr>
 </table>
 
@@ -6252,14 +5718,10 @@ Fuzz testing: Parser14-table
 !! input
 ==a==
 {| STYLE=__TOC__
-|foo
 !! result
 <h2><span class="editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: a">edit</a>]</span> <span class="mw-headline" id="a">a</span></h2>
 <table style="&#95;_TOC&#95;_">
-<tr>
-<td>foo
-</td>
-</tr>
+<tr><td></td></tr>
 </table>
 
 !! end
@@ -6275,11 +5737,11 @@ noxml
 !! result
 <table>
 <tr>
-<th>https://
-</th>
+<th>https://</th>
 <th></th>
 <th></th>
-<th></th>
+<th>
+</td>
 </tr>
 </table>
 
@@ -6294,9 +5756,10 @@ Fuzz testing: Parser21
 !! result
 <table>
 <tr>
-<th><a rel="nofollow" class="external free" href="irc://{{ftp://a">irc://{{ftp://a</a>" onmouseover="alert('hello world');"
+<th> <a rel="nofollow" class="external free" href="irc://{{ftp://a">irc://{{ftp://a</a>" onmouseover="alert('hello world');"
 </th>
-<td></td>
+<td>
+</td>
 </tr>
 </table>
 
@@ -6308,30 +5771,15 @@ Fuzz testing: Parser22
 http://===r:::https://b
 
 {|
-
 !!result
 <p><a rel="nofollow" class="external free" href="http://===r:::https://b">http://===r:::https://b</a>
-</p><p><br />
 </p>
+<table>
+<tr><td></td></tr>
+</table>
+
 !! end
 
-# Known to produce bad XML for now
-
-# Note: the current result listed for this is not what the original one was,
-# but the original bug was JavaScript injection, which is fixed in any case.
-# It's not clear that the original result listed was any more correct than the
-# current one.  Original result:
-# <table>
-# {{{|
-# <u class="&#124;">}}}} &gt;
-# <br style="onmouseover=&#39;alert(document.cookie);&#39;" />
-# 
-# MOVE YOUR MOUSE CURSOR OVER THIS TEXT
-# <tr>
-# <td></u>
-# </td>
-# </tr>
-# </table>
 # Known to produce bad XML for now
 !! test
 Fuzz testing: Parser24
@@ -6347,12 +5795,12 @@ noxml
 MOVE YOUR MOUSE CURSOR OVER THIS TEXT
 |
 !! result
-<p>{{{|
+<table>
+{{{|
 <u class="&#124;">}}}} &gt;
 <br style="onmouseover=&#39;alert(document.cookie);&#39;" />
-</p><p>MOVE YOUR MOUSE CURSOR OVER THIS TEXT
-</p>
-<table>
+
+MOVE YOUR MOUSE CURSOR OVER THIS TEXT
 <tr>
 <td></u>
 </td>
@@ -7787,7 +7235,7 @@ Double RFC
 !! input
 RFC RFC 1234
 !! result
-<p>RFC <a class="external mw-magiclink-rfc" href="http://tools.ietf.org/html/rfc1234">RFC 1234</a>
+<p>RFC <a class="external mw-magiclink-rfc" href="//tools.ietf.org/html/rfc1234">RFC 1234</a>
 </p>
 !! end
 
@@ -7805,7 +7253,7 @@ RFC code coverage
 !! input
 RFC   983&#x20;987
 !! result
-<p><a class="external mw-magiclink-rfc" href="http://tools.ietf.org/html/rfc983">RFC 983</a>&#x20;987
+<p><a class="external mw-magiclink-rfc" href="//tools.ietf.org/html/rfc983">RFC 983</a>&#x20;987
 </p>
 !! end
 
@@ -8561,18 +8009,13 @@ y
 </p>
 <table>
 <tr>
-<td>1
-</td>
-<td>2
-</td>
-</tr>
+<td> 1 </td>
+<td> 2
+</td></tr>
 <tr>
-<td>3
-</td>
-<td>4
-</td>
-</tr>
-</table>
+<td> 3 </td>
+<td> 4
+</td></tr></table>
 <p>y
 </p>
 !! end
@@ -9036,7 +8479,17 @@ comment title=[[Main Page]]
 !! input
 /* External links */ removed bogus entries
 !! result
-<span class="autocomment"><a href="/wiki/Main_Page#External_links" title="Main Page">→</a>External links: </span> removed bogus entries
+<a href="/wiki/Main_Page#External_links" title="Main Page">→</a>‎<span dir="auto"><span class="autocomment">External links: </span> removed bogus entries</span>
+!!end
+
+!! test
+Edit comment with section link and text before it (non-local, eg in history list)
+!! options
+comment title=[[Main Page]]
+!! input
+pre-comment text /* External links */ removed bogus entries
+!! result
+pre-comment text - <a href="/wiki/Main_Page#External_links" title="Main Page">→</a>‎<span dir="auto"><span class="autocomment">External links: </span> removed bogus entries</span>
 !!end
 
 !! test
@@ -9046,7 +8499,7 @@ comment local title=[[Main Page]]
 !! input
 /* External links */ removed bogus entries
 !! result
-<span class="autocomment"><a href="#External_links">→</a>External links: </span> removed bogus entries
+<a href="#External_links">→</a>‎<span dir="auto"><span class="autocomment">External links: </span> removed bogus entries</span>
 !!end
 
 !! test
@@ -9133,7 +8586,7 @@ title=[[Main Page]]
 !!input
 /* __hello__world__ */
 !! result
-<span class="autocomment"><a href="/wiki/Main_Page#hello_world" title="Main Page">→</a>__hello__world__</span>
+<a href="/wiki/Main_Page#hello_world" title="Main Page">→</a>‎<span dir="auto"><span class="autocomment">__hello__world__</span></span>
 !! end
 
 !! test
@@ -9148,6 +8601,8 @@ comment
 
 !! test
 Bad images - basic functionality
+!! options
+disabled
 !! input
 [[File:Bad.jpg]]
 !! result
@@ -9155,6 +8610,8 @@ Bad images - basic functionality
 
 !! test
 Bad images - bug 16039: text after bad image disappears
+!! options
+disabled
 !! input
 Foo bar
 [[File:Bad.jpg]]
@@ -9394,6 +8851,340 @@ http://www.example.org/pic.png　<-- U+3000 (vim: ^Vu3000)
 <p><img src="http://www.example.org/pic.png" alt="pic.png" />　&lt;-- U+3000 (vim: ^Vu3000)
 </p>
 !! end
+
+!! article
+Mediawiki:loop1
+!! text
+{{Identical|A}}
+!! endarticle
+
+!! article
+Mediawiki:loop2
+!! text
+{{Identical|B}}
+!! endarticle
+
+!! article
+Template:Identical
+!! text
+{{int:loop1}}
+{{int:loop2}}
+!! endarticle
+
+!! test
+Bug 31098 Template which includes system messages which includes the template
+!! input
+{{Identical}}
+!! result
+<p><span class="error">Template loop detected: <a href="/wiki/Template:Identical" title="Template:Identical">Template:Identical</a></span>
+<span class="error">Template loop detected: <a href="/wiki/Template:Identical" title="Template:Identical">Template:Identical</a></span>
+</p>
+!! end
+
+!! test
+Deprecated presentational attributes are converted to css
+!! input
+{|
+| valign=top align=left width=100 height=25% | Asdf
+|}
+<ul type="disc"></ul>
+!! result
+<table>
+<tr>
+<td style="text-align: left; height: 25%; vertical-align: top; width: 100px;"> Asdf
+</td></tr></table>
+<ul style="list-style-type: disc;"></ul>
+
+!! end
+
+!! test
+Bug31490 Turkish: ucfirst 'blah'
+!! options
+language=tr
+!! input
+{{ucfirst:blah}}
+!! result
+<p>Blah
+</p>
+!! end
+
+!! test
+Bug31490 Turkish: ucfirst 'ix'
+!! options
+language=tr
+!! input
+{{ucfirst:ix}}
+!! result
+<p>İx
+</p>
+!! end
+
+!! test
+Bug31490 Turkish: lcfirst 'BLAH'
+!! options
+language=tr
+!! input
+{{lcfirst:BLAH}}
+!! result
+<p>bLAH
+</p>
+!! end
+
+!! test
+Bug31490 Turkish: ucfırst (with a dotless i)
+!! options
+language=tr
+!! input
+{{ucfırst:blah}}
+!! result
+<p><a href="/index.php?title=%C5%9Eablon:Ucf%C4%B1rst:blah&amp;action=edit&amp;redlink=1" class="new" title="Şablon:Ucfırst:blah (sayfa mevcut değil)">Şablon:Ucfırst:blah</a>
+</p>
+!! end
+
+!! test
+Bug31490 ucfırst (with a dotless i) with English language
+!! options
+language=en
+!! input
+{{ucfırst:blah}}
+!! result
+<p><a href="/index.php?title=Template:Ucf%C4%B1rst:blah&amp;action=edit&amp;redlink=1" class="new" title="Template:Ucfırst:blah (page does not exist)">Template:Ucfırst:blah</a>
+</p>
+!! end
+
+!! test
+Bug 26375: TOC with italics
+!! options
+title=[[Main Page]]
+!! input
+__TOC__
+== ''Lost'' episodes ==
+!! result
+<table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#Lost_episodes"><span class="tocnumber">1</span> <span class="toctext"><i>Lost</i> episodes</span></a></li>
+</ul>
+</td></tr></table>
+<h2><span class="editsection">[<a href="/index.php?title=Main_Page&amp;action=edit&amp;section=1" title="Edit section: Lost episodes">edit</a>]</span> <span class="mw-headline" id="Lost_episodes"> <i>Lost</i> episodes </span></h2>
+
+!! end
+
+!! test
+Bug 26375: TOC with bold 
+!! options
+title=[[Main Page]]
+!! input
+__TOC__
+== '''should be bold''' then normal text ==
+!! result
+<table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#should_be_bold_then_normal_text"><span class="tocnumber">1</span> <span class="toctext"><b>should be bold</b> then normal text</span></a></li>
+</ul>
+</td></tr></table>
+<h2><span class="editsection">[<a href="/index.php?title=Main_Page&amp;action=edit&amp;section=1" title="Edit section: should be bold then normal text">edit</a>]</span> <span class="mw-headline" id="should_be_bold_then_normal_text"> <b>should be bold</b> then normal text </span></h2>
+
+!! end
+
+!! test
+Bug 33845: Headings become cursive in TOC when they contain an image
+!! options
+title=[[Main Page]]
+!! input
+__TOC__
+== Image [[Image:foobar.jpg]] ==
+!! result
+<table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#Image"><span class="tocnumber">1</span> <span class="toctext">Image</span></a></li>
+</ul>
+</td></tr></table>
+<h2><span class="editsection">[<a href="/index.php?title=Main_Page&amp;action=edit&amp;section=1" title="Edit section: Image">edit</a>]</span> <span class="mw-headline" id="Image"> Image <a href="/wiki/File:Foobar.jpg" class="image"><img alt="Foobar.jpg" src="http://example.com/images/3/3a/Foobar.jpg" width="1941" height="220" /></a> </span></h2>
+
+!! end
+
+!! test
+Bug 33845 (2): Headings become bold in TOC when they contain a blockquote
+!! options
+title=[[Main Page]]
+!! input
+__TOC__
+== <blockquote>Quote</blockquote> ==
+!! result
+<table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#Quote"><span class="tocnumber">1</span> <span class="toctext">Quote</span></a></li>
+</ul>
+</td></tr></table>
+<h2><span class="editsection">[<a href="/index.php?title=Main_Page&amp;action=edit&amp;section=1" title="Edit section: Quote">edit</a>]</span> <span class="mw-headline" id="Quote"> <blockquote>Quote</blockquote> </span></h2>
+
+!! end
+
+!! test
+Unclosed tags in TOC
+!! options
+title=[[Main Page]]
+!! input
+__TOC__
+== Proof: 2 < 3 ==
+<small>Hanc marginis exiguitas non caperet.</small>
+QED
+!! result
+<table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#Proof:_2_.3C_3"><span class="tocnumber">1</span> <span class="toctext">Proof: 2 &lt; 3</span></a></li>
+</ul>
+</td></tr></table>
+<h2><span class="editsection">[<a href="/index.php?title=Main_Page&amp;action=edit&amp;section=1" title="Edit section: Proof: 2 &lt; 3">edit</a>]</span> <span class="mw-headline" id="Proof:_2_.3C_3"> Proof: 2 &lt; 3 </span></h2>
+<p><small>Hanc marginis exiguitas non caperet.</small>
+QED
+</p>
+!! end
+
+!! test
+Multiple tags in TOC
+!! input
+__TOC__
+== <i>Foo</i> <b>Bar</b> ==
+
+== <i>Foo</i> <blockquote>Bar</blockquote> ==
+!! result
+<table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#Foo_Bar"><span class="tocnumber">1</span> <span class="toctext"><i>Foo</i> <b>Bar</b></span></a></li>
+<li class="toclevel-1 tocsection-2"><a href="#Foo_Bar_2"><span class="tocnumber">2</span> <span class="toctext"><i>Foo</i> Bar</span></a></li>
+</ul>
+</td></tr></table>
+<h2><span class="editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: Foo Bar">edit</a>]</span> <span class="mw-headline" id="Foo_Bar"> <i>Foo</i> <b>Bar</b> </span></h2>
+<h2><span class="editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: Foo Bar">edit</a>]</span> <span class="mw-headline" id="Foo_Bar_2"> <i>Foo</i> <blockquote>Bar</blockquote> </span></h2>
+
+!! end
+
+!! test
+Tags with parameters in TOC
+!! input
+__TOC__
+== <sup class="in-h2">Hello</sup> ==
+
+== <sup class="a > b">Evilbye</sup> ==
+!! result
+<table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#Hello"><span class="tocnumber">1</span> <span class="toctext"><sup>Hello</sup></span></a></li>
+<li class="toclevel-1 tocsection-2"><a href="#b.22.3EEvilbye"><span class="tocnumber">2</span> <span class="toctext"><sup> b"&gt;Evilbye</sup></span></a></li>
+</ul>
+</td></tr></table>
+<h2><span class="editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: Hello">edit</a>]</span> <span class="mw-headline" id="Hello"> <sup class="in-h2">Hello</sup> </span></h2>
+<h2><span class="editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=2" title="Edit section: b&quot;>Evilbye">edit</a>]</span> <span class="mw-headline" id="b.22.3EEvilbye"> <sup> b"&gt;Evilbye</sup> </span></h2>
+
+!! end
+
+!! article
+MediaWiki:Bug32057
+!! text
+== {{int:headline_sample}} ==
+!! endarticle
+
+!! test
+Bug 32057: Title needed when expanding <h> nodes.
+!! options
+title=[[Main Page]]
+!! input
+{{int:Bug32057}}
+!! result
+<h2><span class="editsection">[<a href="/index.php?title=Main_Page&amp;action=edit&amp;section=1" title="Edit section: Headline text">edit</a>]</span> <span class="mw-headline" id="Headline_text"> Headline text </span></h2>
+
+!! end
+
+!! test
+Strip marker in urlencode
+!! input
+{{urlencode:x<nowiki/>y}}
+{{urlencode:x<nowiki/>y|wiki}}
+{{urlencode:x<nowiki/>y|path}}
+!! result
+<p>xy
+xy
+xy
+</p>
+!! end
+
+!! test
+Strip marker in lc
+!! input
+{{lc:x<nowiki/>y}}
+!! result
+<p>xy
+</p>
+!! end
+
+!! test
+Strip marker in uc
+!! input
+{{uc:x<nowiki/>y}}
+!! result
+<p>XY
+</p>
+!! end
+
+!! test
+Strip marker in formatNum
+!! input
+{{formatnum:1<nowiki/>2}}
+{{formatnum:1<nowiki/>2|R}}
+!! result
+<p>12
+12
+</p>
+!! end
+
+!! test
+Strip marker in grammar
+!! options
+language=fi
+!! input
+{{grammar:elative|foo<nowiki/>bar}}
+!! result
+<p>foobarista
+</p>
+!! end
+
+!! test
+Strip marker in padleft
+!! input
+{{padleft:|2|x<nowiki/>y}}
+!! result
+<p>xy
+</p>
+!! end
+
+!! test
+Strip marker in padright
+!! input
+{{padright:|2|x<nowiki/>y}}
+!! result
+<p>xy
+</p>
+!! end
+
+!! test
+Strip marker in anchorencode
+!! input
+{{anchorencode:x<nowiki/>y}}
+!! result
+<p>xy
+</p>
+!! end
+
+!! test
+nowiki inside link inside heading (bug 18295)
+!! input
+==[[foo|x<nowiki>y</nowiki>z]]==
+!! result
+<h2><span class="editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: xyz">edit</a>]</span> <span class="mw-headline" id="xyz"><a href="/index.php?title=Foo&amp;action=edit&amp;redlink=1" class="new" title="Foo (page does not exist)">xyz</a></span></h2>
+
+!! end
+
 
 TODO:
 more images

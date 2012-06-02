@@ -20,6 +20,11 @@
  * @defgroup Maintenance Maintenance
  */
 
+/**
+ * @defgroup MaintenanceArchive Maintenance archives
+ * @ingroup Maintenance
+ */
+
 // Define this so scripts can easily find doMaintenance.php
 define( 'RUN_MAINTENANCE_IF_MAIN', dirname( __FILE__ ) . '/doMaintenance.php' );
 define( 'DO_MAINTENANCE', RUN_MAINTENANCE_IF_MAIN ); // original name, harmless
@@ -30,15 +35,6 @@ $maintClass = false;
 if ( !function_exists( 'version_compare' ) || version_compare( PHP_VERSION, '5.2.3' ) < 0 ) {
 	require_once( dirname( __FILE__ ) . '/../includes/PHPVersionError.php' );
 	wfPHPVersionError( 'cli' );
-}
-
-// Wrapper for posix_isatty()
-if ( !function_exists( 'posix_isatty' ) ) {
-	# We default as considering stdin a tty (for nice readline methods)
-	# but treating stout as not a tty to avoid color codes
-	function posix_isatty( $fd ) {
-		return !$fd;
-	}
 }
 
 /**
@@ -257,6 +253,20 @@ abstract class Maintenance {
 	 */
 	protected function setBatchSize( $s = 0 ) {
 		$this->mBatchSize = $s;
+
+		// If we support $mBatchSize, show the option.
+		// Used to be in addDefaultParams, but in order for that to
+		// work, subclasses would have to call this function in the constructor
+		// before they called parent::__construct which is just weird
+		// (and really wasn't done).
+		if ( $this->mBatchSize ) {
+			$this->addOption( 'batch-size', 'Run this many operations ' .
+				'per batch, default: ' . $this->mBatchSize, false, true );
+			if ( isset( $this->mParams['batch-size'] ) ) {
+				// This seems a little ugly...
+				$this->mDependantParameters['batch-size'] = $this->mParams['batch-size'];
+			}
+		}
 	}
 
 	/**
@@ -304,12 +314,12 @@ abstract class Maintenance {
 		}
 		if ( $channel === null ) {
 			$this->cleanupChanneled();
-
-			$f = fopen( 'php://stdout', 'w' );
-			fwrite( $f, $out );
-			fclose( $f );
-		}
-		else {
+			if( php_sapi_name() == 'cli' ) {
+				fwrite( STDOUT, $out );
+			} else {
+				print( $out );
+			}
+		} else {
 			$out = preg_replace( '/\n\z/', '', $out );
 			$this->outputChanneled( $out, $channel );
 		}
@@ -326,9 +336,7 @@ abstract class Maintenance {
 		if ( php_sapi_name() == 'cli' ) {
 			fwrite( STDERR, $err . "\n" );
 		} else {
-			$f = fopen( 'php://stderr', 'w' );
-			fwrite( $f, $err . "\n" );
-			fclose( $f );
+			print $err;
 		}
 		$die = intval( $die );
 		if ( $die > 0 ) {
@@ -344,9 +352,11 @@ abstract class Maintenance {
 	 */
 	public function cleanupChanneled() {
 		if ( !$this->atLineStart ) {
-			$handle = fopen( 'php://stdout', 'w' );
-			fwrite( $handle, "\n" );
-			fclose( $handle );
+			if( php_sapi_name() == 'cli' ) {
+				fwrite( STDOUT, "\n" );
+			} else {
+				print "\n";
+			}
 			$this->atLineStart = true;
 		}
 	}
@@ -365,25 +375,34 @@ abstract class Maintenance {
 			return;
 		}
 
-		$handle = fopen( 'php://stdout', 'w' );
+		$cli = php_sapi_name() == 'cli';
 
 		// End the current line if necessary
 		if ( !$this->atLineStart && $channel !== $this->lastChannel ) {
-			fwrite( $handle, "\n" );
+			if( $cli ) {
+				fwrite( STDOUT, "\n" );
+			} else {
+				print "\n";
+			}
 		}
 
-		fwrite( $handle, $msg );
+		if( $cli ) {
+			fwrite( STDOUT, $msg );
+		} else {
+			print $msg;
+		}
 
 		$this->atLineStart = false;
 		if ( $channel === null ) {
 			// For unchanneled messages, output trailing newline immediately
-			fwrite( $handle, "\n" );
+			if( $cli ) {
+				fwrite( STDOUT, "\n" );
+			} else {
+				print "\n";
+			}
 			$this->atLineStart = true;
 		}
 		$this->lastChannel = $channel;
-
-		// Cleanup handle
-		fclose( $handle );
 	}
 
 	/**
@@ -427,11 +446,7 @@ abstract class Maintenance {
 			$this->addOption( 'dbuser', 'The DB user to use for this script', false, true );
 			$this->addOption( 'dbpass', 'The password to use for this script', false, true );
 		}
-		// If we support $mBatchSize, show the option
-		if ( $this->mBatchSize ) {
-			$this->addOption( 'batch-size', 'Run this many operations ' .
-				'per batch, default: ' . $this->mBatchSize, false, true );
-		}
+
 		# Save additional script dependant options to display
 		# them separately in help
 		$this->mDependantParameters = array_diff_key( $this->mParams, $this->mGenericParameters );
@@ -455,6 +470,9 @@ abstract class Maintenance {
 			}
 		}
 
+		/**
+		 * @var $child Maintenance
+		 */
 		$child = new $maintClass();
 		$child->loadParamsAndArgs( $this->mSelf, $this->mOptions, $this->mArgs );
 		if ( !is_null( $this->mDb ) ) {
@@ -525,6 +543,7 @@ abstract class Maintenance {
 	 * to allow sysadmins to explicitly set one if they'd prefer to override
 	 * defaults (or for people using Suhosin which yells at you for trying
 	 * to disable the limits)
+	 * @return string
 	 */
 	public function memoryLimit() {
 		$limit = $this->getOption( 'memory-limit', 'max' );
@@ -698,7 +717,7 @@ abstract class Maintenance {
 			$this->mQuiet = true;
 		}
 		if ( $this->hasOption( 'batch-size' ) ) {
-			$this->mBatchSize = $this->getOption( 'batch-size' );
+			$this->mBatchSize = intval( $this->getOption( 'batch-size' ) );
 		}
 	}
 
@@ -851,6 +870,9 @@ abstract class Maintenance {
 			$wgDBpassword = $wgDBadminpassword;
 
 			if ( $wgDBservers ) {
+				/**
+				 * @var $wgDBservers array
+				 */
 				foreach ( $wgDBservers as $i => $server ) {
 					$wgDBservers[$i]['user'] = $wgDBuser;
 					$wgDBservers[$i]['password'] = $wgDBpassword;
@@ -886,57 +908,6 @@ abstract class Maintenance {
 	public function globals() {
 		if ( $this->hasOption( 'globals' ) ) {
 			print_r( $GLOBALS );
-		}
-	}
-
-	/**
-	 * Do setup specific to WMF
-	 */
-	public function loadWikimediaSettings() {
-		global $IP, $wgNoDBParam, $wgUseNormalUser, $wgConf, $site, $lang;
-
-		if ( empty( $wgNoDBParam ) ) {
-			# Check if we were passed a db name
-			if ( isset( $this->mOptions['wiki'] ) ) {
-				$db = $this->mOptions['wiki'];
-			} else {
-				$db = array_shift( $this->mArgs );
-			}
-			list( $site, $lang ) = $wgConf->siteFromDB( $db );
-
-			# If not, work out the language and site the old way
-			if ( is_null( $site ) || is_null( $lang ) ) {
-				if ( !$db ) {
-					$lang = 'aa';
-				} else {
-					$lang = $db;
-				}
-				if ( isset( $this->mArgs[0] ) ) {
-					$site = array_shift( $this->mArgs );
-				} else {
-					$site = 'wikipedia';
-				}
-			}
-		} else {
-			$lang = 'aa';
-			$site = 'wikipedia';
-		}
-
-		# This is for the IRC scripts, which now run as the apache user
-		# The apache user doesn't have access to the wikiadmin_pass command
-		if ( $_ENV['USER'] == 'apache' ) {
-		# if ( posix_geteuid() == 48 ) {
-			$wgUseNormalUser = true;
-		}
-
-		putenv( 'wikilang=' . $lang );
-
-		ini_set( 'include_path', ".:$IP:$IP/includes:$IP/languages:$IP/maintenance" );
-
-		if ( $lang == 'test' && $site == 'wikipedia' ) {
-			if ( !defined( 'TESTWIKI' ) ) {
-				define( 'TESTWIKI', 1 );
-			}
 		}
 	}
 
@@ -1030,6 +1001,7 @@ abstract class Maintenance {
 
 	/**
 	 * Get the maintenance directory.
+	 * @return string
 	 */
 	protected function getDir() {
 		return dirname( __FILE__ );
@@ -1177,6 +1149,7 @@ abstract class Maintenance {
 	 * Update the searchindex table for a given pageid
 	 * @param $dbw Database: a database write handle
 	 * @param $pageId Integer: the page ID to update.
+	 * @return null|string
 	 */
 	public function updateSearchIndexForPage( $dbw, $pageId ) {
 		// Get current revision
@@ -1195,6 +1168,22 @@ abstract class Maintenance {
 	}
 
 	/**
+	 * Wrapper for posix_isatty()
+	 * We default as considering stdin a tty (for nice readline methods)
+	 * but treating stout as not a tty to avoid color codes
+	 *
+	 * @param $fd int File descriptor
+	 * @return bool
+	 */
+	public static function posix_isatty( $fd ) {
+		if ( !MWInit::functionExists( 'posix_isatty' ) ) {
+			return !$fd;
+		} else {
+			return posix_isatty( $fd );
+		}
+	}
+
+	/**
 	 * Prompt the console for input
 	 * @param $prompt String what to begin the line with, like '> '
 	 * @return String response
@@ -1202,7 +1191,7 @@ abstract class Maintenance {
 	public static function readconsole( $prompt = '> ' ) {
 		static $isatty = null;
 		if ( is_null( $isatty ) ) {
-			$isatty = posix_isatty( 0 /*STDIN*/ );
+			$isatty = self::posix_isatty( 0 /*STDIN*/ );
 		}
 
 		if ( $isatty && function_exists( 'readline' ) ) {
@@ -1258,9 +1247,80 @@ abstract class Maintenance {
 	}
 }
 
+/**
+ * Fake maintenance wrapper, mostly used for the web installer/updater
+ */
 class FakeMaintenance extends Maintenance {
 	protected $mSelf = "FakeMaintenanceScript";
 	public function execute() {
 		return;
 	}
+}
+
+/**
+ * Class for scripts that perform database maintenance and want to log the
+ * update in `updatelog` so we can later skip it
+ */
+abstract class LoggedUpdateMaintenance extends Maintenance {
+	public function __construct() {
+		parent::__construct();
+		$this->addOption( 'force', 'Run the update even if it was completed already' );
+		$this->setBatchSize( 200 );
+	}
+
+	public function execute() {
+		$db = $this->getDB( DB_MASTER );
+		$key = $this->getUpdateKey();
+
+		if ( !$this->hasOption( 'force' ) &&
+			$db->selectRow( 'updatelog', '1', array( 'ul_key' => $key ), __METHOD__ ) )
+		{
+			$this->output( "..." . $this->updateSkippedMessage() . "\n" );
+			return true;
+		}
+
+		if ( !$this->doDBUpdates() ) {
+			return false;
+		}
+
+		if (
+			$db->insert( 'updatelog', array( 'ul_key' => $key ), __METHOD__, 'IGNORE' ) )
+		{
+			return true;
+		} else {
+			$this->output( $this->updatelogFailedMessage() . "\n" );
+			return false;
+		}
+	}
+
+	/**
+	 * Message to show that the update was done already and was just skipped
+	 * @return String
+	 */
+	protected function updateSkippedMessage() {
+		$key = $this->getUpdateKey();
+		return "Update '{$key}' already logged as completed.";
+	}
+
+	/**
+	 * Message to show the the update log was unable to log the completion of this update
+	 * @return String
+	 */
+	protected function updatelogFailedMessage() {
+		$key = $this->getUpdateKey();
+		return "Unable to log update '{$key}' as completed.";
+	}
+
+	/**
+	 * Do the actual work. All child classes will need to implement this.
+	 * Return true to log the update as done or false (usually on failure).
+	 * @return Bool
+	 */
+	abstract protected function doDBUpdates();
+
+	/**
+	 * Get the update key name to go in the update log table
+	 * @return String
+	 */
+	abstract protected function getUpdateKey();
 }

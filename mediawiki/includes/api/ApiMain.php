@@ -25,11 +25,6 @@
  * @defgroup API API
  */
 
-if ( !defined( 'MEDIAWIKI' ) ) {
-	// Eclipse helper - will be ignored in production
-	require_once( 'ApiBase.php' );
-}
-
 /**
  * This is the main API class, used for both external and internal processing.
  * When executed, it will create the requested formatter object,
@@ -132,7 +127,7 @@ class ApiMain extends ApiBase {
 	private $mPrinter;
 
 	private $mModules, $mModuleNames, $mFormats, $mFormatNames;
-	private $mResult, $mAction, $mShowVersions, $mEnableWrite, $mRequest;
+	private $mResult, $mAction, $mShowVersions, $mEnableWrite;
 	private $mInternalMode, $mSquidMaxage, $mModule;
 
 	private $mCacheMode = 'private';
@@ -141,11 +136,25 @@ class ApiMain extends ApiBase {
 	/**
 	 * Constructs an instance of ApiMain that utilizes the module and format specified by $request.
 	 *
-	 * @param $request WebRequest - if this is an instance of FauxRequest, errors are thrown and no printing occurs
+	 * @param $context IContextSource|WebRequest - if this is an instance of FauxRequest, errors are thrown and no printing occurs
 	 * @param $enableWrite bool should be set to true if the api may modify data
 	 */
-	public function __construct( $request, $enableWrite = false ) {
-		$this->mInternalMode = ( $request instanceof FauxRequest );
+	public function __construct( $context = null, $enableWrite = false ) {
+		if ( $context === null ) {
+			$context = RequestContext::getMain();
+		} elseif ( $context instanceof WebRequest ) {
+			// BC for pre-1.19
+			$request = $context;
+			$context = RequestContext::getMain();
+		}
+		// We set a derivative context so we can change stuff later
+		$this->setContext( new DerivativeContext( $context ) );
+
+		if ( isset( $request ) ) {
+			$this->getContext()->setRequest( $request );
+		}
+
+		$this->mInternalMode = ( $this->getRequest() instanceof FauxRequest );
 
 		// Special handling for the main module: $parent === $this
 		parent::__construct( $this, $this->mInternalMode ? 'main_int' : 'main' );
@@ -156,11 +165,12 @@ class ApiMain extends ApiBase {
 			// Remove all modules other than login
 			global $wgUser;
 
-			if ( $request->getVal( 'callback' ) !== null ) {
+			if ( $this->getRequest()->getVal( 'callback' ) !== null ) {
 				// JSON callback allows cross-site reads.
 				// For safety, strip user credentials.
 				wfDebug( "API: stripping user credentials for JSON callback\n" );
 				$wgUser = new User();
+				$this->getContext()->setUser( $wgUser );
 			}
 		}
 
@@ -175,8 +185,6 @@ class ApiMain extends ApiBase {
 		$this->mShowVersions = false;
 		$this->mEnableWrite = $enableWrite;
 
-		$this->mRequest = &$request;
-
 		$this->mSquidMaxage = - 1; // flag for executeActionWithErrorHandling()
 		$this->mCommit = false;
 	}
@@ -187,14 +195,6 @@ class ApiMain extends ApiBase {
 	 */
 	public function isInternalMode() {
 		return $this->mInternalMode;
-	}
-
-	/**
-	 * Return the request object that contains client's request
-	 * @return WebRequest
-	 */
-	public function getRequest() {
-		return $this->mRequest;
 	}
 
 	/**
@@ -286,6 +286,7 @@ class ApiMain extends ApiBase {
 	 * $this->setCacheMode('private')
 	 */
 	public function setCachePrivate() {
+		wfDeprecated( __METHOD__, '1.17' );
 		$this->setCacheMode( 'private' );
 	}
 
@@ -314,6 +315,7 @@ class ApiMain extends ApiBase {
 	 * @deprecated since 1.17 Use setCacheMode( 'anon-public-user-private' )
 	 */
 	public function setVaryCookie() {
+		wfDeprecated( __METHOD__, '1.17' );
 		$this->setCacheMode( 'anon-public-user-private' );
 	}
 
@@ -399,6 +401,7 @@ class ApiMain extends ApiBase {
 	}
 
 	protected function sendCacheHeaders() {
+		global $wgUseXVO, $wgVaryOnXFP;
 		$response = $this->getRequest()->response();
 
 		if ( $this->mCacheMode == 'private' ) {
@@ -407,11 +410,15 @@ class ApiMain extends ApiBase {
 		}
 
 		if ( $this->mCacheMode == 'anon-public-user-private' ) {
-			global $wgUseXVO, $wgOut;
-			$response->header( 'Vary: Accept-Encoding, Cookie' );
+			$xfp = $wgVaryOnXFP ? ', X-Forwarded-Proto' : '';
+			$response->header( 'Vary: Accept-Encoding, Cookie' . $xfp );
 			if ( $wgUseXVO ) {
-				$response->header( $wgOut->getXVO() );
-				if ( $wgOut->haveCacheVaryCookies() ) {
+				$out = $this->getOutput();
+				if ( $wgVaryOnXFP ) {
+					$out->addVaryHeader( 'X-Forwarded-Proto' );
+				}
+				$response->header( $out->getXVO() );
+				if ( $out->haveCacheVaryCookies() ) {
 					// Logged in, mark this request private
 					$response->header( 'Cache-Control: private' );
 					return;
@@ -423,6 +430,15 @@ class ApiMain extends ApiBase {
 				$response->header( 'Cache-Control: private' );
 				return;
 			} // else no XVO and anonymous, send public headers below
+		}
+
+		// Send public headers
+		if ( $wgVaryOnXFP ) {
+			$response->header( 'Vary: Accept-Encoding, X-Forwarded-Proto' );
+			if ( $wgUseXVO ) {
+				// Bleeeeegh. Our header setting system sucks
+				$response->header( 'X-Vary-Options: Accept-Encoding;list-contains=gzip, X-Forwarded-Proto' );
+			}
 		}
 
 		// If nobody called setCacheMaxAge(), use the (s)maxage parameters
@@ -473,6 +489,8 @@ class ApiMain extends ApiBase {
 	 * @return string
 	 */
 	protected function substituteResultWithError( $e ) {
+		global $wgShowHostnames;
+
 		$result = $this->getResult();
 		// Printer may not be initialized if the extractRequestParams() fails for the main module
 		if ( !isset ( $this->mPrinter ) ) {
@@ -520,8 +538,12 @@ class ApiMain extends ApiBase {
 		if ( !is_null( $requestid ) ) {
 			$result->addValue( null, 'requestid', $requestid );
 		}
-		// servedby is especially useful when debugging errors
-		$result->addValue( null, 'servedby', wfHostName() );
+
+		if ( $wgShowHostnames ) {
+			// servedby is especially useful when debugging errors
+			$result->addValue( null, 'servedby', wfHostName() );
+		}
+
 		$result->addValue( null, 'error', $errMessage );
 
 		return $errMessage['code'];
@@ -532,15 +554,20 @@ class ApiMain extends ApiBase {
 	 * @return array
 	 */
 	protected function setupExecuteAction() {
+		global $wgShowHostnames;
+
 		// First add the id to the top element
 		$result = $this->getResult();
 		$requestid = $this->getParameter( 'requestid' );
 		if ( !is_null( $requestid ) ) {
 			$result->addValue( null, 'requestid', $requestid );
 		}
-		$servedby = $this->getParameter( 'servedby' );
-		if ( $servedby ) {
-			$result->addValue( null, 'servedby', wfHostName() );
+
+		if ( $wgShowHostnames ) {
+			$servedby = $this->getParameter( 'servedby' );
+			if ( $servedby ) {
+				$result->addValue( null, 'servedby', wfHostName() );
+			}
 		}
 
 		$params = $this->extractRequestParams();
@@ -567,13 +594,18 @@ class ApiMain extends ApiBase {
 		$moduleParams = $module->extractRequestParams();
 
 		// Die if token required, but not provided (unless there is a gettoken parameter)
+		if ( isset( $moduleParams['gettoken'] ) ) {
+			$gettoken = $moduleParams['gettoken'];
+		} else {
+			$gettoken = false;
+		}
+
 		$salt = $module->getTokenSalt();
-		if ( $salt !== false && !isset( $moduleParams['gettoken'] ) ) {
+		if ( $salt !== false && !$gettoken ) {
 			if ( !isset( $moduleParams['token'] ) ) {
 				$this->dieUsageMsg( array( 'missingparam', 'token' ) );
 			} else {
-				global $wgUser;
-				if ( !$wgUser->matchEditToken( $moduleParams['token'], $salt, $this->getRequest() ) ) {
+				if ( !$this->getUser()->matchEditToken( $moduleParams['token'], $salt, $this->getRequest() ) ) {
 					$this->dieUsageMsg( 'sessionfailure' );
 				}
 			}
@@ -615,9 +647,9 @@ class ApiMain extends ApiBase {
 	 * @param $module ApiBase An Api module
 	 */
 	protected function checkExecutePermissions( $module ) {
-		global $wgUser;
+		$user = $this->getUser();
 		if ( $module->isReadMode() && !in_array( 'read', User::getGroupPermissions( array( '*' ) ), true ) &&
-			!$wgUser->isAllowed( 'read' ) )
+			!$user->isAllowed( 'read' ) )
 		{
 			$this->dieUsageMsg( 'readrequired' );
 		}
@@ -625,7 +657,7 @@ class ApiMain extends ApiBase {
 			if ( !$this->mEnableWrite ) {
 				$this->dieUsageMsg( 'writedisabled' );
 			}
-			if ( !$wgUser->isAllowed( 'writeapi' ) ) {
+			if ( !$user->isAllowed( 'writeapi' ) ) {
 				$this->dieUsageMsg( 'writerequired' );
 			}
 			if ( wfReadOnly() ) {
@@ -641,7 +673,7 @@ class ApiMain extends ApiBase {
 	 */
 	protected function setupExternalResponse( $module, $params ) {
 		// Ignore mustBePosted() for internal calls
-		if ( $module->mustBePosted() && !$this->mRequest->wasPosted() ) {
+		if ( $module->mustBePosted() && !$this->getRequest()->wasPosted() ) {
 			$this->dieUsageMsg( array( 'mustbeposted', $this->mAction ) );
 		}
 
@@ -766,7 +798,7 @@ class ApiMain extends ApiBase {
 				'wait until the replication lag is less than the specified value.',
 				'In case of a replag error, a HTTP 503 error is returned, with the message like',
 				'"Waiting for $host: $lag seconds lagged\n".',
-				'See http://www.mediawiki.org/wiki/Manual:Maxlag_parameter for more information',
+				'See https://www.mediawiki.org/wiki/Manual:Maxlag_parameter for more information',
 			),
 			'smaxage' => 'Set the s-maxage header to this many seconds. Errors are never cached',
 			'maxage' => 'Set the max-age header to this many seconds. Errors are never cached',
@@ -788,8 +820,8 @@ class ApiMain extends ApiBase {
 			'**                                                                                                      **',
 			'**                      This is an auto-generated MediaWiki API documentation page                      **',
 			'**                                                                                                      **',
-			'**                                    Documentation and Examples:                                       **',
-			'**                                 http://www.mediawiki.org/wiki/API                                    **',
+			'**                                     Documentation and Examples:                                      **',
+			'**                                  https://www.mediawiki.org/wiki/API                                  **',
 			'**                                                                                                      **',
 			'**********************************************************************************************************',
 			'',
@@ -804,13 +836,13 @@ class ApiMain extends ApiBase {
 			'                       In the case of an invalid action being passed, these will have a value',
 			'                       of "unknown_action"',
 			'',
-			'                       For more information see http://www.mediawiki.org/wiki/API:Errors_and_warnings',
+			'                       For more information see https://www.mediawiki.org/wiki/API:Errors_and_warnings',
 			'',
-			'Documentation:         http://www.mediawiki.org/wiki/API:Main_page',
-			'FAQ                    http://www.mediawiki.org/wiki/API:FAQ',
-			'Mailing list:          http://lists.wikimedia.org/mailman/listinfo/mediawiki-api',
-			'Api Announcements:     http://lists.wikimedia.org/mailman/listinfo/mediawiki-api-announce',
-			'Bugs & Requests:       http://bugzilla.wikimedia.org/buglist.cgi?component=API&bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&order=bugs.delta_ts',
+			'Documentation:         https://www.mediawiki.org/wiki/API:Main_page',
+			'FAQ                    https://www.mediawiki.org/wiki/API:FAQ',
+			'Mailing list:          https://lists.wikimedia.org/mailman/listinfo/mediawiki-api',
+			'Api Announcements:     https://lists.wikimedia.org/mailman/listinfo/mediawiki-api-announce',
+			'Bugs & Requests:       https://bugzilla.wikimedia.org/buglist.cgi?component=API&bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&order=bugs.delta_ts',
 			'',
 			'',
 			'',
@@ -846,7 +878,7 @@ class ApiMain extends ApiBase {
 			'    Yuri Astrakhan <Firstname><Lastname>@gmail.com (creator, lead developer Sep 2006-Sep 2007)',
 			'',
 			'Please send your comments, suggestions and questions to mediawiki-api@lists.wikimedia.org',
-			'or file a bug report at http://bugzilla.wikimedia.org/'
+			'or file a bug report at https://bugzilla.wikimedia.org/'
 		);
 	}
 
@@ -951,8 +983,7 @@ class ApiMain extends ApiBase {
 	 */
 	public function canApiHighLimits() {
 		if ( !isset( $this->mCanApiHighLimits ) ) {
-			global $wgUser;
-			$this->mCanApiHighLimits = $wgUser->isAllowed( 'apihighlimits' );
+			$this->mCanApiHighLimits = $this->getUser()->isAllowed( 'apihighlimits' );
 		}
 
 		return $this->mCanApiHighLimits;
@@ -974,8 +1005,8 @@ class ApiMain extends ApiBase {
 	 */
 	public function getVersion() {
 		$vers = array();
-		$vers[] = 'MediaWiki: ' . SpecialVersion::getVersion() . "\n    http://svn.wikimedia.org/viewvc/mediawiki/trunk/phase3/";
-		$vers[] = __CLASS__ . ': $Id: ApiMain.php 92405 2011-07-17 17:23:51Z reedy $';
+		$vers[] = 'MediaWiki: ' . SpecialVersion::getVersion() . "\n    https://svn.wikimedia.org/viewvc/mediawiki/trunk/phase3/";
+		$vers[] = __CLASS__ . ': $Id$';
 		$vers[] = ApiBase::getBaseVersion();
 		$vers[] = ApiFormatBase::getBaseVersion();
 		$vers[] = ApiQueryBase::getBaseVersion();

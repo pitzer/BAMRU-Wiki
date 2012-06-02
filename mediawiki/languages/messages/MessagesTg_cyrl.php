@@ -1,5 +1,5 @@
 <?php
-/** Tajik (Cyrillic) (Тоҷикӣ (Cyrillic))
+/** Tajik (Cyrillic script) (Тоҷикӣ)
  *
  * See MessagesQqq.php for message documentation incl. usage of parameters
  * To improve a translation please visit http://translatewiki.net
@@ -12,6 +12,7 @@
  * @author Farrukh
  * @author FrancisTyers
  * @author Ibrahim
+ * @author Kaganer
  * @author Soroush
  * @author Urhixidur
  * @author לערי ריינהארט
@@ -100,8 +101,8 @@ $messages = array(
 'tog-shownumberswatching'     => 'Нишон додани шумораи корбарони пайгир',
 'tog-oldsig'                  => 'Пешнамоиши имзои вуҷуддошта:',
 'tog-fancysig'                => 'Имзоро ба сурати викиматн ба назар бигир (бе пайванди худкор)',
-'tog-externaleditor'          => 'Истифода аз вироишгари хориҷӣ ба таври пешфарз (фақат барои корбарони пешрафта, ниёзманди танзимоти вижа дар ройонаи шумо аст. [http://www.mediawiki.org/wiki/Manual:External_editors Иттилооти бештар.])',
-'tog-externaldiff'            => 'Истифода аз тафовутгири (diff) хориҷӣ ба таври пешфарз (фақат барои корбарони пешрафта, ниёзманди танзимоти вижа дар ройонаи шумо аст. [http://www.mediawiki.org/wiki/Manual:External_editors Иттилооти бештар.])',
+'tog-externaleditor'          => 'Истифода аз вироишгари хориҷӣ ба таври пешфарз (фақат барои корбарони пешрафта, ниёзманди танзимоти вижа дар ройонаи шумо аст. [//www.mediawiki.org/wiki/Manual:External_editors Иттилооти бештар.])',
+'tog-externaldiff'            => 'Истифода аз тафовутгири (diff) хориҷӣ ба таври пешфарз (фақат барои корбарони пешрафта, ниёзманди танзимоти вижа дар ройонаи шумо аст. [//www.mediawiki.org/wiki/Manual:External_editors Иттилооти бештар.])',
 'tog-showjumplinks'           => 'Намоиши пайвандҳои дастрасии "ҷаҳиш ба" дар феҳристи мундариҷот',
 'tog-uselivepreview'          => 'Истифода аз пешнамоиши зинда (ҶаваСкрипт) (Озмоишӣ)',
 'tog-forceeditsummary'        => 'Ҳангоме ки хулосаи вироиш нанавиштаам юа ман ислоҳ бидеҳ',
@@ -416,20 +417,19 @@ $1',
 'cannotdelete'         => 'Саҳифа ё парвандаи мушаххасшударо ҳазф карда нашуд. (Мумкин аст қаблан касе дигаре онро ҳазф карда бошад.)',
 'badtitle'             => 'Унвони номуносиб',
 'badtitletext'         => 'Унвони саҳифаи дархостшуда номӯътабар, холӣ, ё пайванди байнизабони ё байнивикии нодуруст буд. Он метавонад як ё якчанд аломатҳоеро дар бар гирад, ки дар унвонҳо истифода шуда наметавонанд.',
-'perfcached'           => 'Додаҳои зерин аз ҳофизаи муваққатӣ фарохонӣ шудаанд ва мумкин аст, комилан ба рӯз нашудаанд.',
-'perfcachedts'         => 'Додаҳои зерин аз ҳофизаи муваққатӣ фарохонӣ шудаанд ва мумкин аст, охирин ба рӯзрасонӣ $1 аст.',
+'perfcached'           => 'Додаҳои зерин аз ҳофизаи муваққатӣ фарохонӣ шудаанд ва мумкин аст, комилан ба рӯз нашудаанд. A maximum of {{PLURAL:$1|one result is|$1 results are}} available in the cache.',
+'perfcachedts'         => 'Додаҳои зерин аз ҳофизаи муваққатӣ фарохонӣ шудаанд ва мумкин аст, охирин ба рӯзрасонӣ $1 аст. A maximum of {{PLURAL:$4|one result is|$4 results are}} available in the cache.',
 'querypage-no-updates' => 'Имкони ба рӯзрасонии ин саҳифа феълан ғайрифаъол шудааст.',
 'wrong_wfQuery_params' => 'Параметрҳои нодуруст ба wfQuery()<br />
 Амал: $1<br />
 Пурсуҷӯ: $2',
 'viewsource'           => 'Намоиши матни вики',
-'viewsourcefor'        => 'барои $1',
 'actionthrottled'      => 'Ҷилави амали шумо гирифта шуд',
 'actionthrottledtext'  => 'Ба манзури ҷилавгирӣ аз спам, шумо иҷоза надоред, ки чунин амалеро беш аз чанд бор дар як муддати замони кӯтоҳ анҷом бидиҳед. Лутфан пас аз чанд дақиқа дубора талош кунед.',
 'protectedpagetext'    => 'Ин саҳифа барои ҷилавгирӣ аз вироиш қуфл шудааст.',
 'viewsourcetext'       => 'Шумо метавонед матни викии ин саҳифаро назар кунед ё нусха бардоред:',
 'protectedinterface'   => 'Ин саҳифа ороишдиҳандаи матни ин нармафзор аст, ва ба манзури пешгирӣ аз харобкорӣ қуфл шудааст.',
-'editinginterface'     => "'''Огоҳӣ:''' Шумо саҳифаеро вироиш карда истодаед, ки матни интерфейси барнома мебошад. Тағйироти ин саҳифа барои намуди интерфейси дигар корбарон таъсир хоҳад расонид. Барои тарҷумаҳо, лутфан аз [http://translatewiki.net/wiki/Main_Page?setlang=tg Бетавики], ки лоиҳаи маҳаликунонии МедиаВики мебошад, истифода кунед.",
+'editinginterface'     => "'''Огоҳӣ:''' Шумо саҳифаеро вироиш карда истодаед, ки матни интерфейси барнома мебошад. Тағйироти ин саҳифа барои намуди интерфейси дигар корбарон таъсир хоҳад расонид. Барои тарҷумаҳо, лутфан аз [//translatewiki.net/wiki/Main_Page?setlang=tg Бетавики], ки лоиҳаи маҳаликунонии МедиаВики мебошад, истифода кунед.",
 'sqlhidden'            => '(Дастури SQL пинҳонист)',
 'cascadeprotected'     => 'Ин саҳифа аз вироиш муҳофизат шудааст, барои ин ки  дар {{PLURAL:$1|саҳифаи|саҳифаҳои}} муҳофизатшудаи зерин, ки гузаинаи "обшорӣ" дар {{PLURAL:$1|он|онҳо}} интихоб шудааст, фаро гирифтааст: $2',
 'namespaceprotected'   => "Шумо иҷозати вироиши саҳифаҳои фазоиноми '''$1'''-ро надоред.",
@@ -515,7 +515,7 @@ $1',
 'accountcreated'             => 'Ҳисоби ҷадид сохта шуд',
 'accountcreatedtext'         => 'Ҳисоби корбар барои $1 сохта шуд.',
 'createaccount-title'        => 'Эҷоди ҳисоби корбарӣ дар {{SITENAME}}',
-'createaccount-text'         => 'Як нафаре барои 2$ як ҳисоби корбарӣ дар {{SITENAME}} эҷод кардааст ($4). Калимаи убури "$2" чунин аст: "$3". Шумо бояд вориди систем шавед то калимаи убури худро тағйир бидиҳед.
+'createaccount-text'         => 'Як нафаре барои $2 як ҳисоби корбарӣ дар {{SITENAME}} эҷод кардааст ($4). Калимаи убури "$2" чунин аст: "$3". Шумо бояд вориди систем шавед то калимаи убури худро тағйир бидиҳед.
 
 Агар ин ҳисоб иштибоҳе сохта шудааст, ин номаро нодида бигиред.',
 'usernamehasherror'          => 'Номи корбарӣ наметавонад шомили аломатҳои дар ҳам бошад',
@@ -606,9 +606,6 @@ $1',
 
 Шумораи қатъи дастрасии шумо $5 аст. Лутфан ин шумораро дар ҳар дархосте, ки дар ин матраҳ мекунед, қайд кунед.",
 'blockednoreason'                  => 'далеле мушаххас нашудааст',
-'blockedoriginalsource'            => "Матни манбаи '''$1''' дар зер намоиш дода шудааст:",
-'blockededitsource'                => "Матни '''вироишҳои шумо''' дар '''$1''' дар зер нишон дода шудааст:",
-'whitelistedittitle'               => 'Барои вироиш вуруд бояд кард',
 'whitelistedittext'                => 'Барои вироиши мақола бояд ба систем $1 шавед.',
 'confirmedittext'                  => 'Шумо бояд нишонаи почтаи электрониатонро пеш аз вироиш кардани саҳифаҳо, тасдиқ кунед. Лутфан ин корро тариқи [[Special:Preferences|тарҷиҳоти корбар]] сурат диҳед.',
 'nosuchsectiontitle'               => 'Чунин бахше вуҷуд надорад',
@@ -761,22 +758,11 @@ $1',
 'revdelete-unsuppress'        => 'Хотимаи маҳдудиятҳо дар мавриди нусхаҳои интихобшуда',
 'revdelete-log'               => 'Сабаб:',
 'revdelete-submit'            => 'Амали кардан бар нусхаи интихобшуда',
-'revdelete-logentry'          => 'тағйири намоии нусха дар [[$1]]',
-'logdelete-logentry'          => 'тағйири намоии маврид дар [[$1]]',
 'revdelete-success'           => "'''Тағйири намоёнии нусха бо муваффақият анҷом шуд.'''",
 'logdelete-success'           => "'''Тағйири намоёнии маврид бо муваффақият анҷом шуд.'''",
 'revdel-restore'              => 'Тағйири падидорӣ',
 'pagehist'                    => 'Таърихи саҳифа',
 'deletedhist'                 => 'Таърихи ҳазфшуда',
-'revdelete-content'           => 'мӯҳтаво',
-'revdelete-summary'           => 'вироиши хулоса',
-'revdelete-uname'             => 'номи корбар',
-'revdelete-restricted'        => 'маҳдудиятҳо ба мудирон амалӣ шуданд',
-'revdelete-unrestricted'      => 'маҳдудиятҳо аз мудирон бардошта шуданд',
-'revdelete-hid'               => '$1-ро пинҳон кард',
-'revdelete-unhid'             => '$1-ро аз ҳолати пинҳон дар овард',
-'revdelete-log-message'       => '$1 барои $2 {{PLURAL:$2|нусха|нусха}}',
-'logdelete-log-message'       => '$1 барои $2 {{PLURAL:$2|воқеа|воқеаҳо}}',
 'revdelete-edit-reasonlist'   => 'Вироиш ҳазф далелҳо',
 
 # Suppression log
@@ -1023,7 +1009,6 @@ $1',
 'right-autopatrol'           => 'Аломат задани вироишҳо бо таври худкор ба унвони гаштхӯрда',
 'right-patrolmarks'          => 'Мушоҳидаи тағйироти охирини аломатгашта',
 'right-unwatchedpages'       => 'Мушоҳидаи саҳифаҳое, ки пайгири намешаванд',
-'right-trackback'            => 'Сабти як бозтоб',
 'right-mergehistory'         => 'Идғоми таърихи саҳифаҳо',
 'right-userrights'           => 'Вироиши ҳамаи ихтиёроти корбарон',
 'right-userrights-interwiki' => 'Вироиши ихтиёроти корбарии корбарони дигар викиҳо',
@@ -1402,12 +1387,8 @@ Also see [[Special:WantedCategories|wanted categories]].',
 'listusers-noresult' => 'Ҳеҷ корбаре ёфт нашуд.',
 
 # Special:Log/newusers
-'newuserlogpage'              => 'Гузориши эҷоди корбар',
-'newuserlogpagetext'          => 'Ин гузориш аз номҳои корбарии тозасохташуда аст.',
-'newuserlog-byemail'          => 'калимаи убур ба почтаи электронӣ фиристода шуд',
-'newuserlog-create-entry'     => 'Корбари нав',
-'newuserlog-create2-entry'    => 'ҳисоби ҷадиди $1 эҷод шуд',
-'newuserlog-autocreate-entry' => 'Ҳисоб бо таври худкор эҷод шудааст',
+'newuserlogpage'     => 'Гузориши эҷоди корбар',
+'newuserlogpagetext' => 'Ин гузориш аз номҳои корбарии тозасохташуда аст.',
 
 # Special:ListGroupRights
 'listgrouprights'          => 'Ихтиёроти гурӯҳҳои корбарӣ',
@@ -1501,10 +1482,10 @@ $NEWPAGE
 
 --
 Барои танзимоти феҳристи пайгириҳоятон биравед ба
-{{fullurl:{{#special:EditWatchlist}}}}
+{{canonicalurl:{{#special:EditWatchlist}}}}
 
 Пешниҳодот ва кӯмаки бештар:
-{{fullurl:{{MediaWiki:Helppage}}}}',
+{{canonicalurl:{{MediaWiki:Helppage}}}}',
 
 # Delete
 'deletepage'             => 'Ҳазфи саҳифа',
@@ -1520,8 +1501,6 @@ $NEWPAGE
 'actioncomplete'         => 'Амал иҷро шуд',
 'deletedtext'            => '"$1" ҳазф шудааст.
 Нигаред ба $2 барои гузориши ҳазфи охирин.',
-'deletedarticle'         => 'ҳазфшуда "[[$1]]"',
-'suppressedarticle'      => '"[[$1]]"-ро мавқуф кард',
 'dellogpage'             => 'Гузоришҳои ҳазф',
 'dellogpagetext'         => 'Феҳристи зер феҳристи аз охирин ҳазфҳост. Ҳамаи вақтҳои нишон додашуда, вақти Ҷаҳонӣ (вақти Гринвич) аст.',
 'deletionlog'            => 'гузоришҳои ҳазф',
@@ -1622,7 +1601,6 @@ $NEWPAGE
 'undeleteviewlink'             => 'намоиш',
 'undeletereset'                => 'Аз нав',
 'undeletecomment'              => 'Тавзеҳ:',
-'undeletedarticle'             => 'эҳё "[[$1]]" {{PLURAL:$1|шуд|шуданд}}',
 'undeletedrevisions'           => '$1 нусха бақарор {{PLURAL:$1|шуд|шуданд}}',
 'undeletedrevisions-files'     => '$1 нусха ва $2 парванда барқарор {{PLURAL:$1|шуд|шуданд}}',
 'undeletedfiles'               => '$1 парванда барқарор {{PLURAL:$1|шуд|шуданд}}',
@@ -1717,7 +1695,7 @@ $1',
 'badipaddress'                => 'IP нишонаи номӯътабар',
 'blockipsuccesssub'           => 'Бастан муваффақ щуд',
 'blockipsuccesstext'          => '[[Special:Contributions/$1|$1]] баста шудааст.<br />
-Барои баррасӣ ба [[Special:IPBlockList|феҳристи нишонаҳои IP ва номҳои корбарии баста шуда]] нигаред.',
+Барои баррасӣ ба [[Special:BlockList|феҳристи нишонаҳои IP ва номҳои корбарии баста шуда]] нигаред.',
 'ipb-edit-dropdown'           => 'Далели қатъи дастрасӣ',
 'ipb-unblock-addr'            => 'Боз кардани $1',
 'ipb-unblock'                 => 'Боз кардани номи корбарӣ ё нишонаи IP',
@@ -1833,9 +1811,6 @@ $1',
 'movepage-page-moved'       => 'Саҳифаи $1 ба $2 интиқол ёфт.',
 'movepage-page-unmoved'     => 'Саҳифаи $1 наметавонад ба $2 интиқол дода шавад.',
 'movepage-max-pages'        => 'Ҳади аксар $1 {{PLURAL:$1|саҳифа|саҳифаҳо}} интиқол дода шуд ва саҳифаҳои дигарро наметавон ба таври худкор мунтақил кард.',
-'1movedto2'                 => '[[$1]] ба [[$2]] кӯчонида шудааст',
-'1movedto2_redir'           => '[[$1]] ба [[$2]], ки қабалан тағйири масит буд, кӯчонида шуд',
-'move-redirect-suppressed'  => 'тағйири масир фурӯнишонда шуд',
 'movelogpage'               => 'Кӯчонидани гузориш',
 'movelogpagetext'           => 'Дар зер феҳристи саҳифаҳои кӯчонидашуд омада аст.',
 'movesubpage'               => '{{PLURAL:$1|Зерсаҳифа|Зерсаҳифаҳо}}',
@@ -1874,7 +1849,7 @@ $1',
 'allmessagesdefault'        => 'Матни қарордодӣ',
 'allmessagescurrent'        => 'Матни кунунӣ',
 'allmessagestext'           => 'Ин феҳристи паёмҳои системавии дастрас дар фазои номи MediaWiki мебошад.
-Агар майли ҳиссагузорӣ карданро ба маҳалликунонии MediaWiki доред, пас лутан саҳифаҳои [http://www.mediawiki.org/wiki/Localisation Маҳалликунонии MediaWiki] ва [http://translatewiki.net translatewiki.net] нигаред.',
+Агар майли ҳиссагузорӣ карданро ба маҳалликунонии MediaWiki доред, пас лутан саҳифаҳои [//www.mediawiki.org/wiki/Localisation Маҳалликунонии MediaWiki] ва [//translatewiki.net translatewiki.net] нигаред.',
 'allmessagesnotsupportedDB' => "Аз ин саҳифа наметавон истифода бурд, чун '''\$wgUseDatabaseMessages''' ғайрифаъол гардонида шудааст.",
 'allmessages-filter-legend' => 'Филтр',
 'allmessages-filter-all'    => 'Ҳама',
@@ -2033,8 +2008,6 @@ $1',
 
 # Patrol log
 'patrol-log-page' => 'Гузоришҳои нигаҳбонӣ',
-'patrol-log-line' => '$1 аз $2-ро ба сурати посбонишуда аломат зад $3',
-'patrol-log-auto' => '(худкор)',
 
 # Image deletion
 'deletedrevision'                 => 'Нусхаи ҳазфшудаи кӯҳнаи $1',
@@ -2056,10 +2029,10 @@ $1',
 Бо иҷрои он, системаи шумо шояд осеб бубинад.",
 'imagemaxsize'    => 'Маҳуд кардани аксҳо дар саҳифаҳои тавсифоти парванда ба:',
 'thumbsize'       => 'Андозаи ангуштдона (thumbnail):',
-'widthheightpage' => '$1×$2, $3 {{PLURAL:$3|саҳифа|саҳифаҳо}}',
+'widthheightpage' => '$1 × $2, $3 {{PLURAL:$3|саҳифа|саҳифаҳо}}',
 'file-info'       => 'андозаи парванда: $1, навъи MIME: $2',
 'file-info-size'  => '$1 × $2 пиксел, ҳаҷми парванда: $3, навъи MIME: $4',
-'file-nohires'    => '<small>Нусхаи ҳаҷман ва сифатан баландтар дастрас нест.</small>',
+'file-nohires'    => 'Нусхаи ҳаҷман ва сифатан баландтар дастрас нест.',
 'svg-long-desc'   => 'SVG парванда, исмӣ $1 × $2 пиксел, андозаи парванда: $3',
 'show-big-image'  => 'Акси пурра',
 
@@ -2350,7 +2323,7 @@ $1',
 
 # External editor support
 'edit-externally'      => 'Ин файлро бо барномаи беруна таҳрир кунед',
-'edit-externally-help' => '(Барои иттилооти бештар [http://www.mediawiki.org/wiki/Manual:External_editors роҳнамои танзимотро оиди вироишгарони беруна] нигаред)',
+'edit-externally-help' => '(Барои иттилооти бештар [//www.mediawiki.org/wiki/Manual:External_editors роҳнамои танзимотро оиди вироишгарони беруна] нигаред)',
 
 # 'all' in various places, this might be different for inflected languages
 'watchlistall2' => 'ҳама',
@@ -2411,13 +2384,6 @@ $5
 'scarytranscludedisabled' => '[Ғунҷоиши байнивикиёна фаъол нест]',
 'scarytranscludefailed'   => '[Фарохонии шаблон барои $1 муяссар нашуд]',
 'scarytranscludetoolong'  => '[URL-Нишонаи интернетии мавриди назар беш аз андоза дароз буд; бубахшед]',
-
-# Trackbacks
-'trackbackbox'      => 'Бозтоби ин саҳифа дар вебнавиштҳо:<br />
-$1',
-'trackbackremove'   => '([$1 Ҳазф])',
-'trackbacklink'     => 'Бозтоб',
-'trackbackdeleteok' => 'Бозтоби саҳифа бо муваффақият ҳазф шуд.',
 
 # Delete conflict
 'deletedwhileediting' => "'''Огоҳӣ''': Ин саҳифа баъди ба вироиш шурӯъ кардани шумо ҳазф шуда буд!",
@@ -2577,15 +2543,9 @@ $1',
 'htmlform-reset'               => 'Ботили тағйирот',
 'htmlform-selectorother-other' => 'Дигар',
 
-# Add categories per AJAX
-'ajax-add-category'            => 'Илова кардани гурӯҳ',
-'ajax-add-category-submit'     => 'Илова кардан',
-'ajax-confirm-title'           => 'Таъйиди амал',
-'ajax-confirm-save'            => 'Захира',
-'ajax-add-category-summary'    => 'Илова кардани гурӯҳи "$1"',
-'ajax-remove-category-summary' => 'Ҳазви гурӯҳӣ "$1"',
-'ajax-error-title'             => 'Хато',
-'ajax-remove-category-error'   => 'Имкони ҳазви ин гурӯҳ вуҷуд надошт.
-Ин иттифоқ маъмулан замоне меафтад, ки гурӯҳ аз тариқи як шаблон ба саҳифа изофа шуда бошад.',
+# New logging system
+'revdelete-restricted'   => 'маҳдудиятҳо ба мудирон амалӣ шуданд',
+'revdelete-unrestricted' => 'маҳдудиятҳо аз мудирон бардошта шуданд',
+'newuserlog-byemail'     => 'калимаи убур ба почтаи электронӣ фиристода шуд',
 
 );

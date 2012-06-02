@@ -2,6 +2,26 @@
  * These plugins provide extra functionality for interaction with textareas.
  */
 ( function( $ ) {
+
+if (document.selection && document.selection.createRange) {
+	// On IE, patch the focus() method to restore the windows' scroll position
+	// (bug 32241)
+	$.fn.extend({
+		focus : (function ( _focus ) {
+			return function () {
+				if ( arguments.length == 0 ) {
+					var $w = $( window );
+					var state = {top: $w.scrollTop(), left: $w.scrollLeft()};
+					var result = _focus.apply( this, arguments );
+					window.scrollTo( state.top, state.left );
+					return result;
+				}
+				return _focus.apply( this, arguments );
+			};
+		})( $.fn.focus )
+	});
+}
+
 $.fn.textSelection = function( command, options ) {
 
 /**
@@ -14,6 +34,19 @@ function rangeForElementIE( e ) {
 		var sel = document.body.createTextRange();
 		sel.moveToElementText( e );
 		return sel;
+	}
+}
+
+/**
+ * Helper function for IE for activating the textarea. Called only in the
+ * IE-specific code paths below; makes use of IE-specific non-standard
+ * function setActive() if possible to avoid screen flicker.
+ */
+function activateElementOnIE( element ) {
+	if ( element.setActive ) {
+		element.setActive(); // bug 32241: doesn't scroll
+	} else {
+		$( element ).focus(); // may scroll (but we patched it above)
 	}
 }
 
@@ -34,7 +67,7 @@ getSelection: function() {
 	if ( $(e).is( ':hidden' ) ) {
 		// Do nothing
 	} else if ( document.selection && document.selection.createRange ) {
-		e.focus();
+		activateElementOnIE( e );
 		var range = document.selection.createRange();
 		retval = range.text;
 	} else if ( e.selectionStart || e.selectionStart == '0' ) {
@@ -54,7 +87,7 @@ getSelection: function() {
 encapsulateSelection: function( options ) {
 	return this.each( function() {
 		var pre = options.pre, post = options.post;
-		
+
 		/**
 		 * Check if the selected text is the same as the insert text
 		 */
@@ -77,10 +110,10 @@ encapsulateSelection: function( options ) {
 				}
 			}
 		}
-		
+
 		/**
 		 * Do the splitlines stuff.
-		 * 
+		 *
 		 * Wrap each line of the selected text with pre and post
 		 */
 		function doSplitLines( selText, pre, post ) {
@@ -94,20 +127,82 @@ encapsulateSelection: function( options ) {
 			}
 			return insertText;
 		}
-		
+
 		var isSample = false;
 		if ( this.style.display == 'none' ) {
 			// Do nothing
+		} else if ( document.selection && document.selection.createRange ) {
+			// IE
+
+			// Note that IE9 will trigger the next section unless we check this first.
+			// See bug 35201.
+
+			activateElementOnIE( this );
+			if ( context ) {
+				context.fn.restoreCursorAndScrollTop();
+			}
+			if ( options.selectionStart !== undefined ) {
+				$(this).textSelection( 'setSelection', { 'start': options.selectionStart, 'end': options.selectionEnd } );
+			}
+
+			var selText = $(this).textSelection( 'getSelection' );
+			var scrollTop = this.scrollTop;
+			var range = document.selection.createRange();
+
+			checkSelectedText();
+			var insertText = pre + selText + post;
+			if ( options.splitlines ) {
+				insertText = doSplitLines( selText, pre, post );
+			}
+			if ( options.ownline && range.moveStart ) {
+				var range2 = document.selection.createRange();
+				range2.collapse();
+				range2.moveStart( 'character', -1 );
+				// FIXME: Which check is correct?
+				if ( range2.text != "\r" && range2.text != "\n" && range2.text != "" ) {
+					insertText = "\n" + insertText;
+					pre += "\n";
+				}
+				var range3 = document.selection.createRange();
+				range3.collapse( false );
+				range3.moveEnd( 'character', 1 );
+				if ( range3.text != "\r" && range3.text != "\n" && range3.text != "" ) {
+					insertText += "\n";
+					post += "\n";
+				}
+			}
+
+			range.text = insertText;
+			if ( isSample && options.selectPeri && range.moveStart ) {
+				range.moveStart( 'character', - post.length - selText.length );
+				range.moveEnd( 'character', - post.length );
+			}
+			range.select();
+			// Restore the scroll position
+			this.scrollTop = scrollTop;
 		} else if ( this.selectionStart || this.selectionStart == '0' ) {
 			// Mozilla/Opera
+
 			$(this).focus();
+			if ( options.selectionStart !== undefined ) {
+				$(this).textSelection( 'setSelection', { 'start': options.selectionStart, 'end': options.selectionEnd } );
+			}
+			
 			var selText = $(this).textSelection( 'getSelection' );
 			var startPos = this.selectionStart;
 			var endPos = this.selectionEnd;
 			var scrollTop = this.scrollTop;
 			checkSelectedText();
-			
-			var insertText = pre + selText  + post;
+			if ( options.selectionStart !== undefined
+					&& endPos - startPos != options.selectionEnd - options.selectionStart )
+			{
+				// This means there is a difference in the selection range returned by browser and what we passed.
+				// This happens for Chrome in the case of composite characters. Ref bug #30130
+				// Set the startPos to the correct position.
+				startPos = options.selectionStart;
+			}
+
+			var insertText = pre + selText + post;
 			if ( options.splitlines ) {
 				insertText = doSplitLines( selText, pre, post );
 			}
@@ -137,47 +232,6 @@ encapsulateSelection: function( options ) {
 				this.selectionStart = startPos + insertText.length;
 				this.selectionEnd = this.selectionStart;
 			}
-		} else if ( document.selection && document.selection.createRange ) {
-			// IE
-			$(this).focus();
-			if ( context ) {
-				context.fn.restoreCursorAndScrollTop();
-			}
-			var selText = $(this).textSelection( 'getSelection' );
-			var scrollTop = this.scrollTop;
-			var range = document.selection.createRange();
-			
-			checkSelectedText();
-			var insertText = pre + selText  + post;
-			if ( options.splitlines ) {
-				insertText = doSplitLines( selText, pre, post );
-			}
-			if ( options.ownline && range.moveStart ) {
-				var range2 = document.selection.createRange();
-				range2.collapse();
-				range2.moveStart( 'character', -1 );
-				// FIXME: Which check is correct?
-				if ( range2.text != "\r" && range2.text != "\n" && range2.text != "" ) {
-					insertText = "\n" + insertText;
-					pre += "\n";
-				}
-				var range3 = document.selection.createRange();
-				range3.collapse( false );
-				range3.moveEnd( 'character', 1 );
-				if ( range3.text != "\r" && range3.text != "\n" && range3.text != "" ) {
-					insertText += "\n";
-					post += "\n";
-				}
-			}
-			
-			range.text = insertText;
-			if ( isSample && options.selectPeri && range.moveStart ) {
-				range.moveStart( 'character', - post.length - selText.length );
-				range.moveEnd( 'character', - post.length );
-			}
-			range.select();
-			// Restore the scroll position
-			this.scrollTop = scrollTop;
 		}
 		$(this).trigger( 'encapsulateSelection', [ options.pre, options.peri, options.post, options.ownline,
 			options.replace, options.spitlines ] );
@@ -192,12 +246,20 @@ encapsulateSelection: function( options ) {
  * Get the position (in resolution of bytes not nessecarily characters)
  * in a textarea
  *
+ * Will focus the textarea in some browsers (IE/Opera)
+ *
  * @fixme document the options parameters
  */
  getCaretPosition: function( options ) {
 	function getCaret( e ) {
 		var caretPos = 0, endPos = 0;
-		if ( $.browser.msie ) {
+		if ( document.selection && document.selection.createRange ) {
+			// IE doesn't properly report non-selected caret position through
+			// the selection ranges when textarea isn't focused. This can
+			// lead to saving a bogus empty selection, which then screws up
+			// whatever we do later (bug 31847).
+			activateElementOnIE( e );
+
 			// IE Support
 			var preFinished = false;
 			var periFinished = false;
@@ -298,7 +360,7 @@ setSelection: function( options ) {
 			if ( newLines ) length = length - newLines.length;
 			selection.moveStart( 'character', options.start );
 			selection.moveEnd( 'character', -length + options.end );
-			
+
 			// This line can cause an error under certain circumstances (textarea empty, no selection)
 			// Silence that error
 			try {
@@ -417,7 +479,9 @@ scrollToCaretPosition: function( options ) {
 				'ownline': false, // Put the inserted text on a line of its own
 				'replace': false, // If there is a selection, replace it with peri instead of leaving it alone
 				'selectPeri': true, // Select the peri text if it was inserted (but not if there was a selection and replace==false, or if splitlines==true)
-				'splitlines': false // If multiple lines are selected, encapsulate each line individually
+				'splitlines': false, // If multiple lines are selected, encapsulate each line individually
+				'selectionStart': undefined, // Position to start selection at
+				'selectionEnd': undefined // Position to end selection at. Defaults to start
 			}, options );
 			break;
 		case 'getCaretPosition':
@@ -447,14 +511,14 @@ scrollToCaretPosition: function( options ) {
 	}
 	var context = $(this).data( 'wikiEditor-context' );
 	var hasIframe = typeof context !== 'undefined' && context && typeof context.$iframe !== 'undefined';
-	
+
 	// IE selection restore voodoo
 	var needSave = false;
 	if ( hasIframe && context.savedSelection !== null ) {
 		context.fn.restoreSelection();
 		needSave = true;
 	}
-	retval = ( hasIframe ? context.fn : fn )[command].call( this, options );
+	var retval = ( hasIframe ? context.fn : fn )[command].call( this, options );
 	if ( hasIframe && needSave ) {
 		context.fn.saveSelection();
 	}

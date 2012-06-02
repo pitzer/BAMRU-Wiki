@@ -9,6 +9,7 @@
  *
  * @author Behdarvandyani
  * @author GerardM
+ * @author Huji
  * @author Meno25
  */
 
@@ -251,7 +252,6 @@ $1',
 'badtitletext'   => 'عنوان درخواستی نامعتبر، خالی، یا عنوانی بین زبانی یا بین‌ویکی‌ای با پیوند نادرسته
 و ممکنه دارای یک یا چند کاراکتر بوه که در عنوان مربوط نوا زش استفاده کنین',
 'viewsource'     => 'مشاهده منبع',
-'viewsourcefor'  => 'سی $1',
 'viewsourcetext' => 'ایسا ترین بوینین وکپی کنین منبع ای صفحه را:',
 
 # Login and logout pages
@@ -578,7 +578,6 @@ $2',
 'actioncomplete'        => 'عمل  مربوطه راکامل کن',
 'deletedtext'           => '"$1" حذف وابیده.
 بوین $2 سی ثبت حذف آخر.',
-'deletedarticle'        => 'حذف وابید "[[$1]]"',
 'dellogpage'            => 'نمایه _ حذف',
 'deletecomment'         => 'دلیل:',
 'deleteotherreason'     => 'دیه/دلیل اضافی:',
@@ -609,7 +608,7 @@ $2',
 'protect-expiring'            => 'سپری وابیده $1 (UTC)',
 'protect-cascade'             => 'حمایت صفحات دربرگیرنده در ای صفحه (cascading protection)',
 'protect-cantedit'            => 'ایسا نترین تغییر بدین سطوح حمایتی ای صفحه را, زیرا ایسا اجازه اصلاح آن را ندارین.',
-'protect-expiry-options'      => '۲ ساعت:2 hours,۱ روز:1 day,۳ روز:3 days,۱ هفته:1 week,۲ هفته:2 weeks,۱ ماه:1 month,۳ ماه:3 months,۶ ماه:6 months,۱ سال:1 year,بی‌پایان:infinite',
+'protect-expiry-options'      => '۱ ساعت:1 hour,۱ روز:1 day,۱ هفته:1 week,۲ هفته:2 weeks,۱ ماه:1 month,۳ ماه:3 months,۶ ماه:6 months,۱ سال:1 year,بی‌نهایت:infinite',
 'restriction-type'            => 'اجازه:',
 'restriction-level'           => 'سطح محدودیت:',
 
@@ -646,7 +645,7 @@ $2',
 
 # Block/unblock
 'blockip'       => 'بستن کاربر',
-'ipboptions'    => '۲ ساعت:2 hours,۱ روز:1 day,۳ روز:3 days,۱ هفته:1 week,۲ هفته:2 weeks,۱ ماه:1 month,۳ ماه:3 months,۶ ماه:6 months,۱ سال:1 year,بی‌پایان:infinite',
+'ipboptions'    => '۲ ساعت:2 hours,۱ روز:1 day,۳ روز:3 days,۱ هفته:1 week,۲ هفته:2 weeks,۱ ماه:1 month,۳ ماه:3 months,۶ ماه:6 months,۱ سال:1 year,بی‌نهایت:infinite',
 'ipblocklist'   => 'آدرسهای  آی پی وکاربران بسته وابیدند',
 'blocklink'     => 'بسته بوه !',
 'unblocklink'   => 'باز بوه',
@@ -690,7 +689,6 @@ $2',
 لطفا به صورت دستی آنها را ترکیب کنین.'''",
 'movedto'          => 'جابجا وابید به',
 'movetalk'         => 'جابجایی صفحه صحبت مربوطه',
-'1movedto2'        => '[[$1]] جابجا وابید به[[$2]]',
 'movelogpage'      => 'نمایه جابجایی',
 'movereason'       => 'دلیل:',
 'revertmove'       => 'واگردانی',
@@ -768,7 +766,7 @@ $2',
 
 # Media information
 'file-info-size' => '$1 × $2 پیکسل, اندازه فایل: $3, MIME نوع: $4',
-'file-nohires'   => '<small>قابلیت تفکیک بالاتری در دسترس نه.</small>',
+'file-nohires'   => 'قابلیت تفکیک بالاتری در دسترس نه.',
 'svg-long-desc'  => 'SVG فایل, تقریبا$1 × $2 پیکسل, اندازه فایل: $3',
 'show-big-image' => 'تصویر با قابلیت تفکیک کامل',
 
@@ -804,7 +802,7 @@ $2',
 
 # External editor support
 'edit-externally'      => 'اصلاح ای صفحه با استفاده زه یه ویرایشگر خارجی',
-'edit-externally-help' => ' سی اطلاعات بیشتر [http://www.mediawiki.org/wiki/Manual:External_editors راهنمایی‌های تنظیمات] اصلاح کننده خارجی را بوینین.',
+'edit-externally-help' => ' سی اطلاعات بیشتر [//www.mediawiki.org/wiki/Manual:External_editors راهنمایی‌های تنظیمات] اصلاح کننده خارجی را بوینین.',
 
 # 'all' in various places, this might be different for inflected languages
 'watchlistall2' => 'همه',

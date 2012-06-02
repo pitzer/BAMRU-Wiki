@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * Copyright 2010 Wikimedia Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -79,6 +79,10 @@ class CSSMin {
 		return $files;
 	}
 
+	/**
+	 * @param $file string
+	 * @return bool|string
+	 */
 	protected static function getMimeType( $file ) {
 		$realpath = realpath( $file );
 		// Try a couple of different ways to get the mime-type of a file, in order of
@@ -112,10 +116,10 @@ class CSSMin {
 	 * @param $source string CSS data to remap
 	 * @param $local string File path where the source was read from
 	 * @param $remote string URL path to the file
-	 * @param $embed ???
+	 * @param $embedData bool If false, never do any data URI embedding, even if / * @embed * / is found
 	 * @return string Remapped CSS data
 	 */
-	public static function remap( $source, $local, $remote, $embed = true ) {
+	public static function remap( $source, $local, $remote, $embedData = true ) {
 		$pattern = '/((?P<embed>\s*\/\*\s*\@embed\s*\*\/)(?P<pre>[^\;\}]*))?' .
 			self::URL_REGEX . '(?P<post>[^;]*)[\;]?/';
 		$offset = 0;
@@ -130,14 +134,15 @@ class CSSMin {
 			// URLs with absolute paths like /w/index.php need to be expanded
 			// to absolute URLs but otherwise left alone
 			if ( $match['file'][0] !== '' && $match['file'][0][0] === '/' ) {
-				// Replace the file path with an expanded URL
-				// ...but only if wfExpandUrl() is even available. This will not be the case if we're running outside of MW
+				// Replace the file path with an expanded (possibly protocol-relative) URL
+				// ...but only if wfExpandUrl() is even available.
+				// This will not be the case if we're running outside of MW
 				$lengthIncrease = 0;
 				if ( function_exists( 'wfExpandUrl' ) ) {
-					$expanded = wfExpandUrl( $match['file'][0] );
+					$expanded = wfExpandUrl( $match['file'][0], PROTO_RELATIVE );
 					$origLength = strlen( $match['file'][0] );
 					$lengthIncrease = strlen( $expanded ) - $origLength;
-					$source = substr_replace( $source, wfExpandUrl( $match['file'][0] ),
+					$source = substr_replace( $source, $expanded,
 						$match['file'][1], $origLength
 					);
 				}
@@ -161,7 +166,7 @@ class CSSMin {
 				// using Z for the timezone, meaning GMT
 				$url .= '?' . gmdate( 'Y-m-d\TH:i:s\Z', round( filemtime( $file ), -2 ) );
 				// Embedding requires a bit of extra processing, so let's skip that if we can
-				if ( $embed ) {
+				if ( $embedData && $embed ) {
 					$type = self::getMimeType( $file );
 					// Detect when URLs were preceeded with embed tags, and also verify file size is
 					// below the limit

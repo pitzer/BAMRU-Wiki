@@ -25,11 +25,6 @@
  * @file
  */
 
-if ( !defined( 'MEDIAWIKI' ) ) {
-	// Eclipse helper - will be ignored in production
-	require_once( "ApiQueryBase.php" );
-}
-
 /**
  * A query module to list all interwiki links on a page
  *
@@ -79,20 +74,27 @@ class ApiQueryIWLinks extends ApiQueryBase {
 			);
 		}
 
+		$dir = ( $params['dir'] == 'descending' ? ' DESC' : '' );
 		if ( isset( $params['prefix'] ) ) {
 			$this->addWhereFld( 'iwl_prefix', $params['prefix'] );
 			if ( isset( $params['title'] ) ) {
 				$this->addWhereFld( 'iwl_title', $params['title'] );
-				$this->addOption( 'ORDER BY', 'iwl_from' );
+				$this->addOption( 'ORDER BY', 'iwl_from' . $dir );
 			} else {
-				$this->addOption( 'ORDER BY', 'iwl_title, iwl_from' );
+				$this->addOption( 'ORDER BY', array(
+						'iwl_title' . $dir,
+						'iwl_from' . $dir
+				));
 			}
 		} else {
 			// Don't order by iwl_from if it's constant in the WHERE clause
 			if ( count( $this->getPageSet()->getGoodTitles() ) == 1 ) {
-				$this->addOption( 'ORDER BY', 'iwl_prefix' );
+				$this->addOption( 'ORDER BY', 'iwl_prefix' . $dir );
 			} else {
-				$this->addOption( 'ORDER BY', 'iwl_from, iwl_prefix' );
+				$this->addOption( 'ORDER BY', array (
+						'iwl_from' . $dir,
+						'iwl_prefix' . $dir
+				));
 			}
 		}
 
@@ -112,7 +114,7 @@ class ApiQueryIWLinks extends ApiQueryBase {
 			if ( $params['url'] ) {
 				$title = Title::newFromText( "{$row->iwl_prefix}:{$row->iwl_title}" );
 				if ( $title ) {
-					$entry['url'] = wfExpandUrl( $title->getFullURL() );
+					$entry['url'] = wfExpandUrl( $title->getFullURL(), PROTO_CURRENT );
 				}
 			}
 
@@ -142,6 +144,13 @@ class ApiQueryIWLinks extends ApiQueryBase {
 			'continue' => null,
 			'prefix' => null,
 			'title' => null,
+			'dir' => array(
+				ApiBase::PARAM_DFLT => 'ascending',
+				ApiBase::PARAM_TYPE => array(
+					'ascending',
+					'descending'
+				)
+			),
 		);
 	}
 
@@ -152,6 +161,7 @@ class ApiQueryIWLinks extends ApiQueryBase {
 			'continue' => 'When more results are available, use this to continue',
 			'prefix' => 'Prefix for the interwiki',
 			'title' => "Interwiki link to search for. Must be used with {$this->getModulePrefix()}prefix",
+			'dir' => 'The direction in which to list',
 		);
 	}
 
@@ -166,14 +176,13 @@ class ApiQueryIWLinks extends ApiQueryBase {
 		) );
 	}
 
-	protected function getExamples() {
+	public function getExamples() {
 		return array(
-			'Get interwiki links from the [[Main Page]]:',
-			'  api.php?action=query&prop=iwlinks&titles=Main%20Page',
+			'api.php?action=query&prop=iwlinks&titles=Main%20Page' => 'Get interwiki links from the [[Main Page]]',
 		);
 	}
 
 	public function getVersion() {
-		return __CLASS__ . ': $Id: ApiQueryIWLinks.php 93193 2011-07-26 15:19:05Z reedy $';
+		return __CLASS__ . ': $Id$';
 	}
 }

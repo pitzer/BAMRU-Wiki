@@ -12,8 +12,6 @@ test/tmp
 test/version_tmp
 tmp
 
-mediawiki/data/my_wiki.sqlite
-
 # YARD artifacts
 .yardoc
 _yardoc

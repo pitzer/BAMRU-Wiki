@@ -428,7 +428,16 @@ class MessageCache {
 		);
 
 		foreach ( $res as $row ) {
-			$cache[$row->page_title] = ' ' . Revision::getRevisionText( $row );
+			$text = Revision::getRevisionText( $row );
+			if( $text === false ) {
+				// Failed to fetch data; possible ES errors?
+				// Store a marker to fetch on-demand as a workaround...
+				$entry = '!TOO BIG';
+				wfDebugLog( 'MessageCache', __METHOD__ . ": failed to load message page text for {$row->page_title} ($code)" );
+			} else {
+				$entry = ' ' . $text;
+			}
+			$cache[$row->page_title] = $entry;
 		}
 
 		foreach ( $mostused as $key ) {
@@ -490,10 +499,10 @@ class MessageCache {
 			$codes = array_keys( Language::getLanguageNames() );
 		}
 
-		global $parserMemc;
+		global $wgMemc;
 		foreach ( $codes as $code ) {
 			$sidebarKey = wfMemcKey( 'sidebar', $code );
-			$parserMemc->delete( $sidebarKey );
+			$wgMemc->delete( $sidebarKey );
 		}
 
 		// Update the message in the message blob store
@@ -544,6 +553,8 @@ class MessageCache {
 	/**
 	 * Represents a write lock on the messages key
 	 *
+	 * @param $key string
+	 *
 	 * @return Boolean: success
 	 */
 	function lock( $key ) {
@@ -576,9 +587,16 @@ class MessageCache {
 	 *                  fallback).
 	 * @param $isFullKey Boolean: specifies whether $key is a two part key
 	 *                   "msg/lang".
+	 *
+	 * @return string|false
 	 */
 	function get( $key, $useDB = true, $langcode = true, $isFullKey = false ) {
 		global $wgLanguageCode, $wgContLang;
+
+		if ( is_int( $key ) ) {
+			// "Non-string key given" exception sometimes happens for numerical strings that become ints somewhere on their way here
+			$key = strval( $key );
+		}
 
 		if ( !is_string( $key ) ) {
 			throw new MWException( 'Non-string key given' );
@@ -677,6 +695,8 @@ class MessageCache {
 	 *
 	 * @param $title String: Message cache key with initial uppercase letter.
 	 * @param $code String: code denoting the language to try.
+	 *
+	 * @return string|false
 	 */
 	function getMsgFromNamespace( $title, $code ) {
 		global $wgAdaptiveMessageCache;
@@ -730,8 +750,13 @@ class MessageCache {
 		$revision = Revision::newFromTitle( Title::makeTitle( NS_MEDIAWIKI, $title ) );
 		if ( $revision ) {
 			$message = $revision->getText();
-			$this->mCache[$code][$title] = ' ' . $message;
-			$this->mMemc->set( $titleKey, ' ' . $message, $this->mExpiry );
+			if ($message === false) {
+				// A possibly temporary loading failure.
+				wfDebugLog( 'MessageCache', __METHOD__ . ": failed to load message page text for {$title->getDbKey()} ($code)" );
+			} else {
+				$this->mCache[$code][$title] = ' ' . $message;
+				$this->mMemc->set( $titleKey, ' ' . $message, $this->mExpiry );
+			}
 		} else {
 			$message = false;
 			$this->mCache[$code][$title] = '!NONEXISTENT';
@@ -795,10 +820,9 @@ class MessageCache {
 
 	/**
 	 * @param $text string
-	 * @param $string Title|string
 	 * @param $title Title
-	 * @param $interface bool
 	 * @param $linestart bool
+	 * @param $interface bool
 	 * @param $language
 	 * @return ParserOutput
 	 */
@@ -809,23 +833,26 @@ class MessageCache {
 
 		$parser = $this->getParser();
 		$popts = $this->getParserOptions();
+		$popts->setInterfaceMessage( $interface );
+		$popts->setTargetLanguage( $language );
 
-		if ( $interface ) {
-			$popts->setInterfaceMessage( true );
-		}
-		if ( $language !== null ) {
-			$popts->setTargetLanguage( $language );
-		}
-
+		wfProfileIn( __METHOD__ );
 		if ( !$title || !$title instanceof Title ) {
 			global $wgTitle;
 			$title = $wgTitle;
+		}
+		// Sometimes $wgTitle isn't set either...
+		if ( !$title ) {
+			# It's not uncommon having a null $wgTitle in scripts. See r80898
+			# Create a ghost title in such case
+			$title = Title::newFromText( 'Dwimmerlaik' );
 		}
 
 		$this->mInParser = true;
 		$res = $parser->parse( $text, $title, $popts, $linestart );
 		$this->mInParser = false;
 
+		wfProfileOut( __METHOD__ );
 		return $res;
 	}
 
@@ -851,6 +878,10 @@ class MessageCache {
 		$this->mLoadedLanguages = array();
 	}
 
+	/**
+	 * @param $key
+	 * @return array
+	 */
 	public function figureMessage( $key ) {
 		global $wgLanguageCode;
 		$pieces = explode( '/', $key );
@@ -908,6 +939,9 @@ class MessageCache {
 		wfProfileOut( __METHOD__ );
 	}
 
+	/**
+	 * @return array
+	 */
 	public function getMostUsedMessages() {
 		wfProfileIn( __METHOD__ );
 		$cachekey = wfMemcKey( 'message-profiling' );
@@ -941,4 +975,25 @@ class MessageCache {
 		return array_keys( $list );
 	}
 
+	/**
+	 * Get all message keys stored in the message cache for a given language.
+	 * If $code is the content language code, this will return all message keys
+	 * for which MediaWiki:msgkey exists. If $code is another language code, this
+	 * will ONLY return message keys for which MediaWiki:msgkey/$code exists.
+	 * @param $code string
+	 * @return array of message keys (strings)
+	 */
+	public function getAllMessageKeys( $code ) {
+		global $wgContLang;
+		$this->load( $code );
+		if ( !isset( $this->mCache[$code] ) ) {
+			// Apparently load() failed
+			return null;
+		}
+		$cache = $this->mCache[$code]; // Copy the cache
+		unset( $cache['VERSION'] ); // Remove the VERSION key
+		$cache = array_diff( $cache, array( '!NONEXISTENT' ) ); // Remove any !NONEXISTENT keys
+		// Keys may appear with a capital first letter. lcfirst them.
+		return array_map( array( $wgContLang, 'lcfirst' ), array_keys( $cache ) );
+	}
 }

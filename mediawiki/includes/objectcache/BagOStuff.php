@@ -91,6 +91,20 @@ abstract class BagOStuff {
 		return array();
 	}
 
+	/**
+	 * Delete all objects expiring before a certain date.
+	 * @param $date The reference date in MW format
+	 * @param $progressCallback Optional, a function which will be called 
+	 *     regularly during long-running operations with the percentage progress
+	 *     as the first parameter.
+	 *
+	 * @return true on success, false if unimplemented
+	 */
+	public function deleteObjectsExpiringBefore( $date, $progressCallback = false ) {
+		// stub
+		return false;
+	}
+
 	/* *** Emulated functions *** */
 
 	public function add( $key, $value, $exptime = 0 ) {

@@ -9,6 +9,7 @@
  *
  * @author 2Q
  * @author Andrijko Z.
+ * @author Comp1089
  * @author Trần Nguyễn Minh Huy
  */
 
@@ -106,18 +107,19 @@ $messages = array(
 'jumptosearch'     => 'ettsüse',
 
 # All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
-'aboutsite'      => 'Tääteja {{GRAMMAR:elative|{{SITENAME}}}}',
-'aboutpage'      => 'Project:Täätühsed',
-'copyright'      => 'Sisälto on $1 litsentsii mukka svobodnoi.',
-'copyrightpage'  => '{{ns:project}}:Kopiraitti',
-'disclaimers'    => 'Tšeeltümin vassamizõõ',
-'disclaimerpage' => 'Project:Tšeeltümin vassamizõõ',
-'edithelp'       => 'Muutuzavid',
-'edithelppage'   => 'Help:Kui muuttaa tšültšiä',
-'helppage'       => 'Help:Sisälto',
-'mainpage'       => 'Esitšültši',
-'privacy'        => 'Salaštrahuituz',
-'privacypage'    => 'Project:Salaštrahuituz',
+'aboutsite'            => 'Tääteja {{GRAMMAR:elative|{{SITENAME}}}}',
+'aboutpage'            => 'Project:Täätühsed',
+'copyright'            => 'Sisälto on $1 litsentsii mukka svobodnoi.',
+'copyrightpage'        => '{{ns:project}}:Kopiraitti',
+'disclaimers'          => 'Tšeeltümin vassamizõõ',
+'disclaimerpage'       => 'Project:Tšeeltümin vassamizõõ',
+'edithelp'             => 'Muutuzavid',
+'edithelppage'         => 'Help:Kui muuttaa tšültšiä',
+'helppage'             => 'Help:Sisälto',
+'mainpage'             => 'Esitšültši',
+'mainpage-description' => 'Esicülci',
+'privacy'              => 'Salaštrahuituz',
+'privacypage'          => 'Project:Salaštrahuituz',
 
 'badaccess' => 'Lupa tšeeltistü',
 
@@ -374,8 +376,7 @@ Tšüľľed, kummad õmad teďďellä [[Special:Watchlist|kattsõspiizgalla]] on
 'linksearch' => 'Ulkopoolizõd linkid',
 
 # Special:Log/newusers
-'newuserlogpage'          => 'Uuvvõd tšäüttijäd',
-'newuserlog-create-entry' => 'Uusi tšäüttijä',
+'newuserlogpage' => 'Uuvvõd tšäüttijäd',
 
 # Special:ListGroupRights
 'listgrouprights-members' => '(selttsilainspiiska)',
@@ -407,7 +408,6 @@ Tšültši leeb tširjutõttu '''pimmiässi''' [[Special:RecentChanges|spiizgall
 'actioncomplete'        => 'Töö tehtü lõppuu',
 'deletedtext'           => '"$1" on pühittü.
 Tšüľľellä $2 on spiiska viimeiziss pühtšimühsiiss.',
-'deletedarticle'        => 'roottšiz tšüľľee [[$1]]',
 'dellogpage'            => 'Pühitüd tšüľľed',
 'deletecomment'         => 'Süü',
 'deleteotherreason'     => 'Muu vai lisä süü',
@@ -439,8 +439,7 @@ Tšüľľellä $2 on spiiska viimeiziss pühtšimühsiiss.',
 'restriction-level'           => 'Varjauz',
 
 # Undelete
-'undeletelink'     => 'näüt/vääntee',
-'undeletedarticle' => '"[[$1]]" vääneltü',
+'undeletelink' => 'näüt/vääntee',
 
 # Namespace form on various pages
 'namespace'      => 'Nimiruumi:',
@@ -517,8 +516,6 @@ Neill kõhtoill piättä liikuttaa vai ühissää tšüľľee tšäzi.",
 'talkexists'       => "'''Tšüľľee liikka tuli valmessi, a juttitšültšiä eb õli liikutõttu, ku uuvvõ zagolofkaa all on jo juttutšültši. Juttutšültšije sisälto piättä ühinessä tšäzi.'''",
 'movedto'          => 'liikutõttu',
 'movetalk'         => 'Liikut toož juttutšültši',
-'1movedto2'        => 'Tšültši [[$1]] on liikutõttu uuvvõllõ nimõllõ [[$2]]',
-'1movedto2_redir'  => 'liikuti tšüľľee [[$1]] mešaituhsõõ [[$2]] päälle',
 'movelogpage'      => 'Liikkalogi',
 'movereason'       => 'Süü',
 'revertmove'       => 'kummut',
@@ -592,7 +589,7 @@ Toož, võittõ tširjutta väänteüssee süü.',
 
 # Media information
 'file-info-size' => '$1 × $2 px, $3, MIME-sortta: $4',
-'file-nohires'   => '<small>Suurõpaa kuva ebõõ.</small>',
+'file-nohires'   => 'Suurõpaa kuva ebõõ.',
 'svg-long-desc'  => 'SVG-faili $1 × $2 px, failii suuruz: $3',
 'show-big-image' => 'Kõrka-rezoľuuttsiin verzija',
 
@@ -626,7 +623,7 @@ Kui faili on muutõttu, siiz detaaľid võivad õlla kahõllaizõd muutõtull fa
 
 # External editor support
 'edit-externally'      => 'Muuttaa sitä failia ulkopoolizõõ prograammiikaa.',
-'edit-externally-help' => '(Kattsoga [http://www.mediawiki.org/wiki/Manual:External_editors praavilõd], kui tahotta lisäinformaattsia.)',
+'edit-externally-help' => '(Kattsoga [//www.mediawiki.org/wiki/Manual:External_editors praavilõd], kui tahotta lisäinformaattsia.)',
 
 # 'all' in various places, this might be different for inflected languages
 'watchlistall2' => 'koko istori',

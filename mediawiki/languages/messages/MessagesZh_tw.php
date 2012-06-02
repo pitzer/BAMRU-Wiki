@@ -10,16 +10,20 @@
  * @author Alexsh
  * @author Andrew971218
  * @author BobChao
+ * @author Ianbu
  * @author Jidanni
  * @author Mark85296341
  * @author Pbdragonwang
  * @author PhiLiP
  * @author Roc michael
+ * @author Shizhao
  * @author Urhixidur
  * @author Wong128hk
  * @author Zerng07
  * @author לערי ריינהארט
  */
+
+$fallback = 'zh-hant, zh-hans';
 
 $specialPageAliases = array(
 	'Ancientpages'              => array( '最舊頁面' ),
@@ -41,8 +45,6 @@ $specialPageAliases = array(
 	'Userrights'                => array( '用戶權限' ),
 	'Withoutinterwiki'          => array( '沒有跨語言鏈接的頁面' ),
 );
-
-$fallback = 'zh-hant';
 
 $namespaceNames = array(
 	NS_USER             => '使用者',
@@ -203,15 +205,16 @@ $messages = array(
 
 'badaccess-groups' => '您剛才的請求只有{{PLURAL:$2|這個|這些}}使用者組的使用者才能使用: $1',
 
-'editold'        => '編輯',
-'showtoc'        => '顯示',
-'hidetoc'        => '隱藏',
-'thisisdeleted'  => '檢視或復原$1?',
-'site-rss-feed'  => '訂閱 $1 的 RSS 資料來源',
-'site-atom-feed' => '訂閱 $1 的 Atom 資料來源',
-'page-rss-feed'  => '訂閱「$1」的 RSS 資料來源',
-'page-atom-feed' => '訂閱「$1」的 Atom 資料來源',
-'red-link-title' => '$1 (頁面不存在)',
+'editold'         => '編輯',
+'editsectionhint' => '编辑段落：$1',
+'showtoc'         => '顯示',
+'hidetoc'         => '隱藏',
+'thisisdeleted'   => '檢視或復原$1?',
+'site-rss-feed'   => '訂閱 $1 的 RSS 資料來源',
+'site-atom-feed'  => '訂閱 $1 的 Atom 資料來源',
+'page-rss-feed'   => '訂閱「$1」的 RSS 資料來源',
+'page-atom-feed'  => '訂閱「$1」的 Atom 資料來源',
+'red-link-title'  => '$1 (頁面不存在)',
 
 # Short words for each namespace, by default used in the namespace tab in monobook
 'nstab-main'      => '頁面',
@@ -234,7 +237,7 @@ $messages = array(
 'cannotdelete'        => '無法刪除選定的頁面或圖片（它可能已經被其他人刪除了）。',
 'actionthrottledtext' => '系統因為反垃圾編輯的考量，禁止如此頻繁地修改資料，請數分鐘後再嘗試。',
 'viewsourcetext'      => '你可以檢視並複製本頁面的原始碼。',
-'editinginterface'    => "'''警告：''' 您正在編輯的頁面是正用在軟體上的介面文字。改變此頁將影響其他用戶的介面外觀。如要翻譯，請考慮使用 [http://translatewiki.net/wiki/Main_Page?setlang=zh-hant translatewiki.net]，一個用來為MediaWiki軟體本地化的計畫。",
+'editinginterface'    => "'''警告：''' 您正在編輯的頁面是正用在軟體上的介面文字。改變此頁將影響其他用戶的介面外觀。如要翻譯，請考慮使用 [//translatewiki.net/wiki/Main_Page?setlang=zh-hant translatewiki.net]，一個用來為MediaWiki軟體本地化的計畫。",
 'ns-specialprotected' => '在{{ns:special}}名字空間中的頁面是不可以編輯的。',
 
 # Login and logout pages
@@ -333,6 +336,7 @@ $messages = array(
 'session_fail_preview_html'  => "'''很抱歉！部份資料已遺失，我們無法處理您的編輯。''''''如果這個編輯過程沒有問題，請再試一次。如果仍然有問題，請登出後再重新登入一次。'''",
 'token_suffix_mismatch'      => "'''由於您使用者端中的編輯信符毀損了一些標點符號字元，為防止編輯的文字損壞，您的編輯已經被拒絕。
 這種情況通常出現於使用含有很多臭蟲、以網路為主的匿名代理服務的時候。'''",
+'editing'                    => '正在编辑 $1',
 'editingcomment'             => '正在編輯$1（新段落）',
 'storedversion'              => '已保存版本',
 'nonunicodebrowser'          => "'''警告: 您的瀏覽器不相容Unicode編碼。這裡有一個工作區將使您能安全地編輯頁面: 非ASCII字元將以十六進製編碼模式出現在編輯框中。'''",
@@ -391,7 +395,6 @@ $messages = array(
 'revdelete-hide-restricted'   => '將此限制同樣應用於管理員',
 'revdelete-suppress'          => '同時壓制由操作員以及其他使用者的資料',
 'revdelete-unsuppress'        => '在已復原的修訂中移除限制',
-'revdelete-logentry'          => '已更改「[[$1]]」之修訂可見度',
 'revdelete-success'           => '修訂的可見性已經成功設定。',
 'logdelete-success'           => '事件的可見性已經成功設定。',
 
@@ -632,17 +635,16 @@ $NEWPAGE
 
 --
 要改變您的監視列表設定，請參閱
-{{fullurl:{{#special:EditWatchlist}}}}
+{{canonicalurl:{{#special:EditWatchlist}}}}
 
 回饋和進一步的說明:
-{{fullurl:{{MediaWiki:Helppage}}}}',
+{{canonicalurl:{{MediaWiki:Helppage}}}}',
 
 # Delete
 'confirmdeletetext' => '您即將從資料庫中永遠刪除一個頁面或圖片以及其歷史。
 請確定您要進行此項操作，並且了解其後果，同時您的行為符合[[{{MediaWiki:Policy-url}}]]。',
 'deletedtext'       => '「$1」已經被刪除。
 最近刪除的紀錄請參見$2。',
-'deletedarticle'    => '已刪除「[[$1]]」',
 'dellogpagetext'    => '以下是最近刪除的紀錄列表。
 所有的時間都是使用伺服器時間。',
 'reverted'          => '復原到早期版本',
@@ -687,7 +689,6 @@ $NEWPAGE
 'undelete-revision'            => '刪除$1時由$3（在$2）所編寫的修訂版本:',
 'undeleterevision-missing'     => '此版本的內容不正確或已經遺失。可能連結錯誤、被移除或已經被復原。',
 'undeletebtn'                  => '復原',
-'undeletedarticle'             => '已經復原「$1」',
 'undeletedrevisions'           => '$1個修訂版本已經復原',
 'undeletedrevisions-files'     => '$1 個版本和 $2 個檔案被復原',
 'undeletedfiles'               => '$1 個檔案被復原',
@@ -727,7 +728,7 @@ $NEWPAGE
 'ipbhidename'                 => '在封鎖日誌、活躍封鎖列表以及使用者列表中隱藏使用者名／IP',
 'blockipsuccesssub'           => '封鎖成功',
 'blockipsuccesstext'          => '[[Special:Contributions/$1|$1]]已經被封鎖。
-<br />參看[[Special:IPBlockList|被封IP地址列表]]以覆審封鎖。',
+<br />參看[[Special:BlockList|被封IP地址列表]]以覆審封鎖。',
 'ipb-edit-dropdown'           => '編輯封鎖原因',
 'ipb-unblock-addr'            => '解除封鎖$1',
 'ipb-unblock'                 => '解除禁封使用者名或IP地址',
@@ -854,7 +855,6 @@ $NEWPAGE
 
 # Patrol log
 'patrol-log-page' => '巡查記錄',
-'patrol-log-line' => '已經標示$1/$2版做已巡查的$3',
 
 # Browsing diffs
 'previousdiff' => '←上一個',
@@ -862,7 +862,7 @@ $NEWPAGE
 
 # Media information
 'imagemaxsize'   => '在圖片描述頁對圖片大小限制為:',
-'file-nohires'   => '<small>無更高解析度可提供。</small>',
+'file-nohires'   => '無更高解析度可提供。',
 'show-big-image' => '完整解析度',
 
 # Special:NewFiles
@@ -917,7 +917,7 @@ Variants for Chinese language
 'exif-lightsource-15' => '白色螢光 （WW 3200    3700K）',
 
 # External editor support
-'edit-externally-help' => '請參見[http://www.mediawiki.org/wiki/Manual:External_editors 設定步驟]了解詳細資訊。',
+'edit-externally-help' => '請參見[//www.mediawiki.org/wiki/Manual:External_editors 設定步驟]了解詳細資訊。',
 
 # E-mail address confirmation
 'confirmemail'            => '確認電子郵件地址',

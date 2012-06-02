@@ -2,17 +2,15 @@
 /**
  * Implements uploading from a HTTP resource.
  *
- * @file
- * @ingroup upload
+ * @ingroup Upload
  * @author Bryan Tong Minh
  * @author Michael Dale
  */
-
 class UploadFromUrl extends UploadBase {
 	protected $mAsync, $mUrl;
 	protected $mIgnoreWarnings = true;
 
-	protected $mTempPath;
+	protected $mTempPath, $mTmpHandle;
 
 	/**
 	 * Checks if the user is allowed to use the upload-by-URL feature. If the
@@ -67,8 +65,9 @@ class UploadFromUrl extends UploadBase {
 	 */
 	public function initializeFromRequest( &$request ) {
 		$desiredDestName = $request->getText( 'wpDestFile' );
-		if ( !$desiredDestName )
+		if ( !$desiredDestName ) {
 			$desiredDestName = $request->getText( 'wpUploadFileURL' );
+		}
 		return $this->initialize(
 			$desiredDestName,
 			trim( $request->getVal( 'wpUploadFileURL' ) ),
@@ -78,6 +77,7 @@ class UploadFromUrl extends UploadBase {
 
 	/**
 	 * @param $request WebRequest object
+	 * @return bool
 	 */
 	public static function isValidRequest( $request ) {
 		global $wgUser;
@@ -88,8 +88,14 @@ class UploadFromUrl extends UploadBase {
 			&& $wgUser->isAllowed( 'upload_by_url' );
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getSourceType() { return 'url'; }
 
+	/**
+	 * @return Status
+	 */
 	public function fetchFile() {
 		if ( !Http::isValidURI( $this->mUrl ) ) {
 			return Status::newFatal( 'http-invalid-url' );
@@ -133,6 +139,7 @@ class UploadFromUrl extends UploadBase {
 	/**
 	 * Download the file, save it to the temporary file and update the file
 	 * size and set $mRemoveTempFile to true.
+	 * @return Status
 	 */
 	protected function reallyFetchFile() {
 		if ( $this->mTempPath === false ) {
@@ -148,7 +155,9 @@ class UploadFromUrl extends UploadBase {
 		$this->mRemoveTempFile = true;
 		$this->mFileSize = 0;
 
-		$req = MWHttpRequest::factory( $this->mUrl );
+		$req = MWHttpRequest::factory( $this->mUrl, array(
+			'followRedirects' => true
+		) );
 		$req->setCallback( array( $this, 'saveTempFileChunk' ) );
 		$status = $req->execute();
 
@@ -210,9 +219,7 @@ class UploadFromUrl extends UploadBase {
 		if ( $this->mAsync ) {
 			$sessionKey = $this->insertJob( $comment, $pageText, $watch, $user );
 
-			$status = new Status;
-			$status->error( 'async', $sessionKey );
-			return $status;
+			return Status::newFatal( 'async', $sessionKey );
 		}
 
 		return parent::performUpload( $comment, $pageText, $watch, $user );

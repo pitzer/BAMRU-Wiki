@@ -24,11 +24,6 @@
  * @file
  */
 
-if ( !defined( 'MEDIAWIKI' ) ) {
-	// Eclipse helper - will be ignored in production
-	require_once( 'ApiQueryBase.php' );
-}
-
 /**
  * Query module to enumerate all registered users.
  *
@@ -51,8 +46,9 @@ class ApiQueryAllUsers extends ApiQueryBase {
 			$fld_groups = isset( $prop['groups'] );
 			$fld_rights = isset( $prop['rights'] );
 			$fld_registration = isset( $prop['registration'] );
+			$fld_implicitgroups = isset( $prop['implicitgroups'] );
 		} else {
-			$fld_blockinfo = $fld_editcount = $fld_groups = $fld_registration = $fld_rights = false;
+			$fld_blockinfo = $fld_editcount = $fld_groups = $fld_registration = $fld_rights = $fld_implicitgroups = false;
 		}
 
 		$limit = $params['limit'];
@@ -64,10 +60,15 @@ class ApiQueryAllUsers extends ApiQueryBase {
 		$from = is_null( $params['from'] ) ? null : $this->keyToTitle( $params['from'] );
 		$to = is_null( $params['to'] ) ? null : $this->keyToTitle( $params['to'] );
 
-		$this->addWhereRange( 'user_name', $dir, $from, $to );
+		# MySQL doesn't seem to use 'equality propagation' here, so like the
+		# ActiveUsers special page, we have to use rc_user_text for some cases.
+		$userFieldToSort = $params['activeusers'] ? 'rc_user_text' : 'user_name';
+
+		$this->addWhereRange( $userFieldToSort, $dir, $from, $to );
 
 		if ( !is_null( $params['prefix'] ) ) {
-			$this->addWhere( 'user_name' . $db->buildLike( $this->keyToTitle( $params['prefix'] ), $db->anyString() ) );
+			$this->addWhere( $userFieldToSort .
+				$db->buildLike( $this->keyToTitle( $params['prefix'] ), $db->anyString() ) );
 		}
 
 		if ( !is_null( $params['rights'] ) ) {
@@ -147,7 +148,7 @@ class ApiQueryAllUsers extends ApiQueryBase {
 			$timestamp = $db->timestamp( wfTimestamp( TS_UNIX ) - $wgActiveUserDays*24*3600 );
 			$this->addWhere( "rc_timestamp >= {$db->addQuotes( $timestamp )}" );
 
-			$this->addOption( 'GROUP BY', 'user_name' );
+			$this->addOption( 'GROUP BY', $userFieldToSort );
 		}
 
 		$this->addOption( 'LIMIT', $sqlLimit );
@@ -234,10 +235,12 @@ class ApiQueryAllUsers extends ApiQueryBase {
 					'MediaWiki configuration error: the database contains more user groups than known to User::getAllGroups() function' );
 			}
 
+			$lastUserObj = User::newFromName( $lastUser );
+
 			// Add user's group info
 			if ( $fld_groups ) {
-				if ( !isset( $lastUserData['groups'] ) ) {
-					$lastUserData['groups'] = ApiQueryUsers::getAutoGroups( User::newFromName( $lastUser ) );
+				if ( !isset( $lastUserData['groups'] ) && $lastUserObj ) {
+					$lastUserData['groups'] = ApiQueryUsers::getAutoGroups( $lastUserObj );
 				}
 
 				if ( !is_null( $row->ug_group2 ) ) {
@@ -246,13 +249,17 @@ class ApiQueryAllUsers extends ApiQueryBase {
 				$result->setIndexedTagName( $lastUserData['groups'], 'g' );
 			}
 
+			if ( $fld_implicitgroups && !isset( $lastUserData['implicitgroups'] ) && $lastUserObj ) {
+				$lastUserData['implicitgroups'] = ApiQueryUsers::getAutoGroups( $lastUserObj );
+				$result->setIndexedTagName( $lastUserData['implicitgroups'], 'g' );
+			}
 			if ( $fld_rights ) {
-				if ( !isset( $lastUserData['rights'] ) ) {
-					$lastUserData['rights'] =  User::getGroupPermissions( User::newFromName( $lastUser )->getAutomaticGroups() );
+				if ( !isset( $lastUserData['rights'] ) && $lastUserObj ) {
+					$lastUserData['rights'] =  User::getGroupPermissions( $lastUserObj->getAutomaticGroups() );
 				}
 				if ( !is_null( $row->ug_group2 ) ) {
 					$lastUserData['rights'] = array_unique( array_merge( $lastUserData['rights'],
-					                                        User::getGroupPermissions( array( $row->ug_group2 ) ) ) );
+						User::getGroupPermissions( array( $row->ug_group2 ) ) ) );
 				}
 				$result->setIndexedTagName( $lastUserData['rights'], 'r' );
 			}
@@ -304,6 +311,7 @@ class ApiQueryAllUsers extends ApiQueryBase {
 				ApiBase::PARAM_TYPE => array(
 					'blockinfo',
 					'groups',
+					'implicitgroups',
 					'rights',
 					'editcount',
 					'registration'
@@ -333,11 +341,12 @@ class ApiQueryAllUsers extends ApiQueryBase {
 			'rights' => 'Limit users to given right(s)',
 			'prop' => array(
 				'What pieces of information to include.',
-				' blockinfo     - Adds the information about a current block on the user',
-				' groups        - Lists groups that the user is in. This uses more server resources and may return fewer results than the limit',
-				' rights        - Lists rights that the user has',
-				' editcount     - Adds the edit count of the user',
-				' registration  - Adds the timestamp of when the user registered if available (may be blank)',
+				' blockinfo      - Adds the information about a current block on the user',
+				' groups         - Lists groups that the user is in. This uses more server resources and may return fewer results than the limit',
+				' implicitgroups - Lists all the groups the user is automatically in',
+				' rights         - Lists rights that the user has',
+				' editcount      - Adds the edit count of the user',
+				' registration   - Adds the timestamp of when the user registered if available (may be blank)',
 				),
 			'limit' => 'How many total user names to return',
 			'witheditsonly' => 'Only list users who have made edits',
@@ -355,17 +364,17 @@ class ApiQueryAllUsers extends ApiQueryBase {
 		) );
 	}
 
-	protected function getExamples() {
+	public function getExamples() {
 		return array(
 			'api.php?action=query&list=allusers&aufrom=Y',
 		);
 	}
 
 	public function getHelpUrls() {
-		return 'http://www.mediawiki.org/wiki/API:Allusers';
+		return 'https://www.mediawiki.org/wiki/API:Allusers';
 	}
 
 	public function getVersion() {
-		return __CLASS__ . ': $Id: ApiQueryAllUsers.php 92477 2011-07-18 21:26:33Z reedy $';
+		return __CLASS__ . ': $Id$';
 	}
 }

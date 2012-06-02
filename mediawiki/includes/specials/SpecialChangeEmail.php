@@ -26,44 +26,54 @@
  *
  * @ingroup SpecialPage
  */
-class SpecialChangeEmail extends SpecialPage {
+class SpecialChangeEmail extends UnlistedSpecialPage {
 	public function __construct() {
 		parent::__construct( 'ChangeEmail' );
+	}
+
+	function isListed() {
+		global $wgAuth;
+		return $wgAuth->allowPropChange( 'emailaddress' );
 	}
 
 	/**
 	 * Main execution point
 	 */
 	function execute( $par ) {
-		global $wgRequest;
+		global $wgAuth;
 
-		$out = $this->getOutput();
-		if ( wfReadOnly() ) {
-			$out->readOnlyPage();
+		$this->checkReadOnly();
+
+		$this->setHeaders();
+		$this->outputHeader();
+
+		if ( !$wgAuth->allowPropChange( 'emailaddress' ) ) {
+			$this->error( 'cannotchangeemail' );
 			return;
 		}
 
 		$user = $this->getUser();
+		$request = $this->getRequest();
 
-		$this->mPassword = $wgRequest->getVal( 'wpPassword' );
-		$this->mNewEmail = $wgRequest->getVal( 'wpNewEmail' );
-
-		$this->setHeaders();
-		$this->outputHeader();
-		$out->disallowUserJs();
-
-		if ( !$wgRequest->wasPosted() && !$user->isLoggedIn() ) {
-			$this->error( wfMsg( 'changeemail-no-info' ) );
+		if ( !$request->wasPosted() && !$user->isLoggedIn() ) {
+			$this->error( 'changeemail-no-info' );
 			return;
 		}
 
-		if ( $wgRequest->wasPosted() && $wgRequest->getBool( 'wpCancel' ) ) {
+		if ( $request->wasPosted() && $request->getBool( 'wpCancel' ) ) {
 			$this->doReturnTo();
 			return;
 		}
 
-		if ( $wgRequest->wasPosted()
-			&& $user->matchEditToken( $wgRequest->getVal( 'token' ) ) )
+		$out = $this->getOutput();
+		$out->disallowUserJs();
+		$out->addModules( 'mediawiki.special.changeemail' );
+
+		$this->mPassword = $request->getVal( 'wpPassword' );
+		$this->mNewEmail = $request->getVal( 'wpNewEmail' );
+
+		if ( $request->wasPosted()
+			&& $user->matchEditToken( $request->getVal( 'token' ) ) )
 		{
 			$info = $this->attemptChange( $user, $this->mPassword, $this->mNewEmail );
 			if ( $info === true ) {
@@ -81,8 +91,7 @@ class SpecialChangeEmail extends SpecialPage {
 	}
 
 	protected function doReturnTo( $type = 'hard' ) {
-		global $wgRequest;
-		$titleObj = Title::newFromText( $wgRequest->getVal( 'returnto' ) );
+		$titleObj = Title::newFromText( $this->getRequest()->getVal( 'returnto' ) );
 		if ( !$titleObj instanceof Title ) {
 			$titleObj = Title::newMainPage();
 		}
@@ -94,28 +103,26 @@ class SpecialChangeEmail extends SpecialPage {
 	}
 
 	protected function error( $msg ) {
-		$this->getOutput()->addHTML( Xml::element('p', array( 'class' => 'error' ), $msg ) );
+		$this->getOutput()->wrapWikiMsg( "<p class='error'>\n$1\n</p>", $msg );
 	}
 
 	protected function showForm() {
-		global $wgRequest;
-
 		$user = $this->getUser();
 
 		$oldEmailText = $user->getEmail()
 			? $user->getEmail()
-			: wfMsg( 'changeemail-none' );
+			: $this->msg( 'changeemail-none' )->text();
 
 		$this->getOutput()->addHTML(
-			Xml::fieldset( wfMsg( 'changeemail-header' ) ) .
+			Xml::fieldset( $this->msg( 'changeemail-header' )->text() ) .
 			Xml::openElement( 'form',
 				array(
 					'method' => 'post',
 					'action' => $this->getTitle()->getLocalUrl(),
 					'id' => 'mw-changeemail-form' ) ) . "\n" .
-			Html::hidden( 'token', $user->editToken() ) . "\n" .
-			Html::hidden( 'returnto', $wgRequest->getVal( 'returnto' ) ) . "\n" .
-			wfMsgExt( 'changeemail-text', array( 'parse' ) ) . "\n" .
+			Html::hidden( 'token', $user->getEditToken() ) . "\n" .
+			Html::hidden( 'returnto', $this->getRequest()->getVal( 'returnto' ) ) . "\n" .
+			$this->msg( 'changeemail-text' )->parseAsBlock() . "\n" .
 			Xml::openElement( 'table', array( 'id' => 'mw-changeemail-table' ) ) . "\n" .
 			$this->pretty( array(
 				array( 'wpName', 'username', 'text', $user->getName() ),
@@ -126,8 +133,8 @@ class SpecialChangeEmail extends SpecialPage {
 			"<tr>\n" .
 				"<td></td>\n" .
 				'<td class="mw-input">' .
-					Xml::submitButton( wfMsg( 'changeemail-submit' ) ) .
-					Xml::submitButton( wfMsg( 'changeemail-cancel' ), array( 'name' => 'wpCancel' ) ) .
+					Xml::submitButton( $this->msg( 'changeemail-submit' )->text() ) .
+					Xml::submitButton( $this->msg( 'changeemail-cancel' )->text(), array( 'name' => 'wpCancel' ) ) .
 				"</td>\n" .
 			"</tr>\n" .
 			Xml::closeElement( 'table' ) .
@@ -152,9 +159,9 @@ class SpecialChangeEmail extends SpecialPage {
 			$out .= "<tr>\n";
 			$out .= "\t<td class='mw-label'>";
 			if ( $type != 'text' ) {
-				$out .= Xml::label( wfMsg( $label ), $name );
+				$out .= Xml::label( $this->msg( $label )->text(), $name );
 			} else {
-				$out .=  wfMsgHtml( $label );
+				$out .=  $this->msg( $label )->escaped();
 			}
 			$out .= "</td>\n";
 			$out .= "\t<td class='mw-input'>";
@@ -170,18 +177,18 @@ class SpecialChangeEmail extends SpecialPage {
 	 */
 	protected function attemptChange( User $user, $pass, $newaddr ) {
 		if ( $newaddr != '' && !Sanitizer::validateEmail( $newaddr ) ) {
-			$this->error( wfMsgExt( 'invalidemailaddress', 'parseinline' ) );
+			$this->error( 'invalidemailaddress' );
 			return false;
 		}
 
 		$throttleCount = LoginForm::incLoginThrottle( $user->getName() );
 		if ( $throttleCount === true ) {
-			$this->error( wfMsgHtml( 'login-throttled' ) );
+			$this->error( 'login-throttled' );
 			return false;
 		}
 
-		if ( !$user->checkPassword( $pass ) ) {
-			$this->error( wfMsgHtml( 'wrongpassword' ) );
+		if ( !$user->checkTemporaryPassword( $pass ) && !$user->checkPassword( $pass ) ) {
+			$this->error( 'wrongpassword' );
 			return false;
 		}
 

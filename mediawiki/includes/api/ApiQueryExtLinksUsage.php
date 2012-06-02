@@ -24,11 +24,6 @@
  * @file
  */
 
-if ( !defined( 'MEDIAWIKI' ) ) {
-	// Eclipse helper - will be ignored in production
-	require_once( 'ApiQueryBase.php' );
-}
-
 /**
  * @ingroup API
  */
@@ -182,7 +177,9 @@ class ApiQueryExtLinksUsage extends ApiQueryGeneratorBase {
 		global $wgUrlProtocols;
 		$protocols = array( '' );
 		foreach ( $wgUrlProtocols as $p ) {
-			$protocols[] = substr( $p, 0, strpos( $p, ':' ) );
+			if ( $p !== '//' ) {
+				$protocols[] = substr( $p, 0, strpos( $p, ':' ) );
+			}
 		}
 		return $protocols;
 	}
@@ -245,17 +242,17 @@ class ApiQueryExtLinksUsage extends ApiQueryGeneratorBase {
 		) );
 	}
 
-	protected function getExamples() {
+	public function getExamples() {
 		return array(
 			'api.php?action=query&list=exturlusage&euquery=www.mediawiki.org'
 		);
 	}
 
 	public function getHelpUrls() {
-		return 'http://www.mediawiki.org/wiki/API:Exturlusage';
+		return 'https://www.mediawiki.org/wiki/API:Exturlusage';
 	}
 
 	public function getVersion() {
-		return __CLASS__ . ': $Id: ApiQueryExtLinksUsage.php 92401 2011-07-17 17:02:06Z reedy $';
+		return __CLASS__ . ': $Id$';
 	}
 }

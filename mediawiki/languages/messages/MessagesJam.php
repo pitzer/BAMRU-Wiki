@@ -1,5 +1,5 @@
 <?php
-/** Jamaican Creole English (Patios)
+/** Jamaican Creole English (Patois)
  *
  * See MessagesQqq.php for message documentation incl. usage of parameters
  * To improve a translation please visit http://translatewiki.net
@@ -7,6 +7,7 @@
  * @ingroup Language
  * @file
  *
+ * @author Hazard-SJ
  * @author Ukabia
  * @author Yocahuna
  */
@@ -146,7 +147,7 @@ Lef aaf dif afta pofaamin ruolbak',
 'cancel'        => 'Kiansl',
 'moredotdotdot' => 'Muo...',
 'mypage'        => 'Fimi Piej',
-'mytalk'        => 'Fimi Chat',
+'mytalk'        => 'Mi chat',
 'anontalk'      => 'Taak fi dis IP ajres',
 'navigation'    => 'Navigieshan',
 'and'           => '&#32;ahn',
@@ -168,10 +169,10 @@ Lef aaf dif afta pofaamin ruolbak',
 'vector-action-move'             => 'Muuv',
 'vector-action-protect'          => 'Protek',
 'vector-action-undelete'         => 'Andiliit',
-'vector-action-unprotect'        => 'Anprotek',
+'vector-action-unprotect'        => 'Neu protektian',
 'vector-simplesearch-preference' => 'Eniebl enans saach sojeshan (Vekta skin onli)',
 'vector-view-create'             => 'Kriet',
-'vector-view-edit'               => 'Edit',
+'vector-view-edit'               => 'Hedit',
 'vector-view-history'            => 'Vyuu ischri',
 'vector-view-view'               => 'Riid',
 'vector-view-viewsource'         => 'Vyuu Suos',
@@ -193,6 +194,7 @@ Lef aaf dif afta pofaamin ruolbak',
 'printableversion'  => 'Printobl voerjan',
 'permalink'         => 'Poermanint lingk',
 'print'             => 'Print',
+'view'              => 'Riid',
 'edit'              => 'Edit',
 'create'            => 'Kriet',
 'editthispage'      => 'Edit dis piej',
@@ -200,11 +202,12 @@ Lef aaf dif afta pofaamin ruolbak',
 'delete'            => 'Diliit',
 'deletethispage'    => 'Diliit dis piej',
 'undelete_short'    => 'Andiliit {{PLURAL:$1|wan edit|$1 edit}}',
+'viewdeleted_short' => 'Riid {{PLURAL:$1|wan diliitid hedit|$1 diliitid hedit dem}}',
 'protect'           => 'Protek',
 'protect_change'    => 'chienj',
 'protectthispage'   => 'Protek dis piej',
-'unprotect'         => 'Anprotek',
-'unprotectthispage' => 'Anprotek dis piej',
+'unprotect'         => 'Neu protektian',
+'unprotectthispage' => 'Neu protektian fi dis piej',
 'newpage'           => 'Nyuu piej',
 'talkpage'          => 'Diskos dis piej',
 'talkpagelinktext'  => 'Chat',
@@ -284,6 +287,7 @@ Si [[Special:Version|voerjan piej]].',
 'toc'                     => 'Kantent',
 'showtoc'                 => 'shuo',
 'hidetoc'                 => 'aid',
+'collapsible-expand'      => 'Hexpand',
 'thisisdeleted'           => 'Vyuu ar ristuor $1?',
 'viewdeleted'             => 'Vyuu $1?',
 'restorelink'             => '{{PLURAL:$1|wan diliitid edit|$1 diliitid edit}}',
@@ -367,15 +371,14 @@ Di piej ar fail "$1" kudn diliit.
 Imaita aredi diliit bai smadi els.',
 'badtitle'             => 'Bad taikl',
 'badtitletext'         => 'Di piej taikl yu rikwes invalid, emti, ar a inkarek lingk inta-langwij ar inta-wiki taikl. Imaita kantien wan ar muo kiarakta we kyaahn yuuz ina taikl.',
-'perfcached'           => 'Di falarin dieta kiash ahn maita no op tu diet.',
-'perfcachedts'         => 'Di falarin dieta kiash, ahn laas opdiet $1.',
+'perfcached'           => 'Di falarin dieta kiash ahn maita no op tu diet. A maximum of {{PLURAL:$1|one result is|$1 results are}} available in the cache.',
+'perfcachedts'         => 'Di falarin dieta kiash, ahn laas opdiet $1. A maximum of {{PLURAL:$4|one result is|$4 results are}} available in the cache.',
 'querypage-no-updates' => 'Opdiet fi dis piej korantli disiebl.
 Dieta ya no go rifresh fi nou.',
 'wrong_wfQuery_params' => 'Inkarek paramita tu wfQuery()<br />
 Fongshan: $1<br />
 Kwieri: $2',
 'viewsource'           => 'Vyuu Suos',
-'viewsourcefor'        => 'fi $1',
 'actionthrottled'      => 'Akshan chratl',
 'actionthrottledtext'  => 'Az anti-spam meja, yu limit frahn pofaam dis akshan tomoch taim ina shaat spies a taim, ahn yu exiid di limit.
 Begyu chrai agen ina fyuu minit.',
@@ -384,7 +387,7 @@ Begyu chrai agen ina fyuu minit.',
 'protectedinterface'   => 'Dis piej provaid intafies tex fi di saafwier, ahn iprotek fi privent abyuus.',
 'editinginterface'     => "'''Waanin:''' Yu de edit page we yuuz fi provaid intafies tex fi di saafwier.
 Chienj tu dis piej wi afek di apierans a di yuuza intafies fi ada yuuzadem.
-Fi chranslieshan, begyu kansida fi yuuz [http://translatewiki.net/wiki/Main_Page?setlang=en translatewiki.net], di MediaWiki luokalaizieshan projek.",
+Fi chranslieshan, begyu kansida fi yuuz [//translatewiki.net/wiki/Main_Page?setlang=en translatewiki.net], di MediaWiki luokalaizieshan projek.",
 'sqlhidden'            => '(SQL kwieri aidwe)',
 'cascadeprotected'     => 'Dis piej protek frahn edit, bikaa i\'inkluud ina di falarin {{PLURAL:$1|piej, ush|piejdem, ush}} protek wid di "kiaskiedn" apshan ton aan:
 $2',
@@ -425,6 +428,7 @@ No figat fi chienj yu [[Special:Preferences|{{SITENAME}} prefransdem]].',
 'createaccount'              => 'Kriet akount',
 'gotaccount'                 => 'Aredi gat akount? $1.',
 'gotaccountlink'             => 'Lag iin',
+'userlogin-resetlink'        => 'Figet yu lagin detail dem?',
 'createaccountmail'          => 'Bai e-miel',
 'createaccountreason'        => 'Riizn:',
 'badretype'                  => 'Di paaswod yu enta no mach.',
@@ -517,6 +521,10 @@ A lag yu iin nou ...',
 Yu maita chienj yu paaswod soksesfuli aredi ar rikwes wahn nyuu tempareri paaswod.',
 'resetpass-temp-password'   => 'Tempareri paaswod',
 
+# Special:PasswordReset
+'passwordreset-username' => 'Yuuzaniem:',
+'passwordreset-domain'   => 'Domien:',
+
 # Edit page toolbar
 'bold_sample'     => 'Buol tex',
 'bold_tip'        => 'Buol tex',
@@ -585,9 +593,6 @@ Nuot se yu kyaahn yuuz di "e-miel dis yuuza" fiicha anles yu gat a valid e-miel 
 Yu korant IP ajress a $3, ahn di blak ID a #$5.
 Begyu inkluud aal abov ditiel ina eni kwieri yu mek.',
 'blockednoreason'                  => 'no riizn no gi',
-'blockedoriginalsource'            => "Di suos a '''$1''' shuo biluo:",
-'blockededitsource'                => "Di tex a '''yu edit''' tu '''$1''' shuo biluo:",
-'whitelistedittitle'               => 'Lagiin rikwaya fi edit',
 'whitelistedittext'                => 'Yu afi $1 fi edit piej',
 'confirmedittext'                  => 'Yu mos kanfoerm yu e-miel ajres bifuo yu edit piej.
 Begyu set ahn validiet yu e-miel ajres chruu yu [[Special:Preferences|yuuza prefransdem]].',
@@ -665,7 +670,12 @@ Yu de pramis wi alzwel se a yu rait dis yuself, ar kapi'i frahn a poblik domien 
 'template-semiprotected'           => '(semi-protek)',
 'hiddencategories'                 => 'Dis piej a memb a {{PLURAL:$1|1 idn kiatigari|$1 idn kiatigari}}:',
 'nocreatetitle'                    => 'Piej krieshan limit',
+'permissionserrors'                => 'Permishan herro',
 'permissionserrorstext-withaction' => 'Yu no ab no poermishan fi $2, fi di falarin {{PLURAL:$1|riizn|riizndem}}:',
+'edit-conflict'                    => 'Hedit kanflik: $1',
+
+# Account creation failure
+'cantcreateaccounttitle' => 'Cyannat mek di hakkount',
 
 # History pages
 'viewpagelogs'           => 'Vyuu lagdem fi dis piej',
@@ -675,6 +685,7 @@ Yu de pramis wi alzwel se a yu rait dis yuself, ar kapi'i frahn a poblik domien 
 'nextrevision'           => 'Nyuwa rivijan',
 'currentrevisionlink'    => 'Lietis rivijan',
 'cur'                    => 'kor',
+'next'                   => 'nexx',
 'last'                   => 'priiv',
 'histlegend'             => "Dif silekshan: maak di riedio bax fi di rivijandem fi kompier ahn lik enta ar di botn a di batom.<br />
 Lejen: '''({{int:cur}})''' = difrans wid lietis rivijan, '''({{int:last}})''' = difrans wid prisiidn rivijan, '''{{int:minoreditletter}}''' = maina edit.",
@@ -824,8 +835,7 @@ Piej pahn [[Special:Watchlist|yu wachlis]] dem '''buol'''.",
 'linksearch' => 'Extoernal lingk',
 
 # Special:Log/newusers
-'newuserlogpage'          => 'Yuuza krieshan lag',
-'newuserlog-create-entry' => 'Nyuu yuuza akount',
+'newuserlogpage' => 'Yuuza krieshan lag',
 
 # Special:ListGroupRights
 'listgrouprights-members' => '(lis a memba)',
@@ -857,7 +867,6 @@ Begyu kanfoerm se yu inten fi du dis, se yu andastan di kansikwens, ahn se yu a 
 'actioncomplete'        => 'Akshan kompliit',
 'deletedtext'           => '"$1" don diliit.
 Si $2 fi a rekaad a riisant diliishan.',
-'deletedarticle'        => 'diliitid "[[$1]]"',
 'dellogpage'            => 'Diliishan lag',
 'deletecomment'         => 'Riizn:',
 'deleteotherreason'     => 'Ada/adishanal riizn:',
@@ -891,8 +900,7 @@ Yu kiahn chienj dis piej protekshan lebl, bot inaa go afek di kiaskiedn proteksh
 'restriction-level'           => 'Rischrikshan lebl:',
 
 # Undelete
-'undeletelink'     => 'vyuu/ristuor',
-'undeletedarticle' => 'don ristuor "[[$1]]"',
+'undeletelink' => 'vyuu/ristuor',
 
 # Namespace form on various pages
 'namespace'      => 'Niemspies',
@@ -973,8 +981,6 @@ Begyu chuuz aneda niem.',
 Begyu moerj dem manyuali.'''",
 'movedto'          => 'muuv gaan a',
 'movetalk'         => 'Muuv asuosietid taak piej',
-'1movedto2'        => '[[$1]] muuv gaan a [[$2]]',
-'1movedto2_redir'  => 'muuv [[$1]] tu [[$2]] uoba ridirek',
 'movelogpage'      => 'Muuv lag',
 'movereason'       => 'Riizn:',
 'revertmove'       => 'rivoert',
@@ -1046,7 +1052,7 @@ Yu kiahn vyuu isuos.',
 
 # Media information
 'file-info-size' => '$1 × $2 pixl, fail saiz: $3, MIME taip: $4',
-'file-nohires'   => '<small>No aya rezaluushan no avielobl.</small>',
+'file-nohires'   => 'No aya rezaluushan no avielobl.',
 'svg-long-desc'  => 'SVG fail, naminali $1 × $2 pixl, fail saiz: $3',
 'show-big-image' => 'Ful rezaluushan',
 
@@ -1081,7 +1087,7 @@ Ada wandem wi aid bai difaalt.
 
 # External editor support
 'edit-externally'      => 'Yuuz extoernal aplikieshan fi edit dis fail',
-'edit-externally-help' => '(Si di [http://www.mediawiki.org/wiki/Manual:External_editors setop inschrokshan] fi muo infamieshan)',
+'edit-externally-help' => '(Si di [//www.mediawiki.org/wiki/Manual:External_editors setop inschrokshan] fi muo infamieshan)',
 
 # 'all' in various places, this might be different for inflected languages
 'watchlistall2' => 'aal',

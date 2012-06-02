@@ -41,6 +41,7 @@ class WikiExporter {
 	const CURRENT = 2;
 	const STABLE = 4; // extension defined
 	const LOGS = 8;
+	const RANGE = 16;
 
 	const BUFFER = 0;
 	const STREAM = 1;
@@ -55,8 +56,9 @@ class WikiExporter {
 	 * make additional queries to pull source data while the
 	 * main query is still running.
 	 *
-	 * @param $db Database
-	 * @param $history Mixed: one of WikiExporter::FULL or WikiExporter::CURRENT,
+	 * @param $db DatabaseBase
+	 * @param $history Mixed: one of WikiExporter::FULL, WikiExporter::CURRENT,
+	 *                 WikiExporter::RANGE or WikiExporter::STABLE,
 	 *                 or an associative array:
 	 *                   offset: non-inclusive offset at which to start the query
 	 *                   limit: maximum number of rows to return
@@ -115,6 +117,21 @@ class WikiExporter {
 		$condition = 'page_id >= ' . intval( $start );
 		if ( $end ) {
 			$condition .= ' AND page_id < ' . intval( $end );
+		}
+		return $this->dumpFrom( $condition );
+	}
+
+	/**
+	 * Dumps a series of page and revision records for those pages
+	 * in the database with revisions falling within the rev_id range given.
+	 * @param $start Int: inclusive lower limit (this id is included)
+	 * @param $end   Int: Exclusive upper limit (this id is not included)
+	 *                   If 0, no upper limit.
+	 */
+	public function revsByRange( $start, $end ) {
+		$condition = 'rev_id >= ' . intval( $start );
+		if ( $end ) {
+			$condition .= ' AND rev_id < ' . intval( $end );
 		}
 		return $this->dumpFrom( $condition );
 	}
@@ -259,6 +276,10 @@ class WikiExporter {
 					wfProfileOut( __METHOD__ );
 					throw new MWException( __METHOD__ . " given invalid history dump type." );
 				}
+			} elseif ( $this->history & WikiExporter::RANGE ) {
+				# Dump of revisions within a specified range
+				$join['revision'] = array( 'INNER JOIN', 'page_id=rev_page' );
+				$opts['ORDER BY'] = 'rev_page ASC, rev_id ASC';
 			} else {
 				# Uknown history specification parameter?
 				wfProfileOut( __METHOD__ );
@@ -354,13 +375,12 @@ class WikiExporter {
  * @ingroup Dump
  */
 class XmlDumpWriter {
-
 	/**
 	 * Returns the export schema version.
 	 * @return string
 	 */
 	function schemaVersion() {
-		return "0.5";
+		return "0.6";
 	}
 
 	/**
@@ -411,7 +431,7 @@ class XmlDumpWriter {
 	}
 
 	function homelink() {
-		return Xml::element( 'base', array(), Title::newMainPage()->getFullUrl() );
+		return Xml::element( 'base', array(), Title::newMainPage()->getCanonicalUrl() );
 	}
 
 	function caseSetting() {
@@ -456,11 +476,23 @@ class XmlDumpWriter {
 	function openPage( $row ) {
 		$out = "  <page>\n";
 		$title = Title::makeTitle( $row->page_namespace, $row->page_title );
-		$out .= '    ' . Xml::elementClean( 'title', array(), $title->getPrefixedText() ) . "\n";
+		$out .= '    ' . Xml::elementClean( 'title', array(), self::canonicalTitle( $title ) ) . "\n";
+		$out .= '    ' . Xml::element( 'ns', array(), strval( $row->page_namespace) ) . "\n";
 		$out .= '    ' . Xml::element( 'id', array(), strval( $row->page_id ) ) . "\n";
 		if ( $row->page_is_redirect ) {
-			$out .= '    ' . Xml::element( 'redirect', array() ) . "\n";
+			$page = WikiPage::factory( $title );
+			$redirect = $page->getRedirectTarget();
+			if ( $redirect instanceOf Title && $redirect->isValidRedirectTarget() ) {
+				$out .= '    ' . Xml::element( 'redirect', array( 'title' => self::canonicalTitle( $redirect ) ) ) . "\n";
+			}
 		}
+		
+		if ( $row->rev_sha1 ) {
+			$out .= "      " . Xml::element('sha1', null, strval($row->rev_sha1) ) . "\n";
+		} else {
+			$out .= "      <sha1/>\n";
+		}
+		
 		if ( $row->page_restrictions != '' ) {
 			$out .= '    ' . Xml::element( 'restrictions', array(),
 				strval( $row->page_restrictions ) ) . "\n";
@@ -518,12 +550,12 @@ class XmlDumpWriter {
 			// Raw text from the database may have invalid chars
 			$text = strval( Revision::getRevisionText( $row ) );
 			$out .= "      " . Xml::elementClean( 'text',
-				array( 'xml:space' => 'preserve', 'bytes' => $row->rev_len ),
+				array( 'xml:space' => 'preserve', 'bytes' => intval( $row->rev_len ) ),
 				strval( $text ) ) . "\n";
 		} else {
 			// Stub output
 			$out .= "      " . Xml::element( 'text',
-				array( 'id' => $row->rev_text_id, 'bytes' => $row->rev_len ),
+				array( 'id' => $row->rev_text_id, 'bytes' => intval( $row->rev_len ) ),
 				"" ) . "\n";
 		}
 
@@ -570,7 +602,7 @@ class XmlDumpWriter {
 			$out .= "      " . Xml::element( 'text', array( 'deleted' => 'deleted' ) ) . "\n";
 		} else {
 			$title = Title::makeTitle( $row->log_namespace, $row->log_title );
-			$out .= "      " . Xml::elementClean( 'logtitle', null, $title->getPrefixedText() ) . "\n";
+			$out .= "      " . Xml::elementClean( 'logtitle', null, self::canonicalTitle( $title ) ) . "\n";
 			$out .= "      " . Xml::elementClean( 'params',
 				array( 'xml:space' => 'preserve' ),
 				strval( $row->log_params ) ) . "\n";
@@ -589,7 +621,7 @@ class XmlDumpWriter {
 
 	function writeContributor( $id, $text ) {
 		$out = "      <contributor>\n";
-		if ( $id ) {
+		if ( $id || !IP::isValid( $text ) ) {
 			$out .= "        " . Xml::elementClean( 'username', null, strval( $text ) ) . "\n";
 			$out .= "        " . Xml::element( 'id', null, strval( $id ) ) . "\n";
 		} else {
@@ -624,7 +656,7 @@ class XmlDumpWriter {
 	 */
 	function writeUpload( $file, $dumpContents = false ) {
 		if ( $file->isOld() ) {
-			$archiveName = "      " . 
+			$archiveName = "      " .
 				Xml::element( 'archivename', null, $file->getArchiveName() ) . "\n";
 		} else {
 			$archiveName = '';
@@ -632,7 +664,7 @@ class XmlDumpWriter {
 		if ( $dumpContents ) {
 			# Dump file as base64
 			# Uses only XML-safe characters, so does not need escaping
-			$contents = '      <contents encoding="base64">' . 
+			$contents = '      <contents encoding="base64">' .
 				chunk_split( base64_encode( file_get_contents( $file->getPath() ) ) ) .
 				"      </contents>\n";
 		} else {
@@ -643,8 +675,8 @@ class XmlDumpWriter {
 			$this->writeContributor( $file->getUser( 'id' ), $file->getUser( 'text' ) ) .
 			"      " . Xml::elementClean( 'comment', null, $file->getDescription() ) . "\n" .
 			"      " . Xml::element( 'filename', null, $file->getName() ) . "\n" .
-			$archiveName . 
-			"      " . Xml::element( 'src', null, $file->getFullUrl() ) . "\n" .
+			$archiveName .
+			"      " . Xml::element( 'src', null, $file->getCanonicalUrl() ) . "\n" .
 			"      " . Xml::element( 'size', null, $file->getSize() ) . "\n" .
 			"      " . Xml::element( 'sha1base36', null, $file->getSha1() ) . "\n" .
 			"      " . Xml::element( 'rel', null, $file->getRel() ) . "\n" .
@@ -652,6 +684,30 @@ class XmlDumpWriter {
 			"    </upload>\n";
 	}
 
+	/**
+	 * Return prefixed text form of title, but using the content language's
+	 * canonical namespace. This skips any special-casing such as gendered
+	 * user namespaces -- which while useful, are not yet listed in the
+	 * XML <siteinfo> data so are unsafe in export.
+	 *
+	 * @param Title $title
+	 * @return string
+	 * @since 1.18
+	 */
+	public static function canonicalTitle( Title $title ) {
+		if ( $title->getInterwiki() ) {
+			return $title->getPrefixedText();
+		}
+
+		global $wgContLang;
+		$prefix = str_replace( '_', ' ', $wgContLang->getNsText( $title->getNamespace() ) );
+
+		if ( $prefix !== '' ) {
+			$prefix .= ':';
+		}
+
+		return $prefix . $title->getText();
+	}
 }
 
 
@@ -691,6 +747,36 @@ class DumpOutput {
 	function write( $string ) {
 		print $string;
 	}
+
+	/**
+	 * Close the old file, move it to a specified name,
+	 * and reopen new file with the old name. Use this
+	 * for writing out a file in multiple pieces
+	 * at specified checkpoints (e.g. every n hours).
+	 * @param $newname mixed File name. May be a string or an array with one element
+	 */
+	function closeRenameAndReopen( $newname ) {
+		return;
+	}
+
+	/**
+	 * Close the old file, and move it to a specified name.
+	 * Use this for the last piece of a file written out
+	 * at specified checkpoints (e.g. every n hours).
+	 * @param $newname mixed File name. May be a string or an array with one element
+	 * @param $open bool If true, a new file with the old filename will be opened again for writing (default: false)
+	 */
+	function closeAndRename( $newname, $open = false ) {
+		return;
+	}
+
+	/**
+	 * Returns the name of the file or files which are
+	 * being written to, if there are any.
+	 */
+	function getFilenames() {
+		return NULL;
+	}
 }
 
 /**
@@ -698,14 +784,51 @@ class DumpOutput {
  * @ingroup Dump
  */
 class DumpFileOutput extends DumpOutput {
-	var $handle;
+	protected $handle, $filename;
 
 	function __construct( $file ) {
 		$this->handle = fopen( $file, "wt" );
+		$this->filename = $file;
 	}
 
 	function write( $string ) {
 		fputs( $this->handle, $string );
+	}
+
+	function closeRenameAndReopen( $newname ) {
+		$this->closeAndRename( $newname, true );
+	}
+
+	function renameOrException( $newname ) {
+			if (! rename( $this->filename, $newname ) ) {
+				throw new MWException( __METHOD__ . ": rename of file {$this->filename} to $newname failed\n" );
+			}
+	}
+
+	function checkRenameArgCount( $newname ) {
+		if ( is_array( $newname ) ) {
+			if ( count( $newname ) > 1 ) {
+				throw new MWException( __METHOD__ . ": passed multiple arguments for rename of single file\n" );
+			} else {
+				$newname = $newname[0];
+			}
+		}
+		return $newname;
+	}
+
+	function closeAndRename( $newname, $open = false ) {
+		$newname = $this->checkRenameArgCount( $newname );
+		if ( $newname ) {
+			fclose( $this->handle );
+			$this->renameOrException( $newname );
+			if ( $open ) {
+				$this->handle = fopen( $this->filename, "wt" );
+			}
+		}
+	}
+
+	function getFilenames() {
+		return $this->filename;
 	}
 }
 
@@ -716,12 +839,45 @@ class DumpFileOutput extends DumpOutput {
  * @ingroup Dump
  */
 class DumpPipeOutput extends DumpFileOutput {
+	protected $command, $filename;
+
 	function __construct( $command, $file = null ) {
 		if ( !is_null( $file ) ) {
 			$command .=  " > " . wfEscapeShellArg( $file );
 		}
-		$this->handle = popen( $command, "w" );
+
+		$this->startCommand( $command );
+		$this->command = $command;
+		$this->filename = $file;
 	}
+
+	function startCommand( $command ) {
+		$spec = array(
+			0 => array( "pipe", "r" ),
+		);
+		$pipes = array();
+		$this->procOpenResource = proc_open( $command, $spec, $pipes );
+		$this->handle = $pipes[0];
+	}
+
+	function closeRenameAndReopen( $newname ) {
+		$this->closeAndRename( $newname, true );
+	}
+
+	function closeAndRename( $newname, $open = false ) {
+		$newname = $this->checkRenameArgCount( $newname );
+		if ( $newname ) {
+			fclose( $this->handle );
+			proc_close( $this->procOpenResource );
+			$this->renameOrException( $newname );
+			if ( $open ) {
+				$command = $this->command;
+				$command .=  " > " . wfEscapeShellArg( $this->filename );
+				$this->startCommand( $command );
+			}
+		}
+	}
+
 }
 
 /**
@@ -750,11 +906,30 @@ class DumpBZip2Output extends DumpPipeOutput {
  */
 class Dump7ZipOutput extends DumpPipeOutput {
 	function __construct( $file ) {
+		$command = $this->setup7zCommand( $file );
+		parent::__construct( $command );
+		$this->filename = $file;
+	}
+
+	function setup7zCommand( $file ) {
 		$command = "7za a -bd -si " . wfEscapeShellArg( $file );
 		// Suppress annoying useless crap from p7zip
 		// Unfortunately this could suppress real error messages too
 		$command .= ' >' . wfGetNull() . ' 2>&1';
-		parent::__construct( $command );
+		return( $command );
+	}
+
+	function closeAndRename( $newname, $open = false ) {
+		$newname = $this->checkRenameArgCount( $newname );
+		if ( $newname ) {
+			fclose( $this->handle );
+			proc_close( $this->procOpenResource );
+			$this->renameOrException( $newname );
+			if ( $open ) {
+				$command = $this->setup7zCommand( $this->filename );
+				$this->startCommand( $command );
+			}
+		}
 	}
 }
 
@@ -801,6 +976,18 @@ class DumpFilter {
 
 	function writeLogItem( $rev, $string ) {
 		$this->sink->writeRevision( $rev, $string );
+	}
+
+	function closeRenameAndReopen( $newname ) {
+		$this->sink->closeRenameAndReopen( $newname );
+	}
+
+	function closeAndRename( $newname, $open = false ) {
+		$this->sink->closeAndRename( $newname, $open );
+	}
+
+	function getFilenames() {
+		return $this->sink->getFilenames();
 	}
 
 	/**
@@ -950,6 +1137,25 @@ class DumpMultiWriter {
 			$this->sinks[$i]->writeRevision( $rev, $string );
 		}
 	}
+
+	function closeRenameAndReopen( $newnames ) {
+		$this->closeAndRename( $newnames, true );
+	}
+
+	function closeAndRename( $newnames, $open = false ) {
+		for ( $i = 0; $i < $this->count; $i++ ) {
+			$this->sinks[$i]->closeAndRename( $newnames[$i], $open );
+		}
+	}
+
+	function getFilenames() {
+		$filenames = array();
+		for ( $i = 0; $i < $this->count; $i++ ) {
+			$filenames[] =  $this->sinks[$i]->getFilenames();
+		}
+		return $filenames;
+	}
+
 }
 
 function xmlsafe( $string ) {

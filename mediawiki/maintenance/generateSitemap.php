@@ -162,6 +162,8 @@ class GenerateSitemap extends Maintenance {
 	}
 
 	private function setNamespacePriorities() {
+		global $wgSitemapNamespacesPriorities;
+
 		// Custom main namespaces
 		$this->priorities[self::GS_MAIN] = '0.5';
 		// Custom talk namesspaces
@@ -183,10 +185,28 @@ class GenerateSitemap extends Maintenance {
 		$this->priorities[NS_HELP_TALK] = '0.1';
 		$this->priorities[NS_CATEGORY] = '0.5';
 		$this->priorities[NS_CATEGORY_TALK] = '0.1';
+
+		// Custom priorities
+		if ( $wgSitemapNamespacesPriorities !== false ) {
+			/**
+			 * @var $wgSitemapNamespacesPriorities array
+			 */
+			foreach ( $wgSitemapNamespacesPriorities as $namespace => $priority ) {
+				$float = floatval( $priority );
+				if ( $float > 1.0 ) {
+					$priority = '1.0';
+				} elseif ( $float < 0.0 ) {
+					$priority = '0.0';
+				}
+				$this->priorities[$namespace] = $priority;
+			}
+		}
 	}
 
 	/**
 	 * Create directory if it does not exist and return pathname with a trailing slash
+	 * @param $fspath string
+	 * @return null|string
 	 */
 	private static function init_path( $fspath ) {
 		if ( !isset( $fspath ) ) {
@@ -298,7 +318,7 @@ class GenerateSitemap extends Maintenance {
 				}
 				$title = Title::makeTitle( $row->page_namespace, $row->page_title );
 				$date = wfTimestamp( TS_ISO_8601, $row->page_touched );
-				$entry = $this->fileEntry( $title->getFullURL(), $date, $this->priority( $namespace ) );
+				$entry = $this->fileEntry( $title->getCanonicalURL(), $date, $this->priority( $namespace ) );
 				$length += strlen( $entry );
 				$this->write( $this->file, $entry );
 				// generate pages for language variants
@@ -306,7 +326,7 @@ class GenerateSitemap extends Maintenance {
 					$variants = $wgContLang->getVariants();
 					foreach ( $variants as $vCode ) {
 						if ( $vCode == $wgContLang->getCode() ) continue; // we don't want default variant
-						$entry = $this->fileEntry( $title->getFullURL( '', $vCode ), $date, $this->priority( $namespace ) );
+						$entry = $this->fileEntry( $title->getCanonicalURL( '', $vCode ), $date, $this->priority( $namespace ) );
 						$length += strlen( $entry );
 						$this->write( $this->file, $entry );
 					}
@@ -327,13 +347,20 @@ class GenerateSitemap extends Maintenance {
 	 * @return Resource
 	 */
 	function open( $file, $flags ) {
-		return $this->compress ? gzopen( $file, $flags ) : fopen( $file, $flags );
+		$resource = $this->compress ? gzopen( $file, $flags ) : fopen( $file, $flags );
+		if( $resource === false ) {
+			wfDebugDieBacktrace( __METHOD__ . " error opening file $file with flags $flags. Check permissions?" );
+		}
+		return $resource;
 	}
 
 	/**
 	 * gzwrite() / fwrite() wrapper
 	 */
 	function write( &$handle, $str ) {
+		if( $handle === true || $handle === false ) {
+			wfDebugDieBacktrace( __METHOD__ . " was passed a boolean as a file handle.\n" );
+		}
 		if ( $this->compress )
 			gzwrite( $handle, $str );
 		else
@@ -456,7 +483,7 @@ class GenerateSitemap extends Maintenance {
 
 		$this->limit = array(
 			strlen( $this->openFile() ),
-			strlen( $this->fileEntry( $title->getFullUrl(), wfTimestamp( TS_ISO_8601, wfTimestamp() ), $this->priority( $namespace ) ) ),
+			strlen( $this->fileEntry( $title->getCanonicalURL(), wfTimestamp( TS_ISO_8601, wfTimestamp() ), $this->priority( $namespace ) ) ),
 			strlen( $this->closeFile() )
 		);
 	}

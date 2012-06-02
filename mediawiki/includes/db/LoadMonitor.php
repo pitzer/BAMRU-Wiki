@@ -66,11 +66,15 @@ class LoadMonitor_Null implements LoadMonitor {
 	function postConnectionBackoff( $conn, $threshold ) {
 	}
 
+	/**
+	 * @param $serverIndexes
+	 * @param $wiki
+	 * @return array
+	 */
 	function getLagTimes( $serverIndexes, $wiki ) {
 		return array_fill_keys( $serverIndexes, 0 );
 	}
 }
-
 
 /**
  * Basic MySQL load monitor with no external dependencies
@@ -106,6 +110,11 @@ class LoadMonitor_MySQL implements LoadMonitor {
 	 * @return array
 	 */
 	function getLagTimes( $serverIndexes, $wiki ) {
+		if ( count( $serverIndexes ) == 1 && reset( $serverIndexes ) == 0 ) {
+			// Single server only, just return zero without caching
+			return array( 0 => 0 );
+		}
+
 		wfProfileIn( __METHOD__ );
 		$expiry = 5;
 		$requestRate = 10;

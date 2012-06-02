@@ -1,5 +1,5 @@
 <?php
-/** कश्मीरी (कश्मीरी)
+/** Kashmiri (Devanagari script) (कॉशुर)
  *
  * See MessagesQqq.php for message documentation incl. usage of parameters
  * To improve a translation please visit http://translatewiki.net
@@ -7,6 +7,7 @@
  * @ingroup Language
  * @file
  *
+ * @author Rk_kaul (on ks.wikipedia.org)
  */
 
 $digitTransformTable = array(
@@ -23,6 +24,8 @@ $digitTransformTable = array(
 );
 
 $messages = array(
+'help' => 'मदद',
+
 # Recent changes
 'recentchanges' => 'नवि तबदीली',
 

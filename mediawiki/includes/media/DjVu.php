@@ -131,7 +131,7 @@ class DjVuHandler extends ImageHandler {
 		}
 		$width = $params['width'];
 		$height = $params['height'];
-		$srcPath = $image->getPath();
+		$srcPath = $image->getLocalRefPath();
 		$page = $params['page'];
 		if ( $page > $this->pageCount( $image ) ) {
 			return new MediaTransformError( 'thumbnail_error', $width, $height, wfMsg( 'djvu_page_error' ) );
@@ -190,6 +190,7 @@ class DjVuHandler extends ImageHandler {
 	/**
 	 * Cache a document tree for the DjVu XML metadata
 	 * @param $image File
+	 * @param $gettext Boolean: DOCUMENT (Default: false)
 	 */
 	function getMetaTree( $image , $gettext = false ) {
 		if ( isset( $image->dejaMetaTree ) ) {
@@ -222,7 +223,7 @@ class DjVuHandler extends ImageHandler {
 				$image->dejaMetaTree = $tree;
 			}
 		} catch( Exception $e ) {
-			wfDebug( "Bogus multipage XML metadata on '$image->name'\n" );
+			wfDebug( "Bogus multipage XML metadata on '{$image->getName()}'\n" );
 		}
 		wfRestoreWarnings();
 		wfProfileOut( __METHOD__ );

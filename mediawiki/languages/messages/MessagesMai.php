@@ -10,6 +10,7 @@
  * @author Ashishanchinhar
  * @author Dhirendra.maithili
  * @author Ggajendra
+ * @author Kaganer
  * @author Kapileshwar.raut
  * @author Kumariprity
  * @author Manojberma77
@@ -52,9 +53,9 @@ $messages = array(
 'tog-enotifminoredits'        => 'छोट परिवर्त्तनक हेतु सेहो हमरा ई-मेल पठाऊ',
 'tog-enotifrevealaddr'        => 'हमर ई-पत्र संकेत सूचना ई-पत्रमे देखाउ',
 'tog-shownumberswatching'     => 'ध्यान राखैबला प्रयोक्ताक संख्या',
-'tog-oldsig'                  => 'अखुनका दस्खतक प्रारूप',
+'tog-oldsig'                  => 'अखुनका दस्खत',
 'tog-fancysig'                => 'हस्ताक्षरकें विकिटेक्सटक रूपमे देखू (स्वचालित श्रृंखला हीन)',
-'tog-externaleditor'          => "↓पूर्वनिर्धारित रूपेँ बाह्य सम्पादक क' उपयोग करू (केवल विशेषज्ञसभक लेल, एकरा लेल संगणक पर विशेष सेटिंग चाही। [http://www.mediawiki.org/wiki/Manual:External_editors आओर जानकारी।])",
+'tog-externaleditor'          => "↓पूर्वनिर्धारित रूपेँ बाह्य सम्पादक क' उपयोग करू (केवल विशेषज्ञसभक लेल, एकरा लेल संगणक पर विशेष सेटिंग चाही। [//www.mediawiki.org/wiki/Manual:External_editors आओर जानकारी।])",
 'tog-externaldiff'            => 'पुरान संस्करणमे अंतर देखेबाक हेतु पूर्वनिविष्ट रूपमे बाहरक परिवर्तनक प्रयोग करू',
 'tog-showjumplinks'           => 'करू "तड़पान" भेटैबला लिंक सभ',
 'tog-uselivepreview'          => 'करू चल पूर्वावलोकन (जावास्क्रिप्ट चाही) (प्रायोगिक)',
@@ -283,12 +284,15 @@ $1',
 देखू ee [[Special:Version|version page]]',
 
 'ok'                      => 'ठीक अछि',
+'pagetitle-view-mainpage' => '{{अन्तर्जाल}}',
+'backlinksubtitle'        => '← $1',
 'retrievedfrom'           => 'प्राप्ति स्थल "$1"',
 'youhavenewmessages'      => 'अहाँ लग अछि $1 ($2).',
 'newmessageslink'         => 'नव संदेश सभ',
 'newmessagesdifflink'     => 'अन्तिम परिवर्तन',
 'youhavenewmessagesmulti' => '$1 पर अहाँ लेल नव सन्देश अछि',
 'editsection'             => 'संपादन करू',
+'editsection-brackets'    => '[$1]',
 'editold'                 => 'सम्पादित करू',
 'viewsourceold'           => 'जड़ि देखू',
 'editlink'                => 'सम्पादन करू',
@@ -309,6 +313,8 @@ $1',
 'site-atom-feed'          => '$1 अणु फीड',
 'page-rss-feed'           => '"$1" आर.एस.एस. सूचना',
 'page-atom-feed'          => '"$1" अणु सू़चना',
+'feed-atom'               => 'अणु',
+'feed-rss'                => 'आर.एस.एस.',
 'red-link-title'          => '$1 (पृष्ठ उपलब्ध नै  अछि)',
 'sort-descending'         => 'घटैत क्रममे छाँटू',
 'sort-ascending'          => 'बढ़ैत क्रममे छाँटू',
@@ -375,26 +381,28 @@ $1',
 'formerror'            => 'फॉर्म नै पठा सकल',
 'badarticleerror'      => 'ई क्रिया ऐ पन्नापर नै कएल जा सकैए।',
 'cannotdelete'         => 'पन्ना व संचिका "$1" मेटाएल नै जा सकल।',
+'cannotdelete-title'   => 'पन्ना "$1" नै मेटा सकल',
 'badtitle'             => 'खराप शीर्षक',
 'badtitletext'         => 'आग्रह कएल पन्नाक शीर्षक गलत, खाली, वा गलत सम्बन्धित अन्तर-न्हाषा अन्तर विकी शीर्षक छी। ई एक वा बेशी कलाकार युक्त भऽ सकैए जे शीर्षकमे प्रयुक्त नै कएल जा सकैए।',
-'perfcached'           => 'ई दत्तांश उपस्मृतिक आधारपर अछि आ भऽ सकैए जे अद्यतन नै हुअए।',
-'perfcachedts'         => 'ई दत्तांश उपस्मृतिमे अछि, आ एकर अन्तिम परिवर्धन भेल अछि $1 केँ।',
+'perfcached'           => 'ई दत्तांश उपस्मृतिक आधारपर अछि आ भऽ सकैए जे अद्यतन नै हुअए। A maximum of {{PLURAL:$1|one result is|$1 results are}} available in the cache.',
+'perfcachedts'         => 'ई दत्तांश उपस्मृतिमे अछि, आ एकर अन्तिम परिवर्धन भेल अछि $1 केँ। A maximum of {{PLURAL:$4|one result is|$4 results are}} available in the cache.',
 'querypage-no-updates' => 'ऐ पन्नाक नवीनीकरण अखन बन्न अछि।
 एतुक्का दत्तांश अखन नवीकरण नै कएल जाएत।',
 'wrong_wfQuery_params' => 'अमान्य परिमिति ऐ लेल wfQuery()<br />
 क्रिया : $1<br />
 अभ्यर्थना: $2',
 'viewsource'           => 'जड़ि देखू',
-'viewsourcefor'        => '$1 लेल।',
+'viewsource-title'     => '"$1" लेल जड़ि देखू',
 'actionthrottled'      => 'क्रियाकेँ मोकल गेल',
 'actionthrottledtext'  => 'अनपेक्षित संदेश रोका लेल, अहाँकेँ ऐ क्रियाकेँ कम्मे कालमे सीमासँ बेशी बेर करबासँ रोकल गेल अछि, अहाँ ओइ सीमाकेँ पार कऽ गेल छी।
 कृपया किछु काल बाद फेरसँ प्रयास करू।',
 'protectedpagetext'    => 'ई पन्ना सम्पादन रोकबा लेल संरक्षित अछि।',
 'viewsourcetext'       => 'अहाँ ऐ पन्नाक जड़िकेँ देख आ अनुकृत कऽ सकै छी:',
+'viewyourtext'         => "अहाँ '''अहाँक सम्पादन''' केँ देख आ एतए उतारि सकै छी:",
 'protectedinterface'   => 'ई पन्ना तंत्रांश लेल मध्यस्थ पाठक व्यवस्था करैत अछि, आ अपशब्द रोकबाक ब्योंत करैत अछि।',
 'editinginterface'     => "'''चेतौनी''' अहाँ एकटा एहेन पन्नाक सम्पादन कऽ रहल छी जे तंत्रांशक मध्यस्थ पन्नाकेँ पाठ देबा लेल प्रयोग भऽ रहल अछि।
 ऐ पन्नामे परिवर्तन दोसर प्रयोक्ता लेल प्रयोक्ता मध्यस्थक रूपमे परिवर्तन करत।
-अनुवाद लेल [http://translatewiki.net/wiki/Main_Page?setlang=en translatewiki.net] जाउ, मीडियाविकी स्थानीयकरण परियोजनापर।",
+अनुवाद लेल [//translatewiki.net/wiki/Main_Page?setlang=en translatewiki.net] जाउ, मीडियाविकी स्थानीयकरण परियोजनापर।",
 'sqlhidden'            => '(नुकाएल एस.क्यू.एल. अभ्यर्थना)',
 'cascadeprotected'     => 'ऐ पन्नाक सम्पादन सम्भव नै अछि, कारण ई ऐ मे सम्मिलित अछि, {{PLURAL:$1|पन्ना, जे अछि|पन्ना, से सभ अछि}} सुरक्षित अछि "तराउपड़ी" विकल्प खोललाक बाद:
 $2',
@@ -442,8 +450,8 @@ $2',
 'createaccountmail'          => 'ई-पत्र द्वारा',
 'createaccountreason'        => 'कारण:',
 'badretype'                  => 'कूटशब्द जे अहाँ भरलहुँ से मेल नै खाइए।',
-'userexists'                 => 'जे प्रयोक्तानाम अहाँ भरलहुँ से पहिनहियेसँ प्रयोगमे अछि।
-कृपा कऽ दोसर नामक चयन करू।',
+'userexists'                 => 'सम्प्रवेशित प्रयोक्तानाम पहिनहियेसँ प्रयोगमे अछि।
+कृपा कऽ कोनो दोसर नाम चुनू।',
 'loginerror'                 => 'सम्प्रवेश भ्रम',
 'createaccounterror'         => 'खाता नै बना सकल: $1',
 'nocookiesnew'               => 'प्रयोक्ता खाता खुजि गेल, मुदा अहाँ सम्प्रवेशित नै छी।
@@ -475,7 +483,7 @@ $2',
 'mailmypassword'             => 'नूतन कूटशब्द ई-पत्रसँ पठाउ',
 'passwordremindertitle'      => 'नव अस्थायी कूटशब्द {{अन्तर्जाल-पता}} लेल।',
 'passwordremindertext'       => 'कियो (सम्भवतः अहाँ, अनिकेत $1 सँ) एकटा नव कूटशब्दक आग्रह {{अन्तर्जाल}} ($4) लेल केलौं। एकटा अस्थायी कूटशब्द प्रयोक्ता "$2" लेल बनाओल गेल अछि आ "$3" रूपमे स्थापित कएल गेल अछि। जँ ई अहाँक इच्छा अछि तँ अहाँकेँ सम्प्रवेश करए पड़त आ एकटा नव कूटशब्दक चुनाव करए पड़त। 
-अहाँक अस्थायी कूटशब्द खतम भऽ जाएत {{PLURAL:$5|एक दिन|$ ५ दिन}} मे।',
+अहाँक अस्थायी कूटशब्द खतम भऽ जाएत {{PLURAL:$5|एक दिन|$5 दिन}} मे।',
 'noemail'                    => 'प्रयोक्ता "$1" लेल कोनो ई-पत्र संकेत दर्ज नै अछि।',
 'noemailcreate'              => 'अहाँकेँ एकटा मान्य ई-पत्र संकेत देबऽ पड़त।',
 'passwordsent'               => 'एकटा नव कूटशब्द "$1" लेल पंजीकृत ई-पत्र संकेतपर पठाएल गेल अछि।
@@ -493,6 +501,7 @@ $2',
 'emailconfirmlink'           => 'अपन ई-पत्र संकेत सत्यापित करू',
 'invalidemailaddress'        => 'अमान्य प्रारूपक कारण ऐ ई-पत्र संकेतकेँ स्वीकार नै कएल जा सकैए।
 एकटा मान्य ई-पत्र संकेत लिखू वा ओइ स्थानकेँ खाली करू।',
+'cannotchangeemail'          => 'खाता ई-पत्र संकेत ऐ विकीपर बदलल नै जा सकैए।',
 'accountcreated'             => 'खाता खुजि गेल',
 'accountcreatedtext'         => '$1 लेल प्रयोक्ता खाता खुजि गेल।',
 'createaccount-title'        => '{{अन्तर्जाल}} लेल खाता निर्माण',
@@ -515,6 +524,7 @@ $2',
 'resetpass'                 => 'कूटशब्द बदलू',
 'resetpass_announce'        => 'अहाँ अस्थायी ई-पत्र विध्यादेशसँ सम्प्रवेश केने छी।
 सम्प्रवेश सम्पूर्ण करबा लेल, अहाँ एकटा नव कूटशब्द एतए निर्धारित करू:',
+'resetpass_text'            => '<!-- पाठ एतऽ लिखू -->',
 'resetpass_header'          => 'खाता कूटशब्द बदलू',
 'oldpassword'               => 'पुरान कूटशब्द',
 'newpassword'               => 'नव कूटशब्द',
@@ -531,27 +541,32 @@ $2',
 'resetpass-temp-password'   => 'तात्कालिक कूटशब्द',
 
 # Special:PasswordReset
-'passwordreset'                => 'कूटशब्द फेरसँ बनाउ',
-'passwordreset-text'           => 'ई-पत्र द्वारा अपन खाता विवरणक स्मरण प्राप्त करबा लेल ऐ फॉर्मकेँ भरू।',
-'passwordreset-legend'         => 'कूटशब्द फेरसँ बनाउ',
-'passwordreset-disabled'       => 'कूटशब्द फेरसँ बनाएब ऐ विकीपर अक्षम कएल अछि।',
-'passwordreset-pretext'        => '{{PLURAL:$1||नीचाँक दत्तांशक एकटा भागक प्रविष्टि करू}}',
-'passwordreset-username'       => 'प्रयोक्तानाम',
-'passwordreset-email'          => 'ई-पत्र संकेत',
-'passwordreset-emailtitle'     => 'लेखा विवरण {{अन्तर्जालक नाम}}',
-'passwordreset-emailtext-ip'   => 'कियो (सम्भवतः अहाँ, अन्तर्जाल सेवा कल्पक $1 सँ) अपन लेखा विवरणक पुनःस्मरणक लेल अनुरोध केलहुँ ऐ लेल {{ अन्तर्जालक नाम}} ($4). ई प्रयोक्ता {{PLURAL:$3|लेखा अछि| लेखा सभ अछि}}
+'passwordreset'                    => 'कूटशब्द फेरसँ बनाउ',
+'passwordreset-text'               => 'ई-पत्र द्वारा अपन खाता विवरणक स्मरण प्राप्त करबा लेल ऐ फॉर्मकेँ भरू।',
+'passwordreset-legend'             => 'कूटशब्द फेरसँ बनाउ',
+'passwordreset-disabled'           => 'कूटशब्द फेरसँ बनाएब ऐ विकीपर अक्षम कएल अछि।',
+'passwordreset-pretext'            => '{{PLURAL:$1||नीचाँक दत्तांशक एकटा भागक प्रविष्टि करू}}',
+'passwordreset-username'           => 'प्रयोक्तानाम',
+'passwordreset-domain'             => 'क्षेत्र:',
+'passwordreset-capture'            => 'परिणाम ई-पत्र देखू?',
+'passwordreset-capture-help'       => 'जँ अहाँ ऐ बक्शाकेँ देखै छी, ई-पत्र (तात्कालिक कूटशब्दक संग) अहाँकेँ देखाएल जाएत आ संगे प्रयोक्ताकेँ पठाएल जाएत।',
+'passwordreset-email'              => 'ई-पत्र संकेत',
+'passwordreset-emailtitle'         => 'लेखा विवरण {{अन्तर्जालक नाम}}',
+'passwordreset-emailtext-ip'       => 'कियो (सम्भवतः अहाँ, अन्तर्जाल सेवा कल्पक $1 सँ) अपन लेखा विवरणक पुनःस्मरणक लेल अनुरोध केलहुँ ऐ लेल {{ अन्तर्जालक नाम}} ($4). ई प्रयोक्ता {{PLURAL:$3|लेखा अछि| लेखा सभ अछि}}
 ऐ ई-पत्र संकेतसँ सम्बन्धित:
 
 $2
 
-{{PLURAL:$3|ई अल्पकालक कूटशब्द| ई सभ अल्पकालक कूटशब्द}} खतम भऽ जाएत {{PLURAL:$5|एक दिन|$ पाँच दिन}}.
+{{PLURAL:$3|ई अल्पकालक कूटशब्द| ई सभ अल्पकालक कूटशब्द}} खतम भऽ जाएत {{PLURAL:$5|एक दिन|$5 पाँच दिन}}.
 अहाँ सम्प्रवेश करू आ एकटा नव कूटशब्द चुनू।. जौं कियो आन ई आग्रह केने अछि, वा अहाँकेँ अपन पुरान कूटशब्द मोन पड़ि गेल अछि , आ आब एकरा बदलबाक इच्छा नै राखै छी तँ अहाँ ऐ संदेशकेँ बिसरि जाउ आ अपन पुरान कूटशब्दक प्रयोग करैत रहू।',
-'passwordreset-emailtext-user' => 'प्रयोक्ता $1 {{अन्तर्जाल}} पर अहाँक खाता विवरणक {{SITENAME}} लेल फेरसँ ($4) आग्रह केने छथि। ई प्रयोक्ता {{PLURAL:$3|खाता अछि|खाता सभ अछि}} ऐ ई-पत्र संकेतसँ जुड़ल: $2
+'passwordreset-emailtext-user'     => 'प्रयोक्ता $1 {{अन्तर्जाल}} पर अहाँक खाता विवरणक {{SITENAME}} लेल फेरसँ ($4) आग्रह केने छथि। ई प्रयोक्ता {{PLURAL:$3|खाता अछि|खाता सभ अछि}} ऐ ई-पत्र संकेतसँ जुड़ल: $2
 {{PLURAL:$3| ई अस्थायी कूटशब्द|ई सभ अस्थायी कूटशब्द}} खतम भऽ जाएत {{PLURAL:$5|एक दिन|$5 दिन}} मे।
 अहाँ सम्प्रवेश करू आ एकटा नव कूटशब्द आब चुनू। जँ कियो दोसर ई आग्रह केने छथि, वा जँ अहाँकेँ अपन मूल कूटशब्द मोन पड़ि गेल अछि, आ अहाँ आब ओइ कूटशब्दकेँ नै बदलऽ चाहै छी, अहाँ ऐ संदेशकेँ बिसरि सकै छी आ अपन पुरान कूटशब्दक प्रयोग जारी राखि सकै छी।',
-'passwordreset-emailelement'   => 'प्रयोक्ता: $1
+'passwordreset-emailelement'       => 'प्रयोक्ता: $1
 अस्थायी कूटशब्द: $2',
-'passwordreset-emailsent'      => 'एकटा ई-पत्र मोन पाड़बा लेल पठाओल गेल अछि।',
+'passwordreset-emailsent'          => 'एकटा ई-पत्र मोन पाड़बा लेल पठाओल गेल अछि।',
+'passwordreset-emailsent-capture'  => 'एकटा स्मरण ई-पत्र पठाएल गेल अछि, जे नीचाँ देखाएल अछि।',
+'passwordreset-emailerror-capture' => 'एकटा स्मरण ई-पत्र बनाएल गेल अछि, जे नीचाँ देखाएल अछि, मुदा प्र्योक्ताकेँ एकरा पठेबाक प्रयास विफल भेल: $1',
 
 # Special:ChangeEmail
 'changeemail'          => 'ई-पत्र संकेत बदलू',
@@ -577,7 +592,9 @@ $2
 'headline_tip'    => 'स्तर 2 मुख्यपंक्ति',
 'nowiki_sample'   => 'फॉर्मेट विहीन लेख एतय',
 'nowiki_tip'      => 'विकी फॉरमेटिंगकेँ छोड़ू',
+'image_sample'    => 'उदाहरण.jpg',
 'image_tip'       => 'समाहित चित्र',
+'media_sample'    => 'उदाहरण.ogg',
 'media_tip'       => 'मीडिया फाइल लिंक',
 'sig_tip'         => 'अहाँक हस्ताक्षर समयक मोहरक संग',
 'hr_tip'          => 'अक्षांशीय पंक्ति (अल्प उपयोग)',
@@ -629,15 +646,12 @@ $2
 अहाँक वर्तमान अनिकेत अछि $3, आ प्रतिबन्ध संख्या अछि # $5 ।
 ऐ सभ विवरणक उल्लेख अहाँ अपन कोनो कएल जाइबला प्रश्नमे करू।',
 'blockednoreason'                  => 'कोनो कारण देल नै अछि।',
-'blockedoriginalsource'            => "'''$1''' क कारण नीचाँ देल अछि।",
-'blockededitsource'                => "'''अहाँक सम्पादन सभ''' क पाठ '''$1''' क सन्दर्भमे नीचाँ देल अछि:",
-'whitelistedittitle'               => 'सम्पादन लेल सम्प्रवेश आवश्यक अछि',
 'whitelistedittext'                => 'अहाँकेँ $1पन्ना सम्पादन करबा लेल',
 'confirmedittext'                  => 'पन्ना सभक सम्पादन केलासँ पूर्व अहाँ अपन ई-पत्र संकेतकेँ सत्यापित करू।
 कृपा कऽ अपन ई-पत्र पता दर्ज करू आ सत्यापित करू ऐ सँ [[Special:Preferences|प्रयोक्ताक पसिन्न सभ]]',
 'nosuchsectiontitle'               => 'संवर्ग नै ताकि सकल',
 'nosuchsectiontext'                => 'अहाँ एहन संवर्गकेँ सम्पादित करबाक प्रयास केलहुँ जे अछि नै।
-अहाँ जखन ई पना देख रहल छलहुँ तखन ई मेटा देल गेल हएत वा दोसर ठाम हटा देल गेल हएत।',
+अहाँ जखन ई पन्ना देख रहल छलहुँ तखन ई मेटा देल गेल हएत वा दोसर ठाम हटा देल गेल हएत।',
 'loginreqtitle'                    => 'सम्प्रवेश आवश्यक',
 'loginreqlink'                     => 'सम्प्रवेश',
 'loginreqpagetext'                 => 'अहाँ निश्चयरूपेँ $1 दोसर पन्ना देखबाक लेल।',
@@ -737,6 +751,7 @@ $2
 'template-protected'               => '(सुरक्षित)',
 'template-semiprotected'           => '(अर्ध-रक्षित)',
 'hiddencategories'                 => 'ई पन्ना सदस्य अछि {{PLURAL:$1|1 नुकाएल संवर्ग|$1 नुकाएल संवर्ग सभ}}:',
+'edittools-upload'                 => '-',
 'nocreatetitle'                    => 'पन्ना निर्माण सीमित',
 'nocreatetext'                     => '{{अन्तर्जाल}} नव पन्ना निर्माणक क्षमताकेँ सीमित कऽ देने अछि।
 अहाँ आपस जा सकै छी आ कोनो पन्नाकेँ सम्पादित कऽ सकै छी, वा [[Special:UserLogin|log in or create an account]]',
@@ -827,29 +842,29 @@ $3 द्वारा देल कारण अछि ''$2''",
 'rev-deleted-user-contribs'   => '[प्रयोक्तानाम वा अनिकेत हटाएल गेल- योगदानमे नुकाएल सम्पादित करू]',
 'rev-deleted-text-permission' => "ऐ पन्नाक संशोधन '''मेटा देल गेल'''।
 वर्णन देखि सकै छी [{{fullurl:{{#Special:Log}}/delete|page={{FULLPAGENAMEE}}}} deletion log] मे।",
-'rev-deleted-text-unhide'     => "ई पन्ना सम्पादन '''मेटाएल''' गेल।
+'rev-deleted-text-unhide'     => "ऐ पन्नाक सम्पादन '''मेटाएल''' गेल।
 वर्णन ताकि सकै छी [{{fullurl:{{#Special:Log}}/delete|page={{FULLPAGENAMEE}}}} deletion log] मे।
-संचालकक रूपमे अहाँ अखनो [$1 ई संशोधन देखू] जँ अहाँ आगाँ बढ़ऽ चाहै छी।",
-'rev-suppressed-text-unhide'  => "'''ई पन्ना संशोधन '''दबाएल''' गेल।
+अहाँ अखनो [$1 ई संशोधन देखू] जँ अहाँ आगाँ बढ़ऽ चाहै छी।",
+'rev-suppressed-text-unhide'  => "ई पन्ना संशोधन '''दबाएल''' गेल।
 वर्णन ताकि सकै छी [{{fullurl:{{#Special:Log}}/suppress|page={{FULLPAGENAMEE}}}} suppression log] मे।
-संचालकक रूपमे अहाँ अखनो [$1 ई संशोधन देखू] जँ अहाँ आगाँ बढ़ऽ चाहै छी।",
+अहाँ अखनो [$1 ई संशोधन देखू] जँ अहाँ आगाँ बढ़ऽ चाहै छी।",
 'rev-deleted-text-view'       => "ई पन्ना संशोधन '''मेटाएल''' गेल।
-संचालकक रूपमे अहाँ एकरा देख सकै छी; वर्ण भेट सकैए [{{fullurl:{{#Special:Log}}/delete|page={{FULLPAGENAMEE}}}} deletion log] मे।",
+अहाँ एकरा देख सकै छी; वर्ण भेट सकैए [{{fullurl:{{#Special:Log}}/delete|page={{FULLPAGENAMEE}}}} deletion log] मे।",
 'rev-suppressed-text-view'    => "ई पन्ना संशोधन '''दबाएल''' गेल।
-संचालकक रूपमे अहाँ एकरा देख सकै छी; वर्ण भेट सकैए [{{fullurl:{{#Special:Log}}/suppress|page={{FULLPAGENAMEE}}}} suppression log]मे।",
+अहाँ एकरा देख सकै छी; वर्ण भेट सकैए [{{fullurl:{{#Special:Log}}/suppress|page={{FULLPAGENAMEE}}}} suppression log]मे।",
 'rev-deleted-no-diff'         => "ऐ पन्नाक तुलना निर्धारक अहाँ नै देख सकै छी कारण कोनो एकटा संशोधन '''मेटा देल गेल''' अछि।
 वर्णन देखि सकै छी [{{fullurl:{{#Special:Log}}/delete|page={{FULLPAGENAMEE}}}} deletion log] मे।",
 'rev-suppressed-no-diff'      => "अहाँ तुलना निर्धारक नै देख सकै छी कारण कोनो एकटा संशोधन '''मेटाएल''' गेल अछि।",
 'rev-deleted-unhide-diff'     => "ऐ तुलना निर्धारकक कोनो एकटा संशोधन '''मेटाएल''' गेल अछि।
 वर्णन ताकि सकै छी [{{fullurl:{{#Special:Log}}/delete|page={{FULLPAGENAMEE}}}} deletion log] मे।
-संचालकक रूपमे अहाँ अखनो [$1 ई तुलना निर्धारक देखू] जँ अहाँ आगाँ बढ़ऽ चाहै छी।",
+अहाँ अखनो [$1 ई तुलना निर्धारक देखू] जँ अहाँ आगाँ बढ़ऽ चाहै छी।",
 'rev-suppressed-unhide-diff'  => "ऐ तुलना निर्धारकक कोनो एकटा संशोधन '''दबाएल''' गेल अछि।
 वर्णन ताकि सकै छी [{{fullurl:{{#Special:Log}}/suppress|page={{FULLPAGENAMEE}}}} suppression log] मे।
-संचालकक रूपमे अहाँ अखनो [$1 ई तुलना निर्धारक देखू] जँ अहाँ आगाँ बढ़ऽ चाहै छी।",
+अहाँ अखनो [$1 ई तुलना निर्धारक देखू] जँ अहाँ आगाँ बढ़ऽ चाहै छी।",
 'rev-deleted-diff-view'       => "ई पन्ना संशोधनऐ तुलना निर्धारकक कोनो एकटा संशोधन '''मेटाएल''' गेल अछि।
-संचालकक रूपमे अहाँ एकरा देख सकै छी; वर्ण भेट सकैए [{{fullurl:{{#Special:Log}}/delete|page={{FULLPAGENAMEE}}}} deletion log] मे।",
+अहाँ एकरा देख सकै छी; वर्ण भेट सकैए [{{fullurl:{{#Special:Log}}/delete|page={{FULLPAGENAMEE}}}} deletion log] मे।",
 'rev-suppressed-diff-view'    => "ऐ तुलना निर्धारकक कोनो एकटा संशोधन '''दबाएल''' गेल अछि।
-संचालकक रूपमे अहाँ एकरा देख सकै छी; वर्णन भेट सकैए [{{fullurl:{{#Special:Log}}/suppress|page={{FULLPAGENAMEE}}}} suppression log]मे।",
+अहाँ एकरा देख सकै छी; वर्णन भेट सकैए [{{fullurl:{{#Special:Log}}/suppress|page={{FULLPAGENAMEE}}}} suppression log]मे।",
 'rev-delundel'                => 'देखाउ/ नुकाउ',
 'rev-showdeleted'             => 'देखाउ',
 'revisiondelete'              => 'मेटाउ / संशोधन फेरसँ आनू',
@@ -885,8 +900,6 @@ $3 द्वारा देल कारण अछि ''$2''",
 'revdelete-unsuppress'        => 'पुनर्स्थापित संशोधल लेल प्रतिबन्ध हटाउ',
 'revdelete-log'               => 'कारण:',
 'revdelete-submit'            => 'किछु चुनलपर लागू करू{{PLURAL:$1|संशोधन|संशोधन सभ}}',
-'revdelete-logentry'          => '"[[$1]]"क बदलल संशोधन दृश्यता',
-'logdelete-logentry'          => '"[[$1]]"क बदलल घटना दृश्यता',
 'revdelete-success'           => "'''संशोधन दृश्यता सफलतापूर्वक अद्यतन कएल गेल।'''",
 'revdelete-failure'           => "$1'''संशोधन दृश्यता अद्यतन नै कएल जा सकल:'''",
 'logdelete-success'           => "'''वृत्तलेख दृश्यता सफलतासँ निर्धारित भेल।'''",
@@ -896,15 +909,6 @@ $3 द्वारा देल कारण अछि ''$2''",
 'revdel-restore-visible'      => 'देखाइ दैत संशोधन सभ',
 'pagehist'                    => 'पन्नाक इतिहास',
 'deletedhist'                 => 'मेटाएल इतिहास',
-'revdelete-content'           => 'विषय सूची',
-'revdelete-summary'           => 'सम्पादन सारांश',
-'revdelete-uname'             => 'प्रयोक्तानाम',
-'revdelete-restricted'        => 'संचालक लेल प्रायोगिक प्रतिबन्ध',
-'revdelete-unrestricted'      => 'संचालक लेल हटाओल प्रतिबन्ध',
-'revdelete-hid'               => 'नुकाउ $1',
-'revdelete-unhid'             => 'आनू $1',
-'revdelete-log-message'       => '$2 लेल $1{{PLURAL:$2|संशोधन|संशोधन सभ}}',
-'logdelete-log-message'       => '$2 लेल $1 {{PLURAL:$2|घटना|घटना सभ}}',
 'revdelete-hide-current'      => 'तिथि $2, $1 क अनुक्रमकेँ नुकेबा काल भ्रम: ई वर्तमान संशोधन छी।
 ई नुकाएल नै जा सकैए।',
 'revdelete-show-no-access'    => 'तिथि $2, $1क बौस्तुक देखेबामे भ्रम: ई बौस्तु "प्रतिबन्धित" चिन्हित कएल गेल अछि।',
@@ -993,7 +997,6 @@ $3 द्वारा देल कारण अछि ''$2''",
 'searchmenu-legend'                => 'खोज विकल्प',
 'searchmenu-exists'                => "'''ऐ विकीपर एकटा पन्ना अछि \"[[:\$1]]\" नामसँ।'''",
 'searchmenu-new'                   => "''' पन्ना निर्माण \"[[:\$1]]\" ऐ विकीपर !'''",
-'searchmenu-new-nocreate'          => '"$1" एकटा अमान्य पन्ना-नाम अछि वा अहाँ द्वारा निर्माणक योग्य नै अछि।',
 'searchhelp-url'                   => 'Help: विषय सूची',
 'searchmenu-prefix'                => '[[Special:PrefixIndex/$1|ऐ उपसर्गक पन्ना सभकेँ देखू]]',
 'searchprofile-articles'           => 'अनुक्रम पन्ना सभ',
@@ -1048,7 +1051,7 @@ $3 द्वारा देल कारण अछि ''$2''",
 'qbsettings-fixedright'     => 'दहिन दिस सटल',
 'qbsettings-floatingleft'   => 'वाम कात घुमैत',
 'qbsettings-floatingright'  => 'दहिन कात घुमैत',
-'qbsettings-directionality' => 'कीलित, अहाँक लिपि आ भाषाक दिशा-निर्देशपर आधारित',
+'qbsettings-directionality' => 'कीलित, अहाँक भाषाक लिपि दिशा-निर्देशपर आधारित',
 
 # Preferences page
 'preferences'                   => 'विकल्प',
@@ -1067,7 +1070,7 @@ $3 द्वारा देल कारण अछि ''$2''",
 'prefs-rc'                      => 'हालक परिवर्तन',
 'prefs-watchlist'               => 'साकांक्ष-सूची',
 'prefs-watchlist-days'          => 'साकांक्ष-सूचीमे एतेक दिन देखाएल:',
-'prefs-watchlist-days-max'      => 'बेसीसँ बेसी ७ दिन',
+'prefs-watchlist-days-max'      => 'Maximum $1 {{PLURAL:$1|day|days}}',
 'prefs-watchlist-edits'         => 'बढ़ाएल साकांक्ष सूचीमे अधिकतम परिवर्तन देखाएब:',
 'prefs-watchlist-edits-max'     => 'बेसीसँ बेसी:१०००',
 'prefs-watchlist-token'         => 'साकांक्ष-सूची खेप:',
@@ -1130,9 +1133,13 @@ $3 द्वारा देल कारण अछि ''$2''",
 'username'                      => 'प्रयोक्तानाम:',
 'uid'                           => 'प्रयोक्ताक पहिचान:',
 'prefs-memberingroups'          => '{{PLURAL:$1|संवर्ग|संवर्ग सभ}}:एकर सदस्य',
+'prefs-memberingroups-type'     => '$1',
 'prefs-registration'            => 'पंजीकरणक समए:',
+'prefs-registration-date-time'  => '$1',
 'yourrealname'                  => 'असली नाम:',
 'yourlanguage'                  => 'भाषा:',
+'yourvariant'                   => 'भाषा सामिग्री प्रकार:',
+'prefs-help-variant'            => 'अहाँक मोनमाफिक प्रकार वा भाषा-विशिष्टता ऐ विकीकेँ देखेबा लेल।',
 'yournick'                      => 'नव पहिचान:',
 'prefs-help-signature'          => 'वार्ता पन्ना सभपर टिप्पणी "<nowiki>~~~~</nowiki>" द्वारा हस्ताक्षरित हुअए जे अहाँक हस्ताक्षर आ समय-संकेतसँ मेल खाए।',
 'badsig'                        => 'अमान्य प्रारम्भिक पहिचान।
@@ -1172,26 +1179,27 @@ $3 द्वारा देल कारण अछि ''$2''",
 'email-address-validity-invalid' => 'एकटा मान्य ई-पत्र संकेत लिखू',
 
 # User rights
-'userrights'                   => 'प्रयोक्ता अधिकारक प्रबन्धन',
-'userrights-lookup-user'       => 'प्रयोक्ता संवर्ग सभक प्रबन्ध करू',
-'userrights-user-editname'     => 'एकटा प्रयोक्तानाम लिखू:',
-'editusergroup'                => 'प्रयोक्ता संवर्ग सभक सम्पादन करू',
-'editinguser'                  => "'''[[User:$1|$1]]''' क प्रयोक्ता अधिकार बदलल जा रहल अछि '''[[User:$1|$1]]''' ([[User talk:$1|{{int:talkpagelinktext}}]]{{int:pipe-separator}}[[Special:Contributions/$1|{{int:contribslink}}]])",
-'userrights-editusergroup'     => 'प्रयोक्ता संवर्ग सभक सम्पादन करू',
-'saveusergroups'               => 'प्रयोक्ता संवर्ग सभकेँ सुरक्षित करू',
-'userrights-groupsmember'      => 'क सदस्य:',
-'userrights-groupsmember-auto' => 'क जानल सदस्य:',
-'userrights-groups-help'       => 'अहाँ ऐ प्रयोक्ताक वर्गकेँ बदलि सकै छी:
+'userrights'                     => 'प्रयोक्ता अधिकारक प्रबन्धन',
+'userrights-lookup-user'         => 'प्रयोक्ता संवर्ग सभक प्रबन्ध करू',
+'userrights-user-editname'       => 'एकटा प्रयोक्तानाम लिखू:',
+'editusergroup'                  => 'प्रयोक्ता संवर्ग सभक सम्पादन करू',
+'editinguser'                    => "प्रयोक्ताक प्रयोक्ता अधिकार बदलब '''[[User:$1|$1]]''' $2",
+'userrights-editusergroup'       => 'प्रयोक्ता संवर्ग सभक सम्पादन करू',
+'saveusergroups'                 => 'प्रयोक्ता संवर्ग सभकेँ सुरक्षित करू',
+'userrights-groupsmember'        => 'क सदस्य:',
+'userrights-groupsmember-auto'   => 'क जानल सदस्य:',
+'userrights-groups-help'         => 'अहाँ ऐ प्रयोक्ताक वर्गकेँ बदलि सकै छी:
 * एकटा निशान लगाएल बक्सा माने प्रयोक्ता ओइ वर्गमे अछि।
 * एकटा बिन निशान लगाएल माने प्रयोक्ता ओइ वर्गमे नै अछि।
 * ई * देखबैए जे अहाँ वर्गकेँ एक बेर देलाक बाद हटा नै सकै छी, आ एकर उलट सेहो ठीक अछि।',
-'userrights-reason'            => 'कारण:',
-'userrights-no-interwiki'      => 'अहाँकेँ दोसर विकीपर प्रयोक्ता अधिकारकेँ बदलबाक अधिकार नै अछि।',
-'userrights-nodatabase'        => 'दत्तनिधि $1 नै अछि वा स्थानीय नै अछि।',
-'userrights-nologin'           => 'अहाँ [[Special:UserLogin|सम्प्रवेश]] प्रयोक्ता अधिकार देबा लेल संचालक खातासँ सम्प्रवेश करू।',
-'userrights-notallowed'        => 'अहाँक खाता दोसराकेँ प्रयोक्ता अधिकार नै दै छै।',
-'userrights-changeable-col'    => 'वर्ग जे अहाँ बदलि सकै छी',
-'userrights-unchangeable-col'  => 'वर्ग जे अहाँ नै बदलि सकै छी',
+'userrights-reason'              => 'कारण:',
+'userrights-no-interwiki'        => 'अहाँकेँ दोसर विकीपर प्रयोक्ता अधिकारकेँ बदलबाक अधिकार नै अछि।',
+'userrights-nodatabase'          => 'दत्तनिधि $1 नै अछि वा स्थानीय नै अछि।',
+'userrights-nologin'             => 'अहाँ [[Special:UserLogin|सम्प्रवेश]] प्रयोक्ता अधिकार देबा लेल संचालक खातासँ सम्प्रवेश करू।',
+'userrights-notallowed'          => 'अहाँक खाता दोसराक प्रयोक्ता अधिकारमे कमी बेशी नै करैत अछि।',
+'userrights-changeable-col'      => 'वर्ग जे अहाँ बदलि सकै छी',
+'userrights-unchangeable-col'    => 'वर्ग जे अहाँ नै बदलि सकै छी',
+'userrights-irreversible-marker' => '$1*',
 
 # Groups
 'group'               => 'वर्ग:',
@@ -1203,12 +1211,12 @@ $3 द्वारा देल कारण अछि ''$2''",
 'group-suppress'      => 'नजरिपर नै आएल',
 'group-all'           => '(सभ)',
 
-'group-user-member'          => 'प्रयोक्ता',
-'group-autoconfirmed-member' => 'स्वतःअनुमोदित प्रयोक्ता',
-'group-bot-member'           => 'स्वचालक',
-'group-sysop-member'         => 'माइनजन',
-'group-bureaucrat-member'    => 'अधिकारी',
-'group-suppress-member'      => 'नजरिपर नै आएल',
+'group-user-member'          => '{{लिंग:$1|प्रयोक्ता}}',
+'group-autoconfirmed-member' => '{{लिंग:$1|स्वतःअनुमोदित प्रयोक्ता}}',
+'group-bot-member'           => '{{लिंग:$1|स्वचालक}}',
+'group-sysop-member'         => '{{लिंग:$1|माइनजन}}',
+'group-bureaucrat-member'    => '{{लिंग:$1|अधिकारी}}',
+'group-suppress-member'      => '{{लिंग:$1|नजरिपर नै आएल}}',
 
 'grouppage-user'          => '{{ns:project}}:प्रयोक्ता सभ',
 'grouppage-autoconfirmed' => '{{ns:project}}:स्वतःअनुमोदित प्रयोक्ता सभ',
@@ -1270,14 +1278,13 @@ $3 द्वारा देल कारण अछि ''$2''",
 'right-autopatrol'            => 'अपन सम्पादनकेँ स्वचालित रूपेँ संचालित देखाउ',
 'right-patrolmarks'           => 'हालक परिवर्तनमे संचालन चेन्ह देखू',
 'right-unwatchedpages'        => 'बिना संचालित पन्ना सभक सूचीकेँ देखू',
-'right-trackback'             => 'प्रतिक्रिया दिअ',
 'right-mergehistory'          => 'पन्नाक इतिहास सभकेँ मिज्झर करू',
 'right-userrights'            => 'सभटा प्रयोक्ता अधिकारकेँ सम्पादित करू',
 'right-userrights-interwiki'  => 'दोसर विकीपर प्रयोक्ताक प्रयोक्ता अधिकारक सम्पादन करू',
 'right-siteadmin'             => 'दत्तनिधिकेँ प्रतिबन्धित करू आ फेर प्रतिबन्ध हटाउ',
-'right-reset-passwords'       => 'दोसर प्रयोक्ताक कूटशब्द फेरसँ बनाउ',
 'right-override-export-depth' => '५ परत धरि जा  पन्ना सभ निर्यात, जइमे लागिबला पन्ना सभ शामिल अछि, करू।',
 'right-sendemail'             => 'ई-पत्र दोसर प्रयोक्ता लोकनिकेँ पठाउ',
+'right-passwordreset'         => 'कूटशब्द पुनर्निर्धारण ई-पत्र देखू',
 
 # User rights log
 'rightslog'                  => 'प्रयोक्ता अधिकार वृत्तलेख',
@@ -1311,16 +1318,17 @@ $3 द्वारा देल कारण अछि ''$2''",
 'action-suppressionlog'       => 'ऐ व्यक्तिगत वृत्तलेखकेँ देखू',
 'action-block'                => 'ऐ प्रयोक्ताकेँ सम्पादनसँ रोकू',
 'action-protect'              => 'ऐ पन्नाक सुरक्षा स्तर बदलू',
+'action-rollback'             => 'कृपा कऽ अन्तिम प्रयोक्ताक सम्पादनकेँ प्रत्यावर्तित करू जे एक खास पन्नाकेँ सम्पादित केलन्हि',
 'action-import'               => 'ऐ पन्नाकेँ दोसर विकीसँ आनू',
 'action-importupload'         => 'ऐ पन्नाकेँ संचिका उपारोपणसँ आनू',
 'action-patrol'               => 'दोसराक सम्पादनकेँ संचालित देखाउ',
 'action-autopatrol'           => 'अपन सम्पादनकेँ संचालित देखाउ',
 'action-unwatchedpages'       => 'बिना संचालित पन्ना सभक सूचीकेँ देखू',
-'action-trackback'            => 'प्रतिक्रिया दिअ',
 'action-mergehistory'         => 'पन्नाक इतिहासकेँ मिज्झर करू',
 'action-userrights'           => 'सभटा प्रयोक्ता अधिकारकेँ सम्पादित करू',
 'action-userrights-interwiki' => 'दोसर विकीपर प्रयोक्ताक प्रयोक्ता अधिकारक सम्पादन करू',
 'action-siteadmin'            => 'दत्तनिधिकेँ प्रतिबन्धित करू आ फेर प्रतिबन्ध हटाउ',
+'action-sendemail'            => 'ई-पत्र पठाउ',
 
 # Recent changes
 'nchanges'                          => '$1 {{PLURAL:$1|परिवर्त्तन|परिवर्त्तन}}',
@@ -1349,9 +1357,11 @@ $3 द्वारा देल कारण अछि ''$2''",
 'minoreditletter'                   => 'अ',
 'newpageletter'                     => 'न',
 'boteditletter'                     => 'ब',
+'unpatrolledletter'                 => '!',
 'number_of_watching_users_pageview' => '[$1 देखै अछि {{PLURAL:$1|प्रयोक्ता|प्रयोक्ता सभ}}]',
 'rc_categories'                     => 'संवर्ग सीमित ("|" सँ हटाउ)',
 'rc_categories_any'                 => 'कोनो',
+'rc-change-size'                    => '$1',
 'newsectionsummary'                 => '/* $1 */ नव संवर्ग',
 'rc-enhanced-expand'                => 'वर्णन देखाउ (जावास्क्रिप्ट चाही)',
 'rc-enhanced-hide'                  => 'वर्णन नुकाउ',
@@ -1403,6 +1413,7 @@ $3 द्वारा देल कारण अछि ''$2''",
 'minlength1'                  => 'संचिका नाम सभ एक वर्णसँ कम नै हुअए',
 'illegalfilename'             => '"$1" संचिकानाममे वर्ण अछि जे पन्ना शीर्षक लेल मान्य नै अछि।
 कृपा कऽ संचिकाक नाम बदलू आ फेरसँ उपारोपित करू।',
+'filename-toolong'            => 'संचिकानाम 240 बाइटसँ पैघ नै भऽ सकैए।',
 'badfilename'                 => 'संचिकानाम बदलि कऽ "$1" कएल गेल।',
 'filetype-mime-mismatch'      => '".$1" संचिका विस्तार माइम प्रकारक संचिका ($2) सँ मेल नै खाइए।',
 'filetype-badmime'            => 'माइम प्रकार "$1" सन संचिका उपारोपण लेल मान्य नै अछि।',
@@ -1520,13 +1531,14 @@ $1',
 'uploadstash-badtoken' => 'ओइ कार्यक सम्पादन असफल रहल, प्रायः अहाँक सम्पादन योग्यता खतम भऽ गेल अछि। फेरसँ प्रयास करू।',
 'uploadstash-errclear' => 'संचिका सभकेँ खतम करब असफल रहल।',
 'uploadstash-refresh'  => 'संचिका सभक सूचीकेँ ताजा करू।',
+'invalid-chunk-offset' => 'एकट्ठे अमान्य बौस्तु',
 
 # img_auth script messages
 'img-auth-accessdenied'     => 'प्रवेश प्रतिबन्धित',
 'img-auth-nopathinfo'       => 'बाटक जानकारी नै अछि।
 अहाँक वितरक ऐ सूचनाकेँ प्रसारित नै कऽ सकत।
 ई सी.जी.आइ.आधारित अछि आ चित्र-समर्थन केँ समर्थन नै दऽ सकत।
-देखू http://www.mediawiki.org/wiki/Manual:Image_Authorization ।',
+[https://www.mediawiki.org/wiki/Manual:Image_Authorization देखू image authorization.]',
 'img-auth-notindir'         => 'आग्रह कएल रस्ता विन्यासित उपारोपित निर्देशिकामे नै अछि।',
 'img-auth-badtitle'         => '"$1" लेल कोनो मान्य शीर्षक नै बना सकल।',
 'img-auth-nologinnWL'       => 'अहाँ सम्प्रवेशित नै छी आ "$1" स्वीकृत सूचीमे नै अछि।',
@@ -1568,8 +1580,7 @@ $1',
 
 # Special:ListFiles
 'listfiles-summary'     => 'ई विशिष्ट पन्ना सभटा उपारोपित संचिका देखबैए।
-पूर्वन्यस्त रूपेँ अन्तिम उपारोपित संचिका सूचीक शीर्षपर अछि।
-स्तम्भ शीर्षपर एकटा क्लिक छटनीमे परिवर्तन करैए।',
+प्रयोक्ता द्वारा चुनलापर अन्तिम उपारोपित संचिका देखबैत अछि।',
 'listfiles_search_for'  => 'ऐ दृश्य-श्रव्य नामले ताकू:',
 'imgfile'               => 'संचिका',
 'listfiles'             => 'संचिका सूची',
@@ -1582,41 +1593,42 @@ $1',
 'listfiles_count'       => 'संस्करण सभ',
 
 # File description page
-'file-anchor-link'          => 'संचिका',
-'filehist'                  => 'फाइल इतिहास',
-'filehist-help'             => 'तखुनका तिथि/ समए पर क्लिक करू जखुनका फाइल देखबाक अछि',
-'filehist-deleteall'        => 'सभटाकेँ मेटाउ',
-'filehist-deleteone'        => 'मेटाउ',
-'filehist-revert'           => 'फेरसँ वएह',
-'filehist-current'          => 'अखुनका',
-'filehist-datetime'         => 'तिथि/ समए',
-'filehist-thumb'            => 'लघुचित्र',
-'filehist-thumbtext'        => 'तखुनका लघुचित्र $1',
-'filehist-nothumb'          => 'कोनो लघुचित्र नै',
-'filehist-user'             => 'प्रयोक्ता',
-'filehist-dimensions'       => 'बीम',
-'filehist-filesize'         => 'संचिका आकार',
-'filehist-comment'          => 'समीक्षा',
-'filehist-missing'          => 'संचिका हेराएल',
-'imagelinks'                => 'फाइलक लिंक',
-'linkstoimage'              => 'ऐ {{PLURAL:$1|पन्नाक लागि |$1 पन्नाक लागि}} ऐ फाइलसँ:',
-'linkstoimage-more'         => '$1 सँ बेसी {{PLURAL:$1|page links|पन्ना सभक लागि}} ऐ संचिकाक।
+'file-anchor-link'                  => 'संचिका',
+'filehist'                          => 'फाइल इतिहास',
+'filehist-help'                     => 'तखुनका तिथि/ समए पर क्लिक करू जखुनका फाइल देखबाक अछि',
+'filehist-deleteall'                => 'सभटाकेँ मेटाउ',
+'filehist-deleteone'                => 'मेटाउ',
+'filehist-revert'                   => 'फेरसँ वएह',
+'filehist-current'                  => 'अखुनका',
+'filehist-datetime'                 => 'तिथि/ समए',
+'filehist-thumb'                    => 'लघुचित्र',
+'filehist-thumbtext'                => 'तखुनका लघुचित्र $1',
+'filehist-nothumb'                  => 'कोनो लघुचित्र नै',
+'filehist-user'                     => 'प्रयोक्ता',
+'filehist-dimensions'               => 'बीम',
+'filehist-filesize'                 => 'संचिका आकार',
+'filehist-comment'                  => 'समीक्षा',
+'filehist-missing'                  => 'संचिका हेराएल',
+'imagelinks'                        => 'फाइलक उपयोग',
+'linkstoimage'                      => 'ऐ {{PLURAL:$1|पन्नाक लागि |$1 पन्नाक लागि}} ऐ फाइलसँ:',
+'linkstoimage-more'                 => '$1 सँ बेसी {{PLURAL:$1|page links|पन्ना सभक लागि}} ऐ संचिकाक।
 ई सूची देखबैए {{PLURAL:$1|first page link|first $1 page links}} मात्र ऐ संचिकाक।
 एकटा [[Special:WhatLinksHere/$2|पूर्ण सूची]] उपलब्ध अछि।',
-'nolinkstoimage'            => 'एकोटा पन्ना नै अछि जकर लागि ऐ संचिकासँ हुअए।',
-'morelinkstoimage'          => 'देखू [[Special:WhatLinksHere/$1|आर लागि]] ऐ संचिकाक।',
-'linkstoimage-redirect'     => '$1 (संचिका घुमौआ) $2',
-'duplicatesoffile'          => 'ऐ संचिकाक {{PLURAL:$1|file is a duplicate|$1 संचिका सभ द्वितीयक अछि}} अछि ([[Special:FileDuplicateSearch/$2|आर वर्णन]]):',
-'sharedupload'              => 'ई फाइल $1 सँ अछि आ दोसर प्रकल्प लेल प्रयोग कएल जा सकैए।',
-'sharedupload-desc-there'   => 'ई संचिका $1 सँ अछि आ दोसर परियोजना लेल प्रयोग कएल जा सकैए।
+'nolinkstoimage'                    => 'एकोटा पन्ना नै अछि जकर लागि ऐ संचिकासँ हुअए।',
+'morelinkstoimage'                  => 'देखू [[Special:WhatLinksHere/$1|आर लागि]] ऐ संचिकाक।',
+'linkstoimage-redirect'             => '$1 (संचिका घुमौआ) $2',
+'duplicatesoffile'                  => 'ऐ संचिकाक {{PLURAL:$1|file is a duplicate|$1 संचिका सभ द्वितीयक अछि}} अछि ([[Special:FileDuplicateSearch/$2|आर वर्णन]]):',
+'sharedupload'                      => 'ई फाइल $1 सँ अछि आ दोसर प्रकल्प लेल प्रयोग कएल जा सकैए।',
+'sharedupload-desc-there'           => 'ई संचिका $1 सँ अछि आ दोसर परियोजना लेल प्रयोग कएल जा सकैए।
 कृपा कऽ देखू [$2 संचिका वर्णन पन्ना] विशेष सूचना लेल।',
-'sharedupload-desc-here'    => 'ई संचिका $1 सँ अछि आ ई दोसर परियोजना द्वारा प्रयोग कएल जा सकैए।
+'sharedupload-desc-here'            => 'ई संचिका $1 सँ अछि आ ई दोसर परियोजना द्वारा प्रयोग कएल जा सकैए।
 ऐ पर विवरण [$2 संचिका विवरण पन्ना] ओइपर नीचाँ देखाएल अछि।',
-'filepage-nofile'           => 'ऐ नामक कोनो संचिका उपलब्ध नै अछि।',
-'filepage-nofile-link'      => 'ऐ नामक कोनो संचिका उपलब्ध नै अछि मुदा अहाँ [$1 एकरा उपारोपित करू]।',
-'uploadnewversion-linktext' => 'ऐ फाइलक नव संस्करणक उपारोपण',
-'shared-repo-from'          => '$1 सँ',
-'shared-repo'               => 'एकटा साझी बखारी',
+'filepage-nofile'                   => 'ऐ नामक कोनो संचिका उपलब्ध नै अछि।',
+'filepage-nofile-link'              => 'ऐ नामक कोनो संचिका उपलब्ध नै अछि मुदा अहाँ [$1 एकरा उपारोपित करू]।',
+'uploadnewversion-linktext'         => 'ऐ फाइलक नव संस्करणक उपारोपण',
+'shared-repo-from'                  => '$1 सँ',
+'shared-repo'                       => 'एकटा साझी बखारी',
+'shared-repo-name-wikimediacommons' => 'सामान्य विकीमीडिया',
 
 # File reversion
 'filerevert'                => '$1 लग घुरु',
@@ -1629,23 +1641,24 @@ $1',
 'filerevert-badversion'     => 'ओइ कालक कोनो पुरान स्थानीय संस्करण ऐ संचिकाक नै अछि।',
 
 # File deletion
-'filedelete'                  => '$1 केँ मेटाउ',
-'filedelete-legend'           => 'संचिका मेटाउ',
-'filedelete-intro'            => "अहाँ संचिका '''[[Media:$1|$1]]'''  केँ एकर सभटा इतिहासक संग मेटाबैबला छी।",
-'filedelete-intro-old'        => "अहाँ '''[[Media:$1|$1]]''' एकर संस्करण [$4 $3, $2] केँ मेटाबैबला छी।",
-'filedelete-comment'          => 'कारण:',
-'filedelete-submit'           => 'मेटाउ',
-'filedelete-success'          => "'''$1''' मेटाएल गेल।",
-'filedelete-success-old'      => "'''[[Media:$1|$1]]''' एकर संस्करण $3, $2  केँ मेटा देल गेल।",
-'filedelete-nofile'           => "'''$1''' नै अछि।",
-'filedelete-nofile-old'       => "'''$1''' एकर कोनो संचित संस्करण खास गुणक संग नै अछि।",
-'filedelete-otherreason'      => 'दोसर/ अतिरिक्त कारण:',
-'filedelete-reason-otherlist' => 'दोसर कारण',
-'filedelete-reason-dropdown'  => '* सामान्य हटेबाक कारण
+'filedelete'                   => '$1 केँ मेटाउ',
+'filedelete-legend'            => 'संचिका मेटाउ',
+'filedelete-intro'             => "अहाँ संचिका '''[[Media:$1|$1]]'''  केँ एकर सभटा इतिहासक संग मेटाबैबला छी।",
+'filedelete-intro-old'         => "अहाँ '''[[Media:$1|$1]]''' एकर संस्करण [$4 $3, $2] केँ मेटाबैबला छी।",
+'filedelete-comment'           => 'कारण:',
+'filedelete-submit'            => 'मेटाउ',
+'filedelete-success'           => "'''$1''' मेटाएल गेल।",
+'filedelete-success-old'       => "'''[[Media:$1|$1]]''' एकर संस्करण $3, $2  केँ मेटा देल गेल।",
+'filedelete-nofile'            => "'''$1''' नै अछि।",
+'filedelete-nofile-old'        => "'''$1''' एकर कोनो संचित संस्करण खास गुणक संग नै अछि।",
+'filedelete-otherreason'       => 'दोसर/ अतिरिक्त कारण:',
+'filedelete-reason-otherlist'  => 'दोसर कारण',
+'filedelete-reason-dropdown'   => '* सामान्य हटेबाक कारण
 ** सर्वाधिकार उल्लंघन
 ** द्वितीयक संचिका',
-'filedelete-edit-reasonlist'  => 'मेटेबाक कारणक सम्पादन करू',
-'filedelete-maintenance'      => 'सुस्थापन कालमे संचिकाकेँ मेटएबाक आ फेरसँ अनबाक क्रिया कनी काल लेल अशक्त कएल गेल अछि।',
+'filedelete-edit-reasonlist'   => 'मेटेबाक कारणक सम्पादन करू',
+'filedelete-maintenance'       => 'सुस्थापन कालमे संचिकाकेँ मेटएबाक आ फेरसँ अनबाक क्रिया कनी काल लेल अशक्त कएल गेल अछि।',
+'filedelete-maintenance-title' => 'संचिका हटा नै सकैए',
 
 # MIME search
 'mimesearch'         => 'माइम खोज',
@@ -1695,7 +1708,7 @@ $1',
 'statistics-users-active-desc' => 'प्रयोक्ता जे अन्तिम {{PLURAL:$1|दिन|$1 दिन}} मे कोनो काज केने छथि',
 'statistics-mostpopular'       => 'सभसँ बेसी देखल गेल पन्ना',
 
-'disambiguations'      => 'स्पष्ट पन्ना',
+'disambiguations'      => 'स्पष्ट पन्नासँ लागिबला पन्ना',
 'disambiguationspage'  => 'नमूना: निवारण',
 'disambiguations-text' => "ई सभ पन्ना '''स्पष्ट कएल''' सँ लागिमे अछि।
 ओ सभ एकर बदला उचित वार्तापर लागि करथि।<br />
@@ -1769,7 +1782,7 @@ $1',
 'listusers-editsonly'     => 'सम्पादन करैबला प्रयोक्ताकेँ मात्र देखाउ',
 'listusers-creationsort'  => 'निर्माण तिथिक हिसाबसँ छाँटू',
 'usereditcount'           => '$1 {{PLURAL:$1|सम्पादन|सम्पादन सभ}}',
-'usercreated'             => '$1 केँ बनाएल गेल $2 बजे',
+'usercreated'             => '{{GENDER:$3| बनैलक|बनैलकिन्ह}} $1 तिथि पर $2 काले',
 'newpages'                => 'नव पन्ना सभ',
 'newpages-username'       => 'प्रयोक्तानाम:',
 'ancientpages'            => 'सभसँ पुरान पन्ना सभ',
@@ -1790,13 +1803,14 @@ $1',
 # Book sources
 'booksources'               => 'किताबक सन्दर्भ सभ',
 'booksources-search-legend' => 'किताबक सन्दर्भक लेल ताकू',
+'booksources-isbn'          => 'आइ.एस.बी.एन.:',
 'booksources-go'            => 'चलू',
 'booksources-text'          => 'नीचाँ दोसर जालस्थलसँ लागि सभक सूची अछि जे नव आ प्रयोग कएल किताब बेचैए, आ ई पोथी सभक विषयमे ओहो सूचना दऽ सकैए जे अहाँ ताकि रहल छी:',
 'booksources-invalid-isbn'  => 'देल आइ.एस.बी.एन. संख्या मान्य नै बुझाइत अछि; कृपा कऽ मूल स्रोतसँ द्वितीयक बनेबा काल भेल भ्रमकेँ जाँचू।',
 
 # Special:Log
-'specialloguserlabel'  => 'प्रयोक्ता:',
-'speciallogtitlelabel' => 'शीर्षक:',
+'specialloguserlabel'  => 'कर्ता:',
+'speciallogtitlelabel' => 'लक्ष्य (शीर्षक वा प्रयोक्ता):',
 'log'                  => 'वृत्तलेख सभ',
 'all-logs-page'        => 'सभटा सार्वजनिक वृत्तलेख',
 'alllogstext'          => '{{अन्तर्जाल}} क सभटा उपलब्ध वृत्तलेखक संयुक्त दृश्य।
@@ -1836,12 +1850,12 @@ $1',
 'sp-deletedcontributions-contribs' => 'योगदान सभ',
 
 # Special:LinkSearch
-'linksearch'       => 'बाहरक सम्बन्ध',
+'linksearch'       => 'बाहरक सम्बन्धक खोज',
 'linksearch-pat'   => 'खोज तरीका:',
 'linksearch-ns'    => 'नामस्थान :',
 'linksearch-ok'    => 'ताकू',
-'linksearch-text'  => 'ब्रह्मास्त्र जेना "*.wikipedia.org" प्रयोग कएल जा सकैए।<br />
-सहायक संविद:<tt>$1</tt>',
+'linksearch-text'  => 'ब्रह्मास्त्र जेना "*.wikipedia.org" प्रयोग कएल जा सकैए।
+सहायक संविद:<tt>$1</tt> (खोजमे ऐमेसँ कोनो नै जोड़ू)।',
 'linksearch-line'  => '$2 सँ $1 क लागि अछि।',
 'linksearch-error' => 'निमंत्रकनामक प्रारम्भमे ब्रह्मास्त्र आबि सकैए।',
 
@@ -1861,12 +1875,8 @@ $1',
 'activeusers-noresult'   => 'कोनो प्रयोक्ता नै भेटल',
 
 # Special:Log/newusers
-'newuserlogpage'              => 'प्रयोक्ता रचना वृत्तलेख',
-'newuserlogpagetext'          => 'ई प्रयोक्ता निर्माणक वृत्तलेख अछि।',
-'newuserlog-byemail'          => 'कूटशब्द ई-पत्र द्वारा पठाएल गेल',
-'newuserlog-create-entry'     => 'नव प्रयोक्ता खाता',
-'newuserlog-create2-entry'    => 'नव खाता $1 बनेलौं',
-'newuserlog-autocreate-entry' => 'खाता स्वचालित रूपेँ बनल',
+'newuserlogpage'     => 'प्रयोक्ता रचना वृत्तलेख',
+'newuserlogpagetext' => 'ई प्रयोक्ता निर्माणक वृत्तलेख अछि।',
 
 # Special:ListGroupRights
 'listgrouprights'                      => 'प्रयोक्ता संवर्ग अधिकार',
@@ -1895,7 +1905,7 @@ $1',
 'emailpagetext'        => 'अहाँक नीचाँक आवेदन-पत्र ऐ प्रयोक्ताकेँ ई-पत्र संदेश पठेबा लेल प्रयोग कऽ सकै छी।
 ई-पत्र जे अहाँ [[Special:Preferences|your user preferences]] मे देलहुँ से ई-पत्र"एतएसँ" पतासँ देखाएत, से प्राप्तकर्ता सोझे अहाँकेँ उत्तर देबामे समर्थ हेताह।',
 'usermailererror'      => 'ई-पत्र बौस्तु घुरल भ्रम:',
-'defemailsubject'      => '{{जालस्थल}} ई-पत्र',
+'defemailsubject'      => '{{जालस्थल}} प्रयोक्ता "$1" सँ ई-पत्र',
 'usermaildisabled'     => 'प्रयोक्ता ई-पत्र अशक्त',
 'usermaildisabledtext' => 'अहाँ दोसर प्रयोक्ताकेँ ऐ विकीपर ई-पत्र नै पठा सकै छिऐ।',
 'noemailtitle'         => 'कोनो ई-पत्र पता नै',
@@ -1919,8 +1929,9 @@ $1',
 'emailuserfooter'      => 'ई ई-पत्र $1 सँ $2 केँ "ई-पत्र प्रयोक्ता" केँ पठाओल गेल {{जालसथल}} पर।',
 
 # User Messenger
-'usermessage-summary' => 'प्रणाली संदेश देल।',
-'usermessage-editor'  => 'प्रणालीक दूत',
+'usermessage-summary'  => 'प्रणाली संदेश देल।',
+'usermessage-editor'   => 'प्रणालीक दूत',
+'usermessage-template' => 'मीडियाविकी:प्रयोक्ता संदेश',
 
 # Watchlist
 'watchlist'            => 'हमर साकांक्षसूची',
@@ -1949,7 +1960,7 @@ $1',
 'watchmethod-list'     => 'साकांक्ष-सूचीक हालक सम्पादनकेँ देखि रहल छी',
 'watchlistcontains'    => 'अहाँक साकांक्ष-सूचीमे अछि $1 {{PLURAL:$1|पन्ना|पन्ना}}।',
 'iteminvalidname'      => "'$1' क संग समस्या, अमान्य नाम ...",
-'wlnote'               => "नीचाँ {{PLURAL:$1|is the last change|are the last '''$1''' changes}} अन्तिम {{PLURAL:$2|hour|'''$2''' hours}}।",
+'wlnote'               => "नीचाँ {{PLURAL:$1|is the last change|are the last '''$1''' changes}} अन्तिम {{PLURAL:$2|hour|'''$2''' hours}} $3, $4 जेना।",
 'wlshowlast'           => 'देखाउ अन्तिम $1 घण्टा $2 दिन $3',
 'watchlist-options'    => 'साकांक्षसूचीक विकल्प सभ',
 
@@ -1988,15 +1999,15 @@ $NEWPAGE
 
 --
 अपन ई-पत्र सूचना प्रकार बदलबाक लेल देखू
-{{fullurl:{{#special:Preferences}}}}
+{{canonicalurl:{{#special:Preferences}}}}
 अपन साकांक्ष-सूची सूचना प्रकार बदलबाक लेल देखू
-{{fullurl:{{#special:EditWatchlist}}}}
+{{canonicalurl:{{#special:EditWatchlist}}}}
 
 अपन साकांक्ष-सूचीसँ कोनो पन्ना मेटेबाक लेल देखू
 $UNWATCHURL
 
 अपन अनुभव बतेबा वा कोनो सहायता लेल:
-{{fullurl:{{MediaWiki:Helppage}}}}',
+{{canonicalurl:{{MediaWiki:Helppage}}}}',
 
 # Delete
 'deletepage'             => 'पन्ना मेटाउ',
@@ -2014,8 +2025,6 @@ $UNWATCHURL
 'actionfailed'           => 'कार्य नै भेल',
 'deletedtext'            => '"$1" केँ मेटा देल गेल अछि।
 देखू $2 हालक मेटाएल सामिग्रीक अभिलेख लेल।',
-'deletedarticle'         => 'मेटाएल "[[$1]]"',
-'suppressedarticle'      => 'दबाएल "[[$1]]"',
 'dellogpage'             => 'मेटाएल सामिग्रीक वृत्तलेख',
 'dellogpagetext'         => 'नीचाँ एकदम हालक मेटाएलबला सूची अछि।',
 'deletionlog'            => 'मेटाएल सामिग्रीक वृत्तलेख',
@@ -2063,7 +2072,10 @@ $2 केर संपादित आखिरी अवतरण क पुन
 'unprotectedarticle'          => 'अरक्षित केलौं "[[$1]]"',
 'movedarticleprotection'      => 'सुरक्षा स्तर "[[$2]]" से बदल क  "[[$1]]" क देल गेल.',
 'protect-title'               => '"$1" लेल रक्षा स्तर बदलू',
+'protect-title-notallowed'    => '"$1" लेल रक्षा स्तर देखू',
 'prot_1movedto2'              => '[[$1]] गेल एतय [[$2]]',
+'protect-badnamespace-title'  => 'अरक्षित नाम-गाम',
+'protect-badnamespace-text'   => 'ऐ नामगामक पन्नामे सुरक्षा सम्भव नै।',
 'protect-legend'              => 'सुरक्षितता निर्धारित करू.',
 'protectcomment'              => 'कारण:',
 'protectexpiry'               => 'खतम हएत:',
@@ -2085,6 +2097,7 @@ $2 केर संपादित आखिरी अवतरण क पुन
 'protect-level-sysop'         => 'माइनजन मात्र',
 'protect-summary-cascade'     => 'तराउपड़ी',
 'protect-expiring'            => 'खतम हएत $1 (UTC)',
+'protect-expiring-local'      => 'खतम होइए $1',
 'protect-expiry-indefinite'   => 'अनिश्चित',
 'protect-cascade'             => 'रक्षित पन्ना ऐ पन्नापर संकलित अछि (तराउपड़ी रक्षा)',
 'protect-cantedit'            => 'अहाँ ऐ पन्नाक रक्षा स्तरमे परिवर्तन नै कऽ सकै छी, कारण अहाँकेँ एकरा सम्पादित करबाक अनुमति नै अछि।',
@@ -2145,7 +2158,6 @@ $2 केर संपादित आखिरी अवतरण क पुन
 'undeletereset'                => 'फेरसँ शुरू करू',
 'undeleteinvert'               => 'उनटा चयन',
 'undeletecomment'              => 'कारण:',
-'undeletedarticle'             => 'फेरसँ ओहिना "[[$1]]"',
 'undeletedrevisions'           => '{{PLURAL:$1|1 revision|$1 revisions}} घुराएल',
 'undeletedrevisions-files'     => '{{PLURAL:$1|1 संशोधन|$1 संशोधन}} and {{PLURAL:$2|1 संचिका|$2 संचिका}} आनल',
 'undeletedfiles'               => '{{PLURAL:$1|1 संचिका|$1 संचिका सभ}} आनल',
@@ -2154,6 +2166,7 @@ $2 केर संपादित आखिरी अवतरण क पुन
 'undeletedpage'                => "'''$1 आनि लेल गेल'''$1
 पूछू [[Special:Log/delete|deletion log]] वर्तमान मेटाएल आ आनल सूची लेल।",
 'undelete-header'              => 'देखू [[Special:Log/delete|the deletion log]] हालक मेटाएल पन्ना लेल।',
+'undelete-search-title'        => 'मेटाएल पन्नाकेँ ताकू',
 'undelete-search-box'          => 'मेटाएल पन्ना सभकेँ ताकू',
 'undelete-search-prefix'       => 'से शुरु भेल पन्ना देखाबू.',
 'undelete-search-submit'       => 'ताकू',
@@ -2163,6 +2176,7 @@ $2 केर संपादित आखिरी अवतरण क पुन
 'undelete-cleanup-error'       => 'बिना प्रयोग कएल संचिका "$1" केँ मेटेबामे भ्रम संकेत।',
 'undelete-missing-filearchive' => 'संचिका पेटार चेन्ह $1  केँ नै आनि सकल कारण ई दत्तनिधिमे नै अछि।
 ई पहिनहिये आनि लेल गेल हएत।',
+'undelete-error'               => 'पुनः पन्ना प्राप्तिमे भ्रम',
 'undelete-error-short'         => 'संचिका अनबामे भ्रम : $1',
 'undelete-error-long'          => 'संचिका अनबामे भ्रम संकेत भेटल:
 $1',
@@ -2204,7 +2218,6 @@ $1',
 'sp-contributions-username'            => 'अनिकेत संकेत वा प्रयोक्तानाम:',
 'sp-contributions-toponly'             => 'मात्र ओइ सम्पादनकेँ देखाउ जे अद्यतन संशोधन छी।',
 'sp-contributions-submit'              => 'ताकू',
-'sp-contributions-showsizediff'        => 'पन्ना आकारमे अन्तर देखाउ',
 
 # What links here
 'whatlinkshere'            => 'एतय कोन लिंक अछि',
@@ -2284,6 +2297,7 @@ $1',
 'blocklist-userblocks'            => 'खाता प्रतिबन्ध-सूची नुकाउ',
 'blocklist-tempblocks'            => 'अस्थायी प्रतिबन्ध-सूची नुकाउ',
 'blocklist-addressblocks'         => 'एकल अनिकेत प्रतिबन्ध नुकाउ',
+'blocklist-rangeblocks'           => 'क्षेत्र प्रतिबन्ध नुकाउ',
 'blocklist-timestamp'             => 'समएकाल',
 'blocklist-target'                => 'लक्ष्य',
 'blocklist-expiry'                => 'खतम हएत:',
@@ -2306,6 +2320,7 @@ $1',
 'unblocklink'                     => 'नै बारल',
 'change-blocklink'                => 'खण्ड बदलू',
 'contribslink'                    => 'योगदान',
+'emaillink'                       => 'ई-पत्र पठाउ',
 'autoblocker'                     => 'अहाँक अनिकेत "[[User:$1|$1]]" द्वारा प्रयोगक कारण स्वचालित रूपेँ प्रतिबन्धित भऽ गेल।
 $1 एकर प्रतिबन्धक कारण अछि : "$2"',
 'blocklogpage'                    => 'प्रतिबन्धित वृत्तलेख',
@@ -2437,9 +2452,6 @@ $1 एकर प्रतिबन्धक कारण अछि : "$2"',
 'movepage-page-moved'          => 'पन्ना $1 केँ $2 लग घसका देल गेल अछि।',
 'movepage-page-unmoved'        => 'पन्ना $1 केँ $2 लग नै घसकाएल जा सकैए।',
 'movepage-max-pages'           => 'बेसी सें बेसी $1 पृष्ठ बदलि के {{PLURAL:$1| क देल गेल अछि|क देल गेल अछि}}, आब आर पृष्ठ अपने आप नहि बदलत.',
-'1movedto2'                    => '[[$1]] गेल एतय [[$2]]',
-'1movedto2_redir'              => 'घसकाएल [[$1]] सँ [[$2]] घुरैसँ फराक',
-'move-redirect-suppressed'     => 'दबाएलकेँ घुमाउ',
 'movelogpage'                  => 'वृत्तलेख हटाउ',
 'movelogpagetext'              => 'नाम बदलल गेल लेख क सूचि नीचां देल गेल अछि',
 'movesubpage'                  => '{{PLURAL:$1|उप पृष्ठ|उप पृष्ठ}}',
@@ -2452,7 +2464,7 @@ $1 एकर प्रतिबन्धक कारण अछि : "$2"',
 लक्ष्य पृष्ठ "[[:$1]]" पहिने सें अस्तित्व में अछि. 
 नाम के बदलहि ले की अहां एकरा हटाबय चाहैत छी ?',
 'delete_and_move_confirm'      => 'हँ, पन्ना मेटाउ',
-'delete_and_move_reason'       => 'घसकेबा लेल जगह बनेबा लेल मेटाएल गेल',
+'delete_and_move_reason'       => '"[[$1]]" सँ घसकेबा लेल जगह बनेबा लेल मेटाएल गेल',
 'selfmove'                     => 'स्रोत आ लक्ष्यक शीर्षक एक अछि;
 पृष्ठ अप्पन ठाम पर स्थानांतरित नहि भ सकत.',
 'immobile-source-namespace'    => 'नामस्थान "$1" मे पन्नाकेँ नै घसका सकल',
@@ -2485,6 +2497,7 @@ $1 एकर प्रतिबन्धक कारण अछि : "$2"',
 'exportcuronly'     => 'अखुनका संशोधन मात्र लिअ, पूरा इतिहास नै।',
 'exportnohistory'   => "----
 '''सूचना:''' परिणाम कुशलताकेँ देखैत पन्नाक सम्पूर्ण इतिहासक निर्यात अशक्त कएल गेल अछि।",
+'exportlistauthors' => 'सभ पन्नाक सम्पूर्ण योगदानकर्ताक सूची जोड़ू',
 'export-submit'     => 'निर्यात',
 'export-addcattext' => 'अहि श्रेणी केर पन्ना जोडू',
 'export-addcat'     => 'जोडू',
@@ -2500,7 +2513,7 @@ $1 एकर प्रतिबन्धक कारण अछि : "$2"',
 'allmessagesdefault'            => 'पूर्वनिर्धारित संदेश पाठ',
 'allmessagescurrent'            => 'अखुनका संदेश पाठ',
 'allmessagestext'               => 'ई मीडियाविकी नामस्थानमे उपलब्ध संस्थागत संदेशक सूची छी।
-कृपा कऽ देखू [http://www.mediawiki.org/wiki/Localisation MediaWiki Localisation] आ [http://translatewiki.net translatewiki.net] जँ अहाँ मीडियाविकीक स्थानिकीकरणक मूलक अनुवादमे योगदान करए चाहै छी।',
+कृपा कऽ देखू [//www.mediawiki.org/wiki/Localisation MediaWiki Localisation] आ [//translatewiki.net translatewiki.net] जँ अहाँ मीडियाविकीक स्थानिकीकरणक मूलक अनुवादमे योगदान करए चाहै छी।',
 'allmessagesnotsupportedDB'     => "ई पन्ना प्रयोगमे नै आनल जा सकैए कारण '''\$wgUseDatabaseMessages''' अशक्त कएल अछि।",
 'allmessages-filter-legend'     => 'चलनी',
 'allmessages-filter'            => 'अपन हिसाबे अनुकूलित कऽ छाँटू:',
@@ -2565,6 +2578,8 @@ $1 एकर प्रतिबन्धक कारण अछि : "$2"',
 'import-token-mismatch'      => 'एक उखराहाक दत्तांश खतम भऽ गेल।
 फेरसँ प्रयास करू।',
 'import-invalid-interwiki'   => 'विशिष्ट विकीसँ आयात नै कऽ सकै छी।',
+'import-error-edit'          => '"$1" पन्ना आयातित नै कएल गेल अछि कारण अहाँकेँ एकरा सम्पादित करबाक अधिकार नै अछि।',
+'import-error-create'        => '"$1" पन्ना आयातित नै कएल गेल अछि कारण अहाँकेँ एकरा निर्माण करबाक अधिकार नै अछि।',
 
 # Import log
 'importlogpage'                    => 'लॉगक आयात',
@@ -2679,6 +2694,13 @@ $1 एकर प्रतिबन्धक कारण अछि : "$2"',
 'pageinfo-views'            => 'देखहि बला के संख्या',
 'pageinfo-viewsperedit'     => 'प्रति सम्पादन देखल गेल',
 
+# Skin names
+'skinname-standard'  => 'प्राचीन',
+'skinname-nostalgia' => 'गामसँ प्रेम',
+'skinname-simple'    => 'साधारण',
+'skinname-modern'    => 'आधुनिक',
+'skinname-vector'    => 'सदिश',
+
 # Patrolling
 'markaspatrolleddiff'                 => 'देखि लेल गेल, एहन चिन्ह लगाऊ',
 'markaspatrolledtext'                 => 'देखि लेल गेल, एहन चिन्ह लगाऊ',
@@ -2693,9 +2715,6 @@ $1 एकर प्रतिबन्धक कारण अछि : "$2"',
 # Patrol log
 'patrol-log-page'      => 'संचालन वृत्तलेख',
 'patrol-log-header'    => 'ई संचालित संशोधन सभक वृत्तलेख छी।',
-'patrol-log-line'      => 'चेन्हासी देल $2 क $1 संचालित $3',
-'patrol-log-auto'      => '(स्वचालित)',
-'patrol-log-diff'      => 'संशोधन $1',
 'log-show-hide-patrol' => '$1 निरीक्षण वृत्तलेख',
 
 # Image deletion
@@ -2717,15 +2736,16 @@ $1',
 एकरा प्रयोग केलापर अहाँक तंत्रकेँ किछु समझौता करऽ पड़ि सकै छै।",
 'imagemaxsize'           => "चित्र आकारक सीमा:<br />''(संचिका वर्णन पन्ना लेल)''",
 'thumbsize'              => 'संकुचितचित्र आकार:',
-'widthheightpage'        => '$1×$2, $3 {{PLURAL:$3|पन्ना|पन्ना सभ}}',
+'widthheight'            => '$1 × $2',
+'widthheightpage'        => '$1 × $2, $3 {{PLURAL:$3|पन्ना|पन्ना सभ}}',
 'file-info'              => 'संचिका आकार: $1, माइम प्रकार: $2',
 'file-info-size'         => '$1 × $2 चित्राणु, फाइल आकार: $3, माइम प्रकार: $4',
 'file-info-size-pages'   => '$1 × $2 चित्रकण, संचिका आकार : $3, माइम प्रकार: $4, $5 {{PLURAL:$5|पन्ना|पन्ना सभ}}',
 'file-nohires'           => '<छोट>ऐसँ बेशी आनन्तर्य उपलब्ध नै अछि।</छोट>',
 'svg-long-desc'          => 'एस.वी.जी. फाइल, मामूली रूपमे $1 × $2 चित्रकण, फाइलक आकार: $3',
 'show-big-image'         => 'पूर्ण आनन्तर्य',
-'show-big-image-preview' => '<small>ऐ पूर्वदृश्यक आकार: $1.</small>',
-'show-big-image-other'   => '<small>दोसर आकार: $1.</small>',
+'show-big-image-preview' => 'ऐ पूर्वदृश्यक आकार: $1.',
+'show-big-image-other'   => 'दोसर {{PLURAL:$2|resolution|resolutions}}: $1।',
 'show-big-image-size'    => '$1 × $2 चित्राणु',
 'file-info-gif-looped'   => 'घुरियाएल',
 'file-info-gif-frames'   => '$1 {{PLURAL:$1|खाका |खाका  सभ }}',
@@ -2745,6 +2765,18 @@ $1',
 'bydate'                => 'तारीख सं',
 'sp-newimages-showfrom' => '$2, $1 सं शुरू होइबला नव संचिका देखाउ',
 
+# Video information, used by Language::formatTimePeriod() to format lengths in the above messages
+'video-dims'     => '$1, $2 × $3',
+'seconds-abbrev' => '$1s',
+'minutes-abbrev' => '$1m',
+'hours-abbrev'   => '$1h',
+'days-abbrev'    => '$1d',
+'seconds'        => '{{PLURAL:$1|$1 सेकेण्ड|$1 सेकेण्ड}}',
+'minutes'        => '{{PLURAL:$1|$1 मिनट|$1 मिनट}}',
+'hours'          => '{{PLURAL:$1|$1 घण्टा|$1 घण्टा}}',
+'days'           => '{{PLURAL:$1|$1 दिन|$1 दिन}}',
+'ago'            => '$1 पहिने',
+
 # Bad image list
 'bad_image_list' => 'फॉर्मेट निम्न प्रकारेँ अछि:
 
@@ -2752,27 +2784,43 @@ $1',
 
 ओही पंक्त्तिक कोनो आर लिंक अपवाद स्वरूप अछि, उदाहरणस्वरूप पन्ना जतय चित्र पंक्त्तिअहि पर होय।',
 
+/*
+Short names for language variants used for language conversion links.
+To disable showing a particular link, set it to 'disable', e.g.
+'variantname-zh-sg' => 'disable',
+Variants for Chinese language
+*/
+'variantname-zh-cn' => 'cn',
+'variantname-zh-tw' => 'tw',
+'variantname-zh-hk' => 'hk',
+'variantname-zh-mo' => 'mo',
+'variantname-zh-sg' => 'sg',
+'variantname-zh-my' => 'my',
+'variantname-zh'    => 'zh',
+
 # Metadata
-'metadata'          => 'प्रदत्तांश',
-'metadata-help'     => 'ई फाइल अतिरिक्त सूचना दैत अछि, सम्भवतः ई अंकीय कैमरा वा स्कैनर द्वारा बनाएल वा अंकण कए जोड़ल गेल अछि।
+'metadata'                  => 'प्रदत्तांश',
+'metadata-help'             => 'ई फाइल अतिरिक्त सूचना दैत अछि, सम्भवतः ई अंकीय कैमरा वा स्कैनर द्वारा बनाएल वा अंकण कए जोड़ल गेल अछि।
 जौं फाइलकेँ मूल रूपसँ परिवर्धित कएल गेल हएत तँ किछु विवरण पूर्ण रूपसँ परिवर्धित फाइलमे नै देखाएल गेल हएत।',
-'metadata-expand'   => 'बढ़ाओल विवरण देखाउ।',
-'metadata-collapse' => 'विस्तृत विवरण नुकाउ',
-'metadata-fields'   => 'चित्र प्रदत्तांश क्षेत्र सभ जे ऐ संदेशमे संकलित अछि चित्र पन्ना प्रदर्शनमे लेल जाएत जखन प्रदत्तांश सारणी क्षतिग्रस्त हएत।  
+'metadata-expand'           => 'बढ़ाओल विवरण देखाउ।',
+'metadata-collapse'         => 'विस्तृत विवरण नुकाउ',
+'metadata-fields'           => 'चित्र प्रदत्तांश क्षेत्र सभ जे ऐ संदेशमे संकलित अछि चित्र पन्ना प्रदर्शनमे लेल जाएत जखन प्रदत्तांश सारणी क्षतिग्रस्त हएत।  
 आन सभ पूर्वनिधारित रूपेँ नुका जाएत।
-* बनाउ
-* प्रारूप
-* मूल समए काल
-* प्रायोगिक काल
-* एफ. संख्या
-* आइ.एस.ओ. गति प्रमाण
-* दृश्यपथ नाप
-* कलाकार
-* सर्वाधिकार
-* चित्र विवरण
-* जी.पी.एस. देशांतर
-* जी.पी.एस.अक्षांश
-* जी.पी.एस. लम्बाकार',
+* make
+* model
+* datetimeoriginal
+* exposuretime
+* fnumber
+* isospeedratings
+* focallength
+* artist
+* copyright
+* imagedescription
+* gpslatitude
+* gpslongitude
+* gpsaltitude',
+'metadata-langitem'         => "'''$2:''' $1",
+'metadata-langitem-default' => '$1',
 
 # EXIF tags
 'exif-imagewidth'                  => 'चौड़ाई',
@@ -2969,9 +3017,9 @@ $1',
 'exif-orientation-3' => '180° पर घुमायल गेल',
 'exif-orientation-4' => 'अनुप्रस्थ मिज्झर',
 'exif-orientation-5' => '90° सी.सी.डब्लू. घुमाओल गेल आ अनुप्रस्थ रूपेँ मिज्झर कएल गेल',
-'exif-orientation-6' => '90° CW पर घुमायल गेल',
+'exif-orientation-6' => '९०° सी.सी.डब्लू. घुमाएल गेल',
 'exif-orientation-7' => '९०° सी.डब्लू. घुमाओल गेल आ अनुप्रस्थ रूपेँ मिज्झर कएल गेल',
-'exif-orientation-8' => '९०° सी.सी.डब्लू. पर घुमाएल गेल',
+'exif-orientation-8' => '९०° सी.डब्लू. घुमाएल गेल',
 
 'exif-planarconfiguration-1' => 'मोटगर प्रारूप',
 'exif-planarconfiguration-2' => 'प्लानरक प्रारूप',
@@ -3166,7 +3214,7 @@ $1',
 
 # External editor support
 'edit-externally'      => 'ऐ फाइलकेँ बाहरी अनुप्रयोगसँ हटाउ',
-'edit-externally-help' => '(देखू [http://www.mediawiki.org/wiki/Manual:External_editors setup instructions] विषेष जानकारी लेल)',
+'edit-externally-help' => '(देखू [//www.mediawiki.org/wiki/Manual:External_editors setup instructions] विषेष जानकारी लेल)',
 
 # 'all' in various places, this might be different for inflected languages
 'watchlistall2' => 'सभ',
@@ -3245,13 +3293,6 @@ $5
 'scarytranscludedisabled' => '[अन्तरविकी समावेश अशक्त कएल गेल अछि]',
 'scarytranscludefailed'   => '[नमूना आनब विफल भेल $1 लेल]',
 'scarytranscludetoolong'  => 'यूआरएल बड़ पैग अछि',
-
-# Trackbacks
-'trackbackbox'      => 'अहि पृष्ठक लेल :<br />
-$1',
-'trackbackremove'   => '([$1 हटाऊ])',
-'trackbacklink'     => 'ट्रैकबैक',
-'trackbackdeleteok' => 'ट्रैकबैक के सफलता पूर्वक मिटा देल गेल',
 
 # Delete conflict
 'deletedwhileediting'      => "'''Warning''': अहां जखन सें संपादन शुरू केने छी, ओकर बाद से ई पृष्ठ के मिटा देल गेल अछि.",
@@ -3335,6 +3376,9 @@ $1',
 'watchlisttools-edit' => 'साकांक्षसूचीकेँ देखू आ सम्पादित करू',
 'watchlisttools-raw'  => 'काँच साकांक्षसूची संपादित करू',
 
+# Signatures
+'signature' => '[[{{ns:user}}:$1|$2]] ([[{{ns:user_talk}}:$1|talk]])',
+
 # Core parser functions
 'unknown_extension_tag' => 'अज्ञात बढ़ाएल चेन्ह "$1"',
 'duplicate-defaultsort' => '\'\'\'चेतौनी:\'\'\' पूर्वनिर्धारित विन्यास चाभी "$2" पहिलुका पूर्वनिर्धारित विन्यास चाभी "$1" केँ खतम करैए।',
@@ -3357,13 +3401,13 @@ $1',
 'version-hook-subscribedby'     => 'ई सदस्यता लेलनि',
 'version-version'               => '(संस्करण $1)',
 'version-license'               => 'अधिकार',
-'version-poweredby-credits'     => "ई विकी चालित अछि '''[http://www.mediawiki.org/ MediaWiki]''', copyright © 2001-$1 $2",
+'version-poweredby-credits'     => "ई विकी चालित अछि '''[//www.mediawiki.org/ MediaWiki]''', copyright © 2001-$1 $2",
 'version-poweredby-others'      => 'आन',
 'version-license-info'          => 'मीडियाविकी एकटा मंगनीक तंत्रांश अछि; अहाँ एकरा बाँटि सकै छी आ/ वा संशोधित कऽ सकै छीगी.एन.यू. सामान्य जन लाइसेन्सक अन्तर्गत जेना फ्री सॉफ्टवेयर फाउन्डेशन एकरा प्रकाशित केने अछि; चाहे तँ लाइसेन्सक संस्करण २, वा (अहाँक विकल्पपर) कोनो बादक दोसर संस्करणक अन्तर्गत।
 
 मीडियाविकी ऐ आशामेँ बाँटल जा रहल अछि कि ई उपयोगी हएत, मुदा बिना कोनो गारन्टीक; बिना कोनो व्यापारिक अन्तर्निहित वारन्टीक वा कोनो विशेष काजक लेल उपयोगी हेबाले। देखू गी.एन.यू. सामान्य जन लाइसेन्स विशेष वर्णन लेल।
 
-अहाँ प्राप्त केने हएब [{{SERVER}}{{SCRIPTPATH}}/ अनुकरण गी.एन.यू. सामान्य जन लाइसेन्सक प्रति] ऐ तंत्रांशक संग; जँ नै, लिखू फ्री सॉफ्टवेयर फाउन्डेशन, आइ.एन.सी., ५१, फ्रैंकलिन स्ट्रीट, पाँचम तल, बोस्टन, एम.ए. ०२११०-१३०१, यू.एस.ए. वा [http://www.gnu.org/licenses/old-licenses/gpl-2.0.html अन्तर्भूत पढ़बा लेल]।',
+अहाँ प्राप्त केने हएब [{{SERVER}}{{SCRIPTPATH}}/ अनुकरण गी.एन.यू. सामान्य जन लाइसेन्सक प्रति] ऐ तंत्रांशक संग; जँ नै, लिखू फ्री सॉफ्टवेयर फाउन्डेशन, आइ.एन.सी., ५१, फ्रैंकलिन स्ट्रीट, पाँचम तल, बोस्टन, एम.ए. ०२११०-१३०१, यू.एस.ए. वा [//www.gnu.org/licenses/old-licenses/gpl-2.0.html अन्तर्भूत पढ़बा लेल]।',
 'version-software'              => 'प्रतिष्ठापित तंत्रांश',
 'version-software-product'      => 'उत्पाद',
 'version-software-version'      => 'संस्करण',
@@ -3373,9 +3417,7 @@ $1',
 'filepath-page'    => 'संचिका',
 'filepath-submit'  => 'जाऊ',
 'filepath-summary' => 'ई विशेष पन्ना संचिकाक पूर्ण रस्ता देखबैत अछि।
-चित्र सभ पूर्ण आकारमे देखाएल जाइत अछि, दोसर संचिका प्रकार चालित होइए सोझे सम्बन्धित संविधि द्वारा।
-
-संचिका नाम दर्ज करू बिन "{{ns:file}}:" उपसर्गक।',
+चित्र सभ पूर्ण आकारमे देखाएल जाइत अछि, दोसर संचिका प्रकार चालित होइए सोझे सम्बन्धित संविधि द्वारा।',
 
 # Special:FileDuplicateSearch
 'fileduplicatesearch'           => 'द्वितीयक संचिका ताकू',
@@ -3391,9 +3433,9 @@ $1',
 # Special:SpecialPages
 'specialpages'                   => 'विशेष पन्ना',
 'specialpages-note'              => '----
-*सामान्य विशेष पन्ना सभ।
-* <span class="mw-specialpagerestricted">प्रतिबन्धित विशेष पन्ना सभ।</span>
-* <span class="mw-specialpagecached">खाली उपस्मृतिबला पन्ना सभ।</span>',
+* सामान्य विशिष्ट पन्ना।
+* <span class="mw-specialpagerestricted">प्रतिबंधित विशिष्ट पन्ना।</span>
+* <span class="mw-specialpagecached">उपस्मृतिक विशिष्ट पन्ना (पुरान भऽ सकैए)।</span>',
 'specialpages-group-maintenance' => 'सुस्थापन प्रतिवेदन',
 'specialpages-group-other'       => 'दोसर विशेष पन्ना',
 'specialpages-group-login'       => 'सम्प्रवेश/ सम्प्रवेश आवेदन',
@@ -3435,13 +3477,16 @@ $1',
 'tags-hitcount'           => '$1 {{PLURAL:$1|परिवर्तन|परिवर्तन सभ}}',
 
 # Special:ComparePages
-'comparepages'     => 'पन्ना सभक तुलना करू',
-'compare-selector' => 'पन्ना सभक संशोधनक तुलना करू',
-'compare-page1'    => 'पन्ना १',
-'compare-page2'    => 'पन्ना २',
-'compare-rev1'     => 'संशोधन १',
-'compare-rev2'     => 'संशोधन २',
-'compare-submit'   => 'तुलना करू',
+'comparepages'                => 'पन्ना सभक तुलना करू',
+'compare-selector'            => 'पन्ना सभक संशोधनक तुलना करू',
+'compare-page1'               => 'पन्ना १',
+'compare-page2'               => 'पन्ना २',
+'compare-rev1'                => 'संशोधन १',
+'compare-rev2'                => 'संशोधन २',
+'compare-submit'              => 'तुलना करू',
+'compare-invalid-title'       => 'जे शीर्षक अहाँ देलौं से अमान्य अछि।',
+'compare-title-not-exists'    => 'जे शीर्षक अहाँ कहलौं से अछिये नै।',
+'compare-revision-not-exists' => 'जे संशोधन अहाँ कहलौं से अछिये नै।',
 
 # Database error messages
 'dberr-header'      => 'ऐ विकीमे एकटा समस्या अछि',
@@ -3469,28 +3514,49 @@ $1',
 'sqlite-has-fts' => '$1 पूर्ण-पाठ खोज सहायता युक्त',
 'sqlite-no-fts'  => '$1 बिन पूर्ण-पाठ खोज सहायताक',
 
-# Add categories per AJAX
-'ajax-add-category'             => 'संवर्ग जोड़ू',
-'ajax-remove-category'          => 'संवर्ग हटाउ',
-'ajax-edit-category'            => 'संवर्ग सम्पादित करू',
-'ajax-add-category-submit'      => 'जोडू',
-'ajax-confirm-ok'               => 'ठीक अछि',
-'ajax-confirm-title'            => 'क्रिया संपुष्टि',
-'ajax-confirm-save'             => 'सुरक्षित करू',
-'ajax-confirm-save-all'         => 'अपन सभ परिवर्त्तनकेँ सुरक्षित करू',
-'ajax-cancel'                   => 'सम्पादन रद्द करू',
-'ajax-cancel-all'               => 'सभ परिवर्त्तनकेँ रद्द करू',
-'ajax-add-category-summary'     => 'जोड़ू संवर्ग "$1"',
-'ajax-edit-category-summary'    => 'संवर्ग "$1" केँ "$2" मे बदलू',
-'ajax-remove-category-summary'  => 'संवर्ग "$1" हटाउ',
-'ajax-category-question'        => 'अहाँ ई सभ परिवर्तन किए करए चाहै छी:',
-'ajax-error-title'              => 'भ्रम',
-'ajax-remove-category-error'    => 'संवर्ग "$1" केँ हटेनाइ सम्भव नै छल।
-ई तखने होइए जखन कोनो नमूनामे संवर्ग जोड़ल जाइए।',
-'ajax-edit-category-error'      => 'संवर्ग "$1" क सम्पादन सम्भव नै छल।
-ई तखने होइए जखन कोनो नमूनामे संवर्ग जोड़ल जाइए।',
-'ajax-category-already-present' => 'ई पन्ना पहिनहियेसँ संवर्ग "$1" मे अछि।',
-'ajax-category-hook-error'      => 'कोनो स्थानीय प्रकार्य ऐ परिवर्तन सभक सुरक्षामे बाधक बनल।',
-'ajax-api-error'                => 'ए.पी.आइ. सँ भ्रम आएल:: $1: $2',
+# New logging system
+'logentry-delete-delete'              => '$1 {{लिंग:$2|deleted}} page $3',
+'logentry-delete-restore'             => '$1 {{लिंग:$2|restored}} page $3',
+'logentry-delete-event'               => '$1 {{लिंग:$2|changed}} एकर दृश्य{{PLURAL:$5| एकटा वृत्तलेख|$5 वृत्तलेख}}  $3: $4 केँ',
+'logentry-delete-revision'            => '$1 {{लिंग:$2|changed}} एकर दृश्य{{PLURAL:$5| एकटा संशोधन|$5 संशोधन}}  पन्ना $3: $4 पर',
+'logentry-delete-event-legacy'        => '$1 {{लिंग:$2|changed}}  $3 पर वृत्तलेख दृश्य',
+'logentry-delete-revision-legacy'     => '$1 {{लिंग:$2|changed}}  $3 पर वृत्तलेख संशोधन',
+'logentry-suppress-delete'            => '$1 {{लिंग:$2|दबाएल}} page $3',
+'logentry-suppress-event'             => '$1 चोरिसँ {{लिंग:$2|changed}} एकर दृश्य{{PLURAL:$5| एकटा वृत्तलेख|$5 वृत्तलेख}}  $3: $4 पर',
+'logentry-suppress-revision'          => '$1 चोरिसँ {{लिंग:$2|changed}} एकर दृश्य{{PLURAL:$5| एकटा संशोधन|$5 संशोधन}}  $3: $4 पर',
+'logentry-suppress-event-legacy'      => '$1 नुका कऽ {{लिंग:$2|changed}}  $3 पर वृत्तलेख दृश्य',
+'logentry-suppress-revision-legacy'   => '$1 नुका कऽ {{लिंग:$2|changed}}  $3 पर संशोधन दृश्य',
+'revdelete-content-hid'               => 'सामिग्री नुकाएल',
+'revdelete-summary-hid'               => 'नुकाएल सारांश सम्पादन',
+'revdelete-uname-hid'                 => 'प्रयोक्तानाम नुकाएल',
+'revdelete-content-unhid'             => 'सामिग्री सोझाँ',
+'revdelete-summary-unhid'             => 'सोझाँक सारांश सम्पादन',
+'revdelete-uname-unhid'               => 'प्रयोक्तानाम सोझाँ',
+'revdelete-restricted'                => 'संचालक लेल प्रायोगिक प्रतिबन्ध',
+'revdelete-unrestricted'              => 'संचालक लेल हटाओल प्रतिबन्ध',
+'logentry-move-move'                  => '$1 हटाएल पन्ना $3 सँ $4',
+'logentry-move-move-noredirect'       => '$1 {{लिंग:$2|हटाएल}} पन्ना $3 सँ $4 घुमौआकेँ बिना छोड़ने',
+'logentry-move-move_redir'            => '$1 {{लिंग:$2|हटाएल}} पन्ना $3 सँ $4 घुमौआक अतिरिक्त',
+'logentry-move-move_redir-noredirect' => '$1 {{लिंग:$2|हटाएल}} पन्ना $3 सँ $4 घुमौआक अतितिक्त घुमौआकेँ बिना छोड़ने',
+'logentry-patrol-patrol'              => '$1 {{लिंग:$2|चिन्हित}} संशोधन $4 $3 पन्नाक निरीक्षित',
+'logentry-patrol-patrol-auto'         => '$1 स्वतः {{लिंग:$2|चिन्हित}} संशोधन $4 $3 पन्नाक निरीक्षित',
+'logentry-newusers-newusers'          => '$1 {{लिंग:$2|बनाएल}} एकटा प्रयोक्ता खाता',
+'logentry-newusers-create'            => '$1 {{लिंग:$2|बनाएल}} एकटा प्रयोक्ता खाता',
+'logentry-newusers-create2'           => '$1 {{लिंग:$2|बनाएल}} {{लिंग:$4|एकटा प्रयोक्ता खाता}} $3',
+'logentry-newusers-autocreate'        => 'खाता $1 छल {{लिंग:$2|बनाएल}} स्वतः',
+'newuserlog-byemail'                  => 'कूटशब्द ई-पत्र द्वारा पठाएल गेल',
+
+# API errors
+'api-error-badaccess-groups'  => 'अहि विकी सें अहां कोनो प्रारूप लोड नहि क सकब.',
+'api-error-filename-tooshort' => 'ई संचिका नाम बड छोट अछि |',
+'api-error-filetype-banned'   => 'ऐ तरहक संचिका नाम प्रतिबंधित  अछि।',
+'api-error-http'              => 'आन्तरिक भ्रम: वितरकसँ सम्पर्क करबामे असफल',
+'api-error-illegal-filename'  => 'ऐ तरहक संचिका नाम अमान्य अछि।',
+'api-error-mustbeposted'      => 'आन्तरिक भ्रम: आग्रहक लेल परिपाठ्य संचार संविद पाठ चाही।',
+'api-error-nomodule'          => 'आन्तरिक भ्रम: कोनो उपारोपण तरीका निर्धारित नै अछि।',
+'api-error-ok-but-empty'      => 'आन्तरिक भ्रम: वितरकसँ कोनो सम्पर्क नै',
+'api-error-unclassified'      => 'एकटा अबूझ भ्रम आएल',
+'api-error-unknown-code'      => 'अबूझ भ्रम:"$1"',
+'api-error-uploaddisabled'    => 'ऐ विकीपर उपारोपण अशक्त कएल गेल अछि।',
 
 );

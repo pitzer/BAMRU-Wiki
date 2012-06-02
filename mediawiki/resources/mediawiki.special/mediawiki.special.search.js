@@ -1,7 +1,7 @@
 /*
- * JavaScript for Specical:Search
+ * JavaScript for Special:Search
  */
-( function( $ ) {
+jQuery( function( $ ) {
 
 // Emulate HTML5 autofocus behavior in non HTML5 compliant browsers
 if ( !( 'autofocus' in document.createElement( 'input' ) ) ) {
@@ -22,7 +22,7 @@ var headerLinks = $('.search-types a');
 $('#searchText, #powerSearchText').change(function() {
 	var searchterm = $(this).val();
 	headerLinks.each( function() {
-		var parts = this.href.split( 'search=' );
+		var parts = $(this).attr('href').split( 'search=' );
 		var lastpart = '';
 		var prefix = 'search=';
 		if( parts.length > 1 && parts[1].indexOf('&') >= 0 ) {
@@ -34,4 +34,4 @@ $('#searchText, #powerSearchText').change(function() {
 	});
 }).trigger('change');
 
-} )( jQuery );
+} );

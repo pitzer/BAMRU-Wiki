@@ -24,11 +24,6 @@
  * @file
  */
 
-if ( !defined( 'MEDIAWIKI' ) ) {
-	// Eclipse helper - will be ignored in production
-	require_once( 'ApiQueryBase.php' );
-}
-
 /**
  * Query module to enumerate links from all pages together.
  *
@@ -221,17 +216,17 @@ class ApiQueryAllLinks extends ApiQueryGeneratorBase {
 		) );
 	}
 
-	protected function getExamples() {
+	public function getExamples() {
 		return array(
 			'api.php?action=query&list=alllinks&alunique=&alfrom=B',
 		);
 	}
 
 	public function getHelpUrls() {
-		return 'http://www.mediawiki.org/wiki/API:Alllinks';
+		return 'https://www.mediawiki.org/wiki/API:Alllinks';
 	}
 
 	public function getVersion() {
-		return __CLASS__ . ': $Id: ApiQueryAllLinks.php 92401 2011-07-17 17:02:06Z reedy $';
+		return __CLASS__ . ': $Id$';
 	}
 }

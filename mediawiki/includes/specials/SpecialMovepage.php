@@ -42,10 +42,7 @@ class MovePageForm extends UnlistedSpecialPage {
 	}
 
 	public function execute( $par ) {
-		# Check for database lock
-		if ( wfReadOnly() ) {
-			throw new ReadOnlyError;
-		}
+		$this->checkReadOnly();
 
 		$this->setHeaders();
 		$this->outputHeader();
@@ -54,11 +51,18 @@ class MovePageForm extends UnlistedSpecialPage {
 		$target = !is_null( $par ) ? $par : $request->getVal( 'target' );
 
 		// Yes, the use of getVal() and getText() is wanted, see bug 20365
-		$oldTitleText = $request->getVal( 'wpOldTitle', $target );
-		$newTitleText = $request->getText( 'wpNewTitle' );
 
+		$oldTitleText = $request->getVal( 'wpOldTitle', $target );
 		$this->oldTitle = Title::newFromText( $oldTitleText );
-		$this->newTitle = Title::newFromText( $newTitleText );
+
+		$newTitleTextMain = $request->getText( 'wpNewTitleMain' );
+		$newTitleTextNs = $request->getInt( 'wpNewTitleNs', $this->oldTitle->getNamespace() );
+		// Backwards compatibility for forms submitting here from other sources
+		// which is more common than it should be..
+		$newTitleText_bc = $request->getText( 'wpNewTitle' );
+		$this->newTitle = strlen( $newTitleText_bc ) > 0
+			? Title::newFromText( $newTitleText_bc )
+			: Title::makeTitleSafe( $newTitleTextNs, $newTitleTextMain );
 
 		if( is_null( $this->oldTitle ) ) {
 			throw new ErrorPageError( 'notargettitle', 'notargettext' );
@@ -71,9 +75,10 @@ class MovePageForm extends UnlistedSpecialPage {
 
 		# Check rights
 		$permErrors = $this->oldTitle->getUserPermissionsErrors( 'move', $user );
-		if( !empty( $permErrors ) ) {
-			$this->getOutput()->showPermissionsErrorPage( $permErrors );
-			return;
+		if ( count( $permErrors ) ) {
+			// Auto-block user's IP if the account was "hard" blocked
+			$user->spreadAnyEditBlock();
+			throw new PermissionsError( 'move', $permErrors );
 		}
 
 		$def = !$request->wasPosted();
@@ -91,16 +96,16 @@ class MovePageForm extends UnlistedSpecialPage {
 			&& $user->matchEditToken( $request->getVal( 'wpEditToken' ) ) ) {
 			$this->doSubmit();
 		} else {
-			$this->showForm( '' );
+			$this->showForm( array() );
 		}
 	}
 
 	/**
 	 * Show the form
 	 *
-	 * @param $err Mixed: error message. May either be a string message name or
-	 *    array message name and parameters, like the second argument to
-	 *    OutputPage::wrapWikiMsg().
+	 * @param $err Array: error messages. Each item is an error message.
+	 *    It may either be a string message name or array message name and
+	 *    parameters, like the second argument to OutputPage::wrapWikiMsg().
 	 */
 	function showForm( $err ) {
 		global $wgContLang, $wgFixDoubleRedirects, $wgMaximumMovedPages;
@@ -110,31 +115,30 @@ class MovePageForm extends UnlistedSpecialPage {
 		$oldTitleLink = Linker::link( $this->oldTitle );
 
 		$out = $this->getOutput();
-		$out->setPagetitle( wfMsg( 'move-page', $this->oldTitle->getPrefixedText() ) );
+		$out->setPageTitle( $this->msg( 'move-page', $this->oldTitle->getPrefixedText() ) );
 		$out->addModules( 'mediawiki.special.movePage' );
 
 		$newTitle = $this->newTitle;
 
-		if( !$newTitle ) {
+		if ( !$newTitle ) {
 			# Show the current title as a default
 			# when the form is first opened.
 			$newTitle = $this->oldTitle;
-		}
-		else {
-			if( empty($err) ) {
-				# If a title was supplied, probably from the move log revert
-				# link, check for validity. We can then show some diagnostic
-				# information and save a click.
-				$newerr = $this->oldTitle->isValidMoveOperation( $newTitle );
-				if( $newerr ) {
-					$err = $newerr[0];
-				}
+		} elseif ( !count( $err ) ) {
+			# If a title was supplied, probably from the move log revert
+			# link, check for validity. We can then show some diagnostic
+			# information and save a click.
+			$newerr = $this->oldTitle->isValidMoveOperation( $newTitle );
+			if( is_array( $newerr ) ) {
+				$err = $newerr;
 			}
 		}
 
 		$user = $this->getUser();
 
-		if ( !empty($err) && $err[0] == 'articleexists' && $user->isAllowed( 'delete' ) ) {
+		if ( count( $err ) == 1 && isset( $err[0][0] ) && $err[0][0] == 'articleexists'
+			&& $newTitle->quickUserCan( 'delete', $user )
+		) {
 			$out->addWikiMsg( 'delete_and_move_text', $newTitle->getPrefixedText() );
 			$movepagebtn = wfMsg( 'delete_and_move' );
 			$submitVar = 'wpDeleteAndMove';
@@ -145,7 +149,7 @@ class MovePageForm extends UnlistedSpecialPage {
 						Xml::checkLabel( wfMsg( 'delete_and_move_confirm' ), 'wpConfirm', 'wpConfirm' ) .
 					"</td>
 				</tr>";
-			$err = '';
+			$err = array();
 		} else {
 			if ($this->oldTitle->getNamespace() == NS_USER && !$this->oldTitle->isSubpage() ) {
 				$out->wrapWikiMsg( "<div class=\"error mw-moveuserpage-warning\">\n$1\n</div>", 'moveuserpage-warning' );
@@ -157,14 +161,26 @@ class MovePageForm extends UnlistedSpecialPage {
 			$confirm = false;
 		}
 
-		if ( !empty($err) && $err[0] == 'file-exists-sharedrepo' && $user->isAllowed( 'reupload-shared' ) ) {
+		if ( count( $err ) == 1 && isset( $err[0][0] ) && $err[0][0] == 'file-exists-sharedrepo'
+			&& $user->isAllowed( 'reupload-shared' )
+		) {
 			$out->addWikiMsg( 'move-over-sharedrepo', $newTitle->getPrefixedText() );
 			$submitVar = 'wpMoveOverSharedFile';
-			$err = '';
+			$err = array();
 		}
 
 		$oldTalk = $this->oldTitle->getTalkPage();
-		$considerTalk = ( !$this->oldTitle->isTalkPage() && $oldTalk->exists() );
+		$oldTitleSubpages = $this->oldTitle->hasSubpages();
+		$oldTitleTalkSubpages = $this->oldTitle->getTalkPage()->hasSubpages();
+
+		$canMoveSubpage = ( $oldTitleSubpages || $oldTitleTalkSubpages ) &&
+			!count( $this->oldTitle->getUserPermissionsErrors( 'move-subpages', $user ) );
+
+		# We also want to be able to move assoc. subpage talk-pages even if base page
+		# has no associated talk page, so || with $oldTitleTalkSubpages.
+		$considerTalk = !$this->oldTitle->isTalkPage() &&
+			( $oldTalk->exists()
+				|| ( $oldTitleTalkSubpages && $canMoveSubpage ) );
 
 		$dbr = wfGetDB( DB_SLAVE );
 		if ( $wgFixDoubleRedirects ) {
@@ -181,17 +197,33 @@ class MovePageForm extends UnlistedSpecialPage {
 			$out->addWikiMsg( 'movepagetalktext' );
 		}
 
-		$token = htmlspecialchars( $user->editToken() );
+		if ( count( $err ) ) {
+			$out->addHTML( "<div class='error'>\n" );
+			$action_desc = $this->msg( 'action-move' )->plain();
+			$out->addWikiMsg( 'permissionserrorstext-withaction', count( $err ), $action_desc );
 
-		if ( !empty($err) ) {
-			$out->setSubtitle( wfMsg( 'formerror' ) );
-			if( $err[0] == 'hookaborted' ) {
-				$hookErr = $err[1];
-				$errMsg = "<p><strong class=\"error\">$hookErr</strong></p>\n";
-				$out->addHTML( $errMsg );
+			if ( count( $err ) == 1 ) {
+				$errMsg = $err[0];
+				$errMsgName = array_shift( $errMsg );
+				if ( $errMsgName == 'hookaborted' ) {
+					$out->addHTML( "<p>{$errMsg[0]}</p>\n" );
+				} else {
+					$out->addWikiMsgArray( $errMsgName, $errMsg );
+				}
 			} else {
-				$out->wrapWikiMsg( "<p><strong class=\"error\">\n$1\n</strong></p>", $err );
+				$errStr = array();
+				foreach( $err as $errMsg ) {
+					if( $errMsg[0] == 'hookaborted' ) {
+						$errStr[] = $errMsg[1];
+					} else {
+						$errMsgName = array_shift( $errMsg );
+						$errStr[] = $this->msg( $errMsgName, $errMsg )->parse();
+					}
+				}
+
+				$out->addHTML( '<ul><li>' . implode( "</li>\n<li>", $errStr ) . "</li></ul>\n" );
 			}
+			$out->addHTML( "</div>\n" );
 		}
 
 		if ( $this->oldTitle->isProtected( 'move' ) ) {
@@ -206,9 +238,12 @@ class MovePageForm extends UnlistedSpecialPage {
 			}
 			$out->addHTML( "<div class='mw-warning-with-logexcerpt'>\n" );
 			$out->addWikiMsg( $noticeMsg );
-			LogEventsList::showLogExtract( $out, 'protect', $this->oldTitle->getPrefixedText(), '', array( 'lim' => 1 ) );
+			LogEventsList::showLogExtract( $out, 'protect', $this->oldTitle, '', array( 'lim' => 1 ) );
 			$out->addHTML( "</div>\n" );
 		}
+
+		// Byte limit (not string length limit) for wpReason and wpNewTitleMain
+		// is enforced in the mediawiki.special.movePage module
 
 		$out->addHTML(
 			 Xml::openElement( 'form', array( 'method' => 'post', 'action' => $this->getTitle()->getLocalURL( 'action=submit' ), 'id' => 'movepage' ) ) .
@@ -225,10 +260,18 @@ class MovePageForm extends UnlistedSpecialPage {
 			</tr>
 			<tr>
 				<td class='mw-label'>" .
-					Xml::label( wfMsg( 'newtitle' ), 'wpNewTitle' ) .
+					Xml::label( wfMsg( 'newtitle' ), 'wpNewTitleMain' ) .
 				"</td>
 				<td class='mw-input'>" .
-					Xml::input( 'wpNewTitle', 40, $wgContLang->recodeForEdit( $newTitle->getPrefixedText() ), array( 'type' => 'text', 'id' => 'wpNewTitle' ) ) .
+					Html::namespaceSelector(
+						array( 'selected' => $newTitle->getNamespace() ),
+						array( 'name' => 'wpNewTitleNs', 'id' => 'wpNewTitleNs' )
+					) .
+					Xml::input( 'wpNewTitleMain', 60, $wgContLang->recodeForEdit( $newTitle->getText() ), array(
+						'type' => 'text',
+						'id' => 'wpNewTitleMain',
+						'maxlength' => 255,
+					) ) .
 					Html::hidden( 'wpOldTitle', $this->oldTitle->getPrefixedText() ) .
 				"</td>
 			</tr>
@@ -238,7 +281,7 @@ class MovePageForm extends UnlistedSpecialPage {
 				"</td>
 				<td class='mw-input'>" .
 					Html::element( 'textarea', array( 'name' => 'wpReason', 'id' => 'wpReason', 'cols' => 60, 'rows' => 2,
-					'maxlength' => 200 ), $this->reason ) . // maxlength byte limit is enforce in mediawiki.special.movePage.js
+					'maxlength' => 200 ), $this->reason ) .
 				"</td>
 			</tr>"
 		);
@@ -278,9 +321,7 @@ class MovePageForm extends UnlistedSpecialPage {
 			);
 		}
 
-		if( ($this->oldTitle->hasSubpages() || $this->oldTitle->getTalkPage()->hasSubpages())
-			&& !count( $this->oldTitle->getUserPermissionsErrors( 'move-subpages', $user ) ) )
-		{
+		if( $canMoveSubpage ) {
 			$out->addHTML( "
 				<tr>
 					<td></td>
@@ -298,7 +339,7 @@ class MovePageForm extends UnlistedSpecialPage {
 							? 'move-subpages'
 							: 'move-talk-subpages' ),
 						array( 'parseinline' ),
-						$this->getLang()->formatNum( $wgMaximumMovedPages ),
+						$this->getLanguage()->formatNum( $wgMaximumMovedPages ),
 						# $2 to allow use of PLURAL in message.
 						$wgMaximumMovedPages
 					)
@@ -330,7 +371,7 @@ class MovePageForm extends UnlistedSpecialPage {
 				"</td>
 			</tr>" .
 			Xml::closeElement( 'table' ) .
-			Html::hidden( 'wpEditToken', $token ) .
+			Html::hidden( 'wpEditToken', $user->getEditToken() ) .
 			Xml::closeElement( 'fieldset' ) .
 			Xml::closeElement( 'form' ) .
 			"\n"
@@ -353,30 +394,9 @@ class MovePageForm extends UnlistedSpecialPage {
 		$ot = $this->oldTitle;
 		$nt = $this->newTitle;
 
-		# Delete to make way if requested
-		if ( $user->isAllowed( 'delete' ) && $this->deleteAndMove ) {
-			$article = new Article( $nt );
-
-			# Disallow deletions of big articles
-			$bigHistory = $article->isBigDeletion();
-			if( $bigHistory && count( $nt->getUserPermissionsErrors( 'bigdelete', $user ) ) ) {
-				$this->showForm( array('delete-toobig', $this->getLang()->formatNum( $wgDeleteRevisionsLimit ) ) );
-				return;
-			}
-
-			// Delete an associated image if there is
-			$file = wfLocalFile( $nt );
-			if( $file->exists() ) {
-				$file->delete( wfMsgForContent( 'delete_and_move_reason' ), false );
-			}
-
-			// This may output an error message and exit
-			$article->doDelete( wfMsgForContent( 'delete_and_move_reason' ) );
-		}
-
 		# don't allow moving to pages with # in
 		if ( !$nt || $nt->getFragment() != '' ) {
-			$this->showForm( 'badtitletext' );
+			$this->showForm( array( array( 'badtitletext' ) ) );
 			return;
 		}
 
@@ -386,9 +406,36 @@ class MovePageForm extends UnlistedSpecialPage {
 			&& !RepoGroup::singleton()->getLocalRepo()->findFile( $nt )
 			&& wfFindFile( $nt ) )
 		{
-			$this->showForm( array('file-exists-sharedrepo') );
+			$this->showForm( array( array( 'file-exists-sharedrepo' ) ) );
 			return;
 
+		}
+
+		# Delete to make way if requested
+		if ( $this->deleteAndMove ) {
+			$permErrors = $nt->getUserPermissionsErrors( 'delete', $user );
+			if ( count( $permErrors ) ) {
+				# Only show the first error
+				$this->showForm( $permErrors );
+				return;
+			}
+
+			$reason = wfMessage( 'delete_and_move_reason', $ot )->inContentLanguage()->text();
+
+			// Delete an associated image if there is
+			if ( $nt->getNamespace() == NS_FILE ) {
+				$file = wfLocalFile( $nt );
+				if ( $file->exists() ) {
+					$file->delete( $reason, false );
+				}
+			}
+
+			$error = ''; // passed by ref
+			$page = WikiPage::factory( $nt );
+			if ( !$page->doDeleteArticle( $reason, false, 0, true, $error, $user ) ) {
+				$this->showForm( array( array( 'cannotdelete', wfEscapeWikiText( $nt->getPrefixedText() ) ) ) );
+				return;
+			}
 		}
 
 		if ( $user->isAllowed( 'suppressredirect' ) ) {
@@ -400,8 +447,7 @@ class MovePageForm extends UnlistedSpecialPage {
 		# Do the actual move.
 		$error = $ot->moveTo( $nt, true, $this->reason, $createRedirect );
 		if ( $error !== true ) {
-			# @todo FIXME: Show all the errors in a list, not just the first one
-			$this->showForm( reset( $error ) );
+			$this->showForm( $error );
 			return;
 		}
 
@@ -414,15 +460,19 @@ class MovePageForm extends UnlistedSpecialPage {
 		$out = $this->getOutput();
 		$out->setPagetitle( wfMsg( 'pagemovedsub' ) );
 
-		$oldUrl = $ot->getFullUrl( 'redirect=no' );
-		$newUrl = $nt->getFullUrl();
+		$oldLink = Linker::link(
+			$ot,
+			null,
+			array(),
+			array( 'redirect' => 'no' )
+		);
+		$newLink = Linker::linkKnown( $nt );
 		$oldText = $ot->getPrefixedText();
 		$newText = $nt->getPrefixedText();
-		$oldLink = "<span class='plainlinks'>[$oldUrl $oldText]</span>";
-		$newLink = "<span class='plainlinks'>[$newUrl $newText]</span>";
 
 		$msgName = $createRedirect ? 'movepage-moved-redirect' : 'movepage-moved-noredirect';
-		$out->addWikiMsg( 'movepage-moved', $oldLink, $newLink, $oldText, $newText );
+		$out->addHTML( wfMessage( 'movepage-moved' )->rawParams( $oldLink,
+			$newLink )->params( $oldText, $newText )->parseAsBlock() );
 		$out->addWikiMsg( $msgName );
 
 		# Now we move extra pages we've been asked to move: subpages and talk
@@ -526,7 +576,7 @@ class MovePageForm extends UnlistedSpecialPage {
 					if ( $this->fixRedirects ) {
 						DoubleRedirectJob::fixRedirects( 'move', $oldSubpage, $newSubpage );
 					}
-					$oldLink = Linker::linkKnown(
+					$oldLink = Linker::link(
 						$oldSubpage,
 						null,
 						array(),
@@ -536,7 +586,7 @@ class MovePageForm extends UnlistedSpecialPage {
 					$extraOutput []= wfMsgHtml( 'movepage-page-moved', $oldLink, $newLink );
 					++$count;
 					if( $count >= $wgMaximumMovedPages ) {
-						$extraOutput []= wfMsgExt( 'movepage-max-pages', array( 'parsemag', 'escape' ), $this->getLang()->formatNum( $wgMaximumMovedPages ) );
+						$extraOutput []= wfMsgExt( 'movepage-max-pages', array( 'parsemag', 'escape' ), $this->getLanguage()->formatNum( $wgMaximumMovedPages ) );
 						break;
 					}
 				} else {
@@ -572,7 +622,7 @@ class MovePageForm extends UnlistedSpecialPage {
 	function showLogFragment( $title ) {
 		$out = $this->getOutput();
 		$out->addHTML( Xml::element( 'h2', null, LogPage::logName( 'move' ) ) );
-		LogEventsList::showLogExtract( $out, 'move', $title->getPrefixedText() );
+		LogEventsList::showLogExtract( $out, 'move', $title );
 	}
 
 	function showSubpages( $title ) {
@@ -591,7 +641,7 @@ class MovePageForm extends UnlistedSpecialPage {
 			return;
 		}
 
-		$out->addWikiMsg( 'movesubpagetext', $this->getLang()->formatNum( $count ) );
+		$out->addWikiMsg( 'movesubpagetext', $this->getLanguage()->formatNum( $count ) );
 		$out->addHTML( "<ul>\n" );
 
 		foreach( $subpages as $subpage ) {
@@ -601,4 +651,3 @@ class MovePageForm extends UnlistedSpecialPage {
 		$out->addHTML( "</ul>\n" );
 	}
 }
-

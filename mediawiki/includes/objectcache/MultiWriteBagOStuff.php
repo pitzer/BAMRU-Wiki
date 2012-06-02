@@ -89,9 +89,25 @@ class MultiWriteBagOStuff extends BagOStuff {
 		array_shift( $args );
 
 		foreach ( $this->caches as $cache ) {
-			$ret = $ret && call_user_func_array( array( $cache, $method ), $args );
+			if ( !call_user_func_array( array( $cache, $method ), $args ) ) {
+				$ret = false;
+			}
 		}
 		return $ret;
 	}
 
+	/**
+	 * Delete objects expiring before a certain date. 
+	 *
+	 * Succeed if any of the child caches succeed.
+	 */
+	public function deleteObjectsExpiringBefore( $date, $progressCallback = false ) {
+		$ret = false;
+		foreach ( $this->caches as $cache ) {
+			if ( $cache->deleteObjectsExpiringBefore( $date, $progressCallback ) ) {
+				$ret = true;
+			}
+		}
+		return $ret;
+	}
 }

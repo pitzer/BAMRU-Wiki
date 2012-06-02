@@ -138,6 +138,7 @@ class SpecialPageFactory {
 		'Blankpage'                 => 'SpecialBlankpage',
 		'Blockme'                   => 'SpecialBlockme',
 		'Emailuser'                 => 'SpecialEmailUser',
+		'JavaScriptTest'            => 'SpecialJavaScriptTest',
 		'Movepage'                  => 'MovePageForm',
 		'Mycontributions'           => 'SpecialMycontributions',
 		'Mypage'                    => 'SpecialMypage',
@@ -339,18 +340,21 @@ class SpecialPageFactory {
 	 * Return categorised listable special pages which are available
 	 * for the current user, and everyone.
 	 *
+	 * @param $user User object to check permissions, $wgUser will be used
+	 *              if not provided
 	 * @return Array( String => Specialpage )
 	 */
-	public static function getUsablePages() {
-		global $wgUser;
+	public static function getUsablePages( User $user = null ) {
 		$pages = array();
+		if ( $user === null ) {
+			global $wgUser;
+			$user = $wgUser;
+		}
 		foreach ( self::getList() as $name => $rec ) {
 			$page = self::getPage( $name );
-			if ( $page->isListed()
-				&& (
-					!$page->isRestricted()
-					|| $page->userCanExecute( $wgUser )
-				)
+			if ( $page // not null
+				&& $page->isListed()
+				&& ( !$page->isRestricted() || $page->userCanExecute( $user ) )
 			) {
 				$pages[$name] = $page;
 			}
@@ -405,12 +409,12 @@ class SpecialPageFactory {
 	 * page, and true if it was successful.
 	 *
 	 * @param $title          Title object
-	 * @param $context        RequestContext
+	 * @param $context        IContextSource
 	 * @param $including      Bool output is being captured for use in {{special:whatever}}
 	 *
 	 * @return bool
 	 */
-	public static function executePath( Title &$title, RequestContext &$context, $including = false ) {
+	public static function executePath( Title &$title, IContextSource &$context, $including = false ) {
 		wfProfileIn( __METHOD__ );
 
 		// @todo FIXME: Redirects broken due to this call
@@ -426,7 +430,12 @@ class SpecialPageFactory {
 		if ( !$page ) {
 			$context->getOutput()->setArticleRelated( false );
 			$context->getOutput()->setRobotPolicy( 'noindex,nofollow' );
-			$context->getOutput()->setStatusCode( 404 );
+
+			global $wgSend404Code;
+			if ( $wgSend404Code ) {
+				$context->getOutput()->setStatusCode( 404 );
+			}
+
 			$context->getOutput()->showErrorPage( 'nosuchspecialpage', 'nospecialpagetext' );
 			wfProfileOut( __METHOD__ );
 			return false;
@@ -451,7 +460,7 @@ class SpecialPageFactory {
 				wfProfileOut( __METHOD__ );
 				return $title;
 			} else {
-				$context->setTitle( $page->getTitle() );
+				$context->setTitle( $page->getTitle( $par ) );
 			}
 
 		} elseif ( !$page->isIncludable() ) {
@@ -471,40 +480,47 @@ class SpecialPageFactory {
 	}
 
 	/**
-	 * Just like executePath() except it returns the HTML instead of outputting it
-	 * Returns false if there was no such special page, or a title object if it was
-	 * a redirect.
+	 * Just like executePath() but will override global variables and execute
+	 * the page in "inclusion" mode. Returns true if the execution was
+	 * successful or false if there was no such special page, or a title object
+	 * if it was a redirect.
 	 *
-	 * Also saves the current $wgTitle, $wgOut, and $wgRequest variables so that
-	 * the special page will get the context it'd expect on a normal request,
-	 * and then restores them to their previous values after.
+	 * Also saves the current $wgTitle, $wgOut, $wgRequest, $wgUser and $wgLang
+	 * variables so that the special page will get the context it'd expect on a
+	 * normal request, and then restores them to their previous values after.
 	 *
 	 * @param $title Title
+	 * @param $context IContextSource
 	 *
 	 * @return String: HTML fragment
 	 */
-	static function capturePath( &$title ) {
-		global $wgOut, $wgTitle, $wgRequest;
+	static function capturePath( Title $title, IContextSource $context ) {
+		global $wgOut, $wgTitle, $wgRequest, $wgUser, $wgLang;
 
+		// Save current globals
 		$oldTitle = $wgTitle;
 		$oldOut = $wgOut;
 		$oldRequest = $wgRequest;
+		$oldUser = $wgUser;
+		$oldLang = $wgLang;
 
-		// Don't want special pages interpreting ?feed=atom parameters.
-		$wgRequest = new FauxRequest( array() );
-
-		$context = new RequestContext;
-		$context->setTitle( $title );
-		$context->setRequest( $wgRequest );
+		// Set the globals to the current context
+		$wgTitle = $title;
 		$wgOut = $context->getOutput();
+		$wgRequest = $context->getRequest();
+		$wgUser = $context->getUser();
+		$wgLang = $context->getLanguage();
 
+		// The useful part
 		$ret = self::executePath( $title, $context, true );
-		if ( $ret === true ) {
-			$ret = $wgOut->getHTML();
-		}
+
+		// And restore the old globals
 		$wgTitle = $oldTitle;
 		$wgOut = $oldOut;
 		$wgRequest = $oldRequest;
+		$wgUser = $oldUser;
+		$wgLang = $oldLang;
+
 		return $ret;
 	}
 

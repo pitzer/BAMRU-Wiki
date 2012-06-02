@@ -24,11 +24,6 @@
  * @file
  */
 
-if ( !defined( 'MEDIAWIKI' ) ) {
-	// Eclipse helper - will be ignored in production
-	require_once( "ApiQueryBase.php" );
-}
-
 /**
  * This is a three-in-one module to query:
  *   * backlinks  - links pointing to the given page,
@@ -64,19 +59,19 @@ class ApiQueryBacklinks extends ApiQueryGeneratorBase {
 			'code' => 'bl',
 			'prefix' => 'pl',
 			'linktbl' => 'pagelinks',
-			'helpurl' => 'http://www.mediawiki.org/wiki/API:Backlinks',
+			'helpurl' => 'https://www.mediawiki.org/wiki/API:Backlinks',
 		),
 		'embeddedin' => array(
 			'code' => 'ei',
 			'prefix' => 'tl',
 			'linktbl' => 'templatelinks',
-			'helpurl' => 'http://www.mediawiki.org/wiki/API:Embeddedin',
+			'helpurl' => 'https://www.mediawiki.org/wiki/API:Embeddedin',
 		),
 		'imageusage' => array(
 			'code' => 'iu',
 			'prefix' => 'il',
 			'linktbl' => 'imagelinks',
-			'helpurl' => 'http://www.mediawiki.org/wiki/API:Imageusage',
+			'helpurl' => 'https://www.mediawiki.org/wiki/API:Imageusage',
 		)
 	);
 
@@ -511,7 +506,7 @@ class ApiQueryBacklinks extends ApiQueryGeneratorBase {
 		) );
 	}
 
-	protected function getExamples() {
+	public function getExamples() {
 		static $examples = array(
 			'backlinks' => array(
 				'api.php?action=query&list=backlinks&bltitle=Main%20Page',
@@ -535,6 +530,6 @@ class ApiQueryBacklinks extends ApiQueryGeneratorBase {
 	}
 
 	public function getVersion() {
-		return __CLASS__ . ': $Id: ApiQueryBacklinks.php 92401 2011-07-17 17:02:06Z reedy $';
+		return __CLASS__ . ': $Id$';
 	}
 }
